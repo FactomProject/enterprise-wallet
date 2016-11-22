@@ -1,0 +1,51 @@
+{{define "templateTop"}}
+
+{{/* 3 initial starting strings taken from passed in array to set up page*/}}
+{{$pageTitle := index . 0}}
+{{$theme := index . 1}}
+{{$activeNav := index . 2 }}
+{{$mainClass := index . 3 }}
+
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Factoid Wallet - {{$pageTitle}}</title>
+        <link rel="stylesheet" href="css/app.css">
+    </head>
+    <body class="{{$theme}}">
+        <section id="frame" class="row align-stretch">
+            <section class="leftCol small-12 medium-3 columns">
+                <header>
+                    <img src="img/factom_stacked.svg" class="svg logo" alt="Factom">
+                    <h1>Factoid Wallet</h1>
+                </header>
+                <nav>
+                    <ul>
+                        <li {{if compareInts $activeNav 1 }} class="active" {{end}}><a href="/" class="transactions"><i><img src="img/nav_transactions.svg" class="svg" alt="Transactions"></i>Transactions</a></li>
+                        <li {{if compareInts $activeNav 2 }} class="active" {{end}}><a href="AddressBook" class="address-book"><i><img src="img/nav_address-book.svg" class="svg" alt="Address Book"></i>Address Book</a></li>
+                        <li {{if compareInts $activeNav 3 }} class="active" {{end}}><a href="Settings" class="settings"><i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>Settings</a></li>
+                    </ul>
+                </nav>
+            </section>
+            <section class="rightCol small-12 medium-expand columns">
+                <section class="balances">
+                    <div class="row">
+                        <div class="small-6 columns">
+                            <section class="balance factoids dec8">
+                                <i><img src="img/balance_factoids.svg" class="svg" alt="Factoids"></i>
+								<span>5,123<small>.32100001</small></span>
+                            </section>
+                        </div>
+                        <div class="small-6 columns">
+                            <section class="balance credits">
+                                <i><img src="img/balance_credits.svg" class="svg" alt="Entry Credits"></i>
+                                <span>1,422</span>
+                            </section>
+                        </div>
+                    </div>
+                </section>
+                <main class="{{$mainClass}}">
+{{end}}

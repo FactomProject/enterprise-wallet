@@ -1,0 +1,13 @@
+{{define "notFoundError"}}
+
+{{$pageTitle := "NotFound"}}
+{{$mainClass := "notFound"}}
+{{$theme := .}}
+{{$activeNav := 1}}
+{{ $info := mkArray $pageTitle $theme $activeNav $mainClass }}
+{{template "templateTop" $info}}
+
+Nothing Found
+
+{{template "templateBottom"}}
+{{end}}

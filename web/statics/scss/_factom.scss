@@ -1,0 +1,914 @@
+
+// variables
+
+$font-weight-thin: 300;
+$font-weight-regular: 400;
+$font-weight-bold: 700;
+
+$text-color: #656666;
+
+
+// fonts
+
+/* Webfont: Lato-Regular */@font-face {
+    font-family: 'LatoWeb';
+    src: url('fonts/lato/Lato-Regular.eot'); /* IE9 Compat Modes */
+    src: url('fonts/lato/Lato-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('fonts/lato/Lato-Regular.woff2') format('woff2'), /* Modern Browsers */
+         url('fonts/lato/Lato-Regular.woff') format('woff'), /* Modern Browsers */
+         url('fonts/lato/Lato-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
+/* Webfont: Lato-Thin */@font-face {
+    font-family: 'LatoWeb';
+    src: url('fonts/lato/Lato-Thin.eot'); /* IE9 Compat Modes */
+    src: url('fonts/lato/Lato-Thin.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('fonts/lato/Lato-Thin.woff2') format('woff2'), /* Modern Browsers */
+         url('fonts/lato/Lato-Thin.woff') format('woff'), /* Modern Browsers */
+         url('fonts/lato/Lato-Thin.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 100;
+    text-rendering: optimizeLegibility;
+}
+
+/* Webfont: Lato-Italic */@font-face {
+    font-family: 'LatoWeb';
+    src: url('fonts/lato/Lato-Italic.eot'); /* IE9 Compat Modes */
+    src: url('fonts/lato/Lato-Italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('fonts/lato/Lato-Italic.woff2') format('woff2'), /* Modern Browsers */
+         url('fonts/lato/Lato-Italic.woff') format('woff'), /* Modern Browsers */
+         url('fonts/lato/Lato-Italic.ttf') format('truetype');
+    font-style: italic;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
+/* Webfont: Lato-Bold */@font-face {
+    font-family: 'LatoWeb';
+    src: url('fonts/lato/Lato-Bold.eot'); /* IE9 Compat Modes */
+    src: url('fonts/lato/Lato-Bold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('fonts/lato/Lato-Bold.woff2') format('woff2'), /* Modern Browsers */
+         url('fonts/lato/Lato-Bold.woff') format('woff'), /* Modern Browsers */
+         url('fonts/lato/Lato-Bold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 700;
+    text-rendering: optimizeLegibility;
+}
+
+/* Webfont: Lato-BoldItalic */@font-face {
+    font-family: 'LatoWeb';
+    src: url('fonts/lato/Lato-BoldItalic.eot'); /* IE9 Compat Modes */
+    src: url('fonts/lato/Lato-BoldItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('fonts/lato/Lato-BoldItalic.woff2') format('woff2'), /* Modern Browsers */
+         url('fonts/lato/Lato-BoldItalic.woff') format('woff'), /* Modern Browsers */
+         url('fonts/lato/Lato-BoldItalic.ttf') format('truetype');
+    font-style: italic;
+    font-weight: 700;
+    text-rendering: optimizeLegibility;
+}
+
+@import '../css/fonts/fontawesome/font-awesome.min.css';
+
+// mixins
+
+
+// resets
+
+@keyframes showPage {
+	to { opacity: 1; }
+}
+html.no-js {
+	opacity: 0;
+	animation: showPage 0.01s forwards;
+	animation-delay: 1s;
+}
+
+a { outline: none; }
+svg { height: auto; overflow: hidden; }
+
+.button, button {
+    background: $primary-color;
+    color: #c2dbe8;
+    font-size: 14px;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    &:not(.input-group-button) { padding: 0.825em 1em; }
+    &:hover, &:active { 
+        background: lighten($primary-color, 10%);
+        color: $white;
+    }
+    & + .button, & + button { margin-left: 8px; }
+    &.add:before {
+        content: '+';
+        display: inline-block;
+        position: relative;
+        top: 2px;
+        margin-right: 8px;
+        font-size: 18px;
+        line-height: 12px;
+    }
+    &.newPlus {
+        position: relative;
+        overflow: hidden;
+        &:before {
+            content: '+';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            font-size: 26px;
+            line-height: 39px;
+        }
+    }
+    &.alert:hover { background: #EA6752; }
+    &.close-button {
+        top: 1rem;
+        right: 1rem;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        background-color: darken($light-gray,10%);
+        color: $white;
+        font-size: 20px;
+        line-height: 24px;
+        &:hover {
+            background: #ec5840;
+            color: $white;
+        }
+    }
+    .fa { font-size: 20px; }
+}
+
+hr { 
+    max-width: none;
+    border-bottom: solid 2px darken($light-gray, 10%);
+}
+
+::-webkit-input-placeholder { color: lighten($text-color,10%); }
+:-moz-placeholder           { color: lighten($text-color,10%); }
+::-moz-placeholder          { color: lighten($text-color,10%); }
+:-ms-input-placeholder      { color: lighten($text-color,10%); }
+
+
+// custom site styles
+
+html, body { 
+    min-height: 100%;
+    @include breakpoint(small only) {
+        min-height: 0;
+        height: auto;
+    }
+}
+body { color: $text-color; }
+
+header {
+    min-height: 150px;
+    padding: 32px 0 22px;
+    text-align: center;
+    @include breakpoint(small only) { 
+        min-height: 0;
+        padding: 24px 0 16px;
+    }
+    img { margin-bottom: 10px !important; }
+    .svg, svg {
+        max-width: 209px;
+		margin-bottom: 3px;
+        @include breakpoint(medium down) { max-width: 140px; }
+    }
+    h1 {
+		margin-bottom: 1rem;
+        color: lighten($primary-color, 20%);
+        font-size: 21px;
+		text-transform: uppercase;
+        @include breakpoint(medium down) { font-size: 15px; }
+    }
+	@include breakpoint(small only) { background: $white; }
+}
+
+#frame {
+    min-height: 100%;
+    &.row { max-width: 100%; }
+    > section { padding: 0; }
+    section.leftCol {
+        max-width: 314px;
+		background: $light-gray;
+        @include breakpoint(small only) {
+            flex: none;
+            width: 100%;
+            max-width: none;
+        }
+        nav {
+            ul {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                li {
+                    margin: 0;
+                    padding: 0;
+                    a {
+                        display: block;
+                        position: relative;
+                        padding: 2.25rem 0.5rem 2.25rem 8.5rem;
+                        overflow: hidden;
+                        transition: ease 0.15s all;
+                        color: $primary-color;
+                        font-size: 18px;
+                        line-height: 35px;
+                        @include breakpoint(medium only) {
+                            padding-left: 8em;
+                            font-size: 14px;
+                        }
+                        i {
+                            display: block;
+							position: absolute;
+							top: 1.5rem;
+							left: 2.75rem;
+                            width: 59px;
+                            height: 57px;
+                            text-align: center;
+                            svg, .svg { 
+                                max-width: 100%;
+                                path, rect, poly { 
+                                    fill: $primary-color !important;
+                                    transition: ease 0.15s fill;
+                                }
+                            }
+                        }
+						&.address-book i { top: 1.8rem; left: 2.5rem; width: 64px; }
+						&.settings i { top: 1.5rem; left: 3rem; width: 54px; }
+						@include breakpoint(medium only) { 
+							padding-left: 6rem;
+							i {
+								left: 1.75rem;
+								width: 48px;
+								height: 48px;
+							}
+							&.address-book i { top: 1.95rem; left: 1.5rem; width: 52px; height: 48px; }
+							&.settings i { top: 1.75rem; left: 2rem; width: 44px; }
+						}
+                        &:hover {
+							background: darken($light-gray, 3%);
+                            color: lighten($primary-color,10%);
+                            svg {
+                                path, rect, poly { fill: lighten($primary-color,10%) !important; }
+                            }
+                        }
+                    }
+                    &.active a {
+                        background: $body-background;
+                        color: $tertiary-color;
+                        svg, .svg {
+                            path, rect, poly { fill: $tertiary-color !important; }
+                        }
+                    }
+                }
+                @include breakpoint(small only) {
+                    margin: 0;
+                    padding: 16px 0 12px;
+                    text-align: center;
+                    li {
+                        display: inline-block;
+                        &:not(:first-child) { margin-left: 8px; }
+                        a {
+                            width: 64px;
+                            height: 64px;
+                            padding: 0;
+							border-radius: 50%;
+                            font-size: 0;
+                            i {
+								top: 0.6rem;
+								left: 0;
+								right: 0;
+                                float: none;
+                                width: 40px;
+                                height: 40px;
+                                margin: 0 auto;
+                            }
+							&.address-book i { top: 1rem; left: 0; width: 44px; height: 44px; }
+							&.settings i { top: 0.7rem; left: 0; width: 40px; }
+                        }
+                        &.active a { background-color: $body-background; }
+                    }
+                }
+            }
+        }
+    }
+    section.rightCol {
+        display: flex;
+        flex-flow: column;
+        max-height: 100vh;
+        background: $white;
+        @include breakpoint(small only) {
+            display: block;
+            flex: none;
+            width: 100%;
+            max-height: none;
+        }
+        .balances {
+            min-height: 150px;
+            padding: 40px 0 0;
+            background: lighten($light-gray,3%);
+            text-align: center;
+            @include breakpoint(medium only) { padding-top: 40px; }
+            > .row { 
+                margin: 0 auto;
+            }
+            .balance {
+				display: inline-block;
+                position: relative;
+				padding-left: 92px;
+                text-align: left;
+                //@include breakpoint(medium only) { margin-left: 56px; }
+//                h4 {
+//                    margin: 0;
+//                    color: $primary-color;
+//                    font-size: 18px;
+//                    font-weight: $font-weight-bold;
+//                    text-transform: uppercase;
+//                    @include breakpoint(medium only) { font-size: 14px; }
+//                }
+                span {
+					position: relative;
+					top: 0.5rem;
+                    color: $primary-color;
+                    font-size: 56px;
+                    font-weight: $font-weight-thin;
+                    line-height: 60px;
+					small { font-size: 24px; }
+                    @include breakpoint(medium only) {
+                        font-size: 40px;
+                        line-height: 40px;
+                    }
+                }
+                i {
+                    position: absolute;
+                    top: 0px;
+                    left: 0;
+                    width: 64px;
+                    height: 64px;
+                    @include breakpoint(medium only) {
+                        width: 40px;
+                        height: 40px;
+                    }
+                    svg, .svg {
+                        path, rect, poly { fill: #3f3f3f; }
+                    }
+                }
+				&.credits span { color: $secondary-color; }
+            }
+            @include breakpoint(small only) { 
+                min-height: 72px;
+				padding-top: 20px;
+                .balance {
+					padding-left: 48px;
+                    i {
+                        width: 32px;
+                        height: 32px;
+                    }
+                    h4 {
+                        font-size: 10px;
+                    }
+                    span {
+                        font-size: 24px;
+                        line-height: 22px;
+						small { font-size: 14px; }
+                    }
+                }
+            }
+        }
+        main {
+            position: relative;
+            flex: 2;
+            overflow-y: auto;
+            max-height: 100vh;
+            padding: 3em;
+            @include breakpoint(small only) {
+                flex: none;
+                max-height: none;
+                padding: 1em;
+            }
+            &::-webkit-scrollbar { width: 20px; }
+            &::-webkit-scrollbar-track { background: transparent; }
+            &::-webkit-scrollbar-thumb { 
+                background: $tertiary-color;
+                border-radius: 12px;
+                &:hover { background: lighten($tertiary-color,10%); }
+            }
+            &::-webkit-scrollbar-button { display: none; }
+            &.transactions, &.address-book { 
+                padding: 0;
+                border: solid 8px transparent;
+                border-top: none;
+            }
+            > .row { margin: 0 auto; }
+            h1 {
+                margin-bottom: 16px;
+                color: $primary-color;
+                font-size: 25px;
+                font-weight: $font-weight-regular;
+                text-transform: uppercase;
+            }
+            form {
+                .row {
+                    max-width: none;
+                    margin-left: -0.625rem;
+                    margin-right: -0.625rem;
+                    .column, .columns {
+                        padding-left: 0.625rem;
+                        padding-right: 0.625rem;
+                    }
+                    &.collapse {
+                        margin: 0;
+                        .column, .columns { padding: 0; }
+                    }
+                }
+                > .row:last-of-type { padding-top: 32px; }
+                label {
+                    color: $text-color;
+                    font-size: 18px;
+                    font-weight: $font-weight-bold;
+                    small {
+                        position: relative;
+                        top: 5px;
+                        float: right;
+                        font-size: 13px;
+                        font-weight: $font-weight-regular;
+                        text-transform: uppercase;
+                        a { 
+                            color: lighten($primary-color, 20%);
+                            &:hover { color: $white; }
+                        }
+                    }
+                }
+                .input-group-label {
+                    background: $secondary-color;
+                    border-color: transparent;
+                    color: $white;
+                }
+                input[type='text'], select {
+                    padding: 0.5rem 1rem;
+                    background: darken($light-gray,5%);
+                    border: solid 1px transparent;
+                    color: $text-color;
+                    &[disabled='true'] {
+                        background: lighten($tertiary-color,35%);
+                        border-color: transparent;
+                        color: $secondary-color;
+                    }
+                }
+                select {
+                    position: relative;
+                    padding-right: 56px;
+                    background-image: url('../img/select-bg.png');
+                    background-repeat: no-repeat;
+                    background-position: center right;
+                }
+                input[type='checkbox'] { 
+                    //margin-right: 8px;
+                    display: none;
+                    & + label {
+                        position: relative;
+                        margin: 0 0 4px;
+                        color: $text-color;
+                        font-size: 18px;
+                        font-weight: $font-weight-regular;
+                        &:before {
+                            content: '';
+                            display: inline-block;
+                            position: relative;
+                            top: 5px;
+                            width: 24px;
+                            height: 24px;
+                            margin-right: 16px;
+                            //background: #0f3d65;
+                            background: darken($light-gray,5%);
+                            border-radius: 4px;
+                        }
+                        &:hover { color: $primary-color; }
+                    }
+                    &:checked + label:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        top: 7px;
+                        left: 8px;
+                        width: 8px;
+                        height: 16px;
+                        border: solid lighten($primary-color, 20%);
+                        border-width: 0 4px 4px 0;
+                        transform: rotate(45deg);
+                    }
+                }
+            }
+            table {
+                display: block;
+                //max-height: 650px;
+                max-height: 100%;
+                width: 100%;
+                margin: 0;
+                background: transparent;
+                //border: solid 8px $dark-gray;
+                border: none;
+                tbody {
+                    display: table;
+                    width: 100%;
+                    margin: 0;
+                    background: transparent;
+                    border: none;
+                    border-right: solid 8px transparent;
+                    @include breakpoint(small only) { border-right: none; }
+                    tr {
+                        background: transparent;
+                        transition: ease 0.15s background-color;
+                        &:nth-child(even) { background: lighten($light-gray, 2%); }
+                        td {
+                            padding: 1.25rem 1rem;
+                            transition: ease 0.15s color;
+                            font-size: 16px;
+                            @include breakpoint(small only) { 
+                                padding: 0.75rem 1rem;
+                                font-size: 12px;
+                            }
+                            .nick {
+                                //@include breakpoint(small only) { display: inline-block; }
+                            }
+                            a { 
+                                transition: ease 0.15s color;
+								i svg, i .svg {
+									path, rect, poly { fill: $tertiary-color !important; }
+								}
+                                &:hover { 
+                                    text-decoration: underline;
+                                    i svg, i .svg {
+                                        path, rect, poly { fill: $primary-color !important; }
+                                    }
+                                }
+                            }
+                            i {
+                                display: block;
+                                width: 64px;
+                                height: 40px;
+                                margin: 0 auto;
+                                &.received {
+                                    width: 48px;
+                                    height: 52px;
+                                }
+                                &.converted {
+                                    width: 81px;
+                                    height: 60px;
+                                }
+                                svg, .svg {
+                                    path, rect, poly {
+                                        //fill: #505050;
+                                        transition: ease 0.15s fill;
+                                    }
+                                }
+                                @include breakpoint(small only) { 
+                                    width: 36px;
+                                    height: 25px;
+									&.received {
+										width: 28px;
+										height: 28px;
+									}
+                                    &.converted {
+                                        width: 40px;
+                                        height: 36px;
+                                    }
+                                }
+                            }
+                        }
+                        &:hover {
+                            background: lighten($tertiary-color, 40%);
+                        }
+                    }
+                }
+            }
+			&.transactions table tbody tr td a {
+				i svg, i .svg {
+					path, rect, poly { fill: $text-color !important; }
+				}
+				&:hover i svg, &:hover i .svg {
+					path, rect, poly { fill: $tertiary-color !important; }
+				}
+			}
+            &.address-book {
+                table { 
+                    @include breakpoint(small only) { 
+                        td:nth-child(3) { display: none; }
+                    }
+                }
+                i.qr {
+                    width: 40px;
+                    height: 40px;
+                }
+                i.edit {
+                    display: inline-block;
+                    position: relative;
+                    top: 3px;
+                    width: 16px;
+                    height: 16px;
+                    margin-left: 2px;
+                }
+                .tabs {
+					margin-top: 0.5rem;
+                    background: none;
+                    border: none;
+                    .tabs-title {
+                        margin-right: 8px;
+                        background: $light-gray;
+                        transition: ease 0.15s background-color;
+                        a {
+                            background: none;
+                            transition: ease 0.15s all;
+                            color: #777;
+                            font-size: 16px;
+                            text-transform: uppercase;
+                            &:hover { 
+                                background: darken($light-gray,5%);
+                            }
+                        }
+                        &:last-child { margin-right: 0; }
+                        &.is-active {
+                            background: $tertiary-color;
+                            a { 
+                                color: $white;
+                                &:hover { background: none; }
+                            }
+                        }
+                    }
+                    @include breakpoint(small only) { 
+                        li { 
+                            display: block;
+                            width: 100%;
+                            a {
+                                padding: 1rem 1.5rem;
+                            }
+                        }
+                    }
+                }
+                .tabs-content {
+                    background: none;
+                    border: none;
+                    .tabs-panel {
+                        padding: 0;
+                    }
+                }
+            }
+            .newCTA {
+                position: relative;
+                margin: 0;
+                > a {
+                    display: inline-block;
+                    position: fixed;
+                    bottom: 16px;
+                    right: 48px;
+                    padding-bottom: 8px;
+                    border: none;
+                    border-bottom-left-radius: 24px;
+                    border-bottom-right-radius: 24px;
+                    transition: ease 0.15s color;
+                    color: $body-background;
+                    font-size: 24px;
+                    font-weight: $font-weight-bold;
+                    line-height: 40px;
+                    text-transform: uppercase;
+                    @include breakpoint(small only) { 
+                        right: 16px;
+                    }
+                    &:before {
+                        content: '+';
+                        display: inline-block;
+                        position: relative;
+                        top: 4px;
+                        z-index: 2;
+                        width: 39px;
+                        height: 39px;
+                        margin-top: 8px;
+                        background: $white;
+                        border: solid 3px $tertiary-color;
+                        border-radius: 50%;
+                        transition: ease 0.15s background-color;
+                        color: $tertiary-color;
+                        font-size: 40px;
+                        line-height: 34px;
+                        text-align: center;
+                    }
+                    &.transaction:after, &.address:after {
+                        content: 'New Transaction';
+                        display: block;
+                        position: absolute;
+                        right: 20px;
+                        top: 12px;
+                        width: 0;
+                        padding: 0;
+                        background: $tertiary-color;
+                        border-top-left-radius: 18px;
+                        border-bottom-left-radius: 18px;
+                        overflow: hidden;
+                        transition: ease 0.4s all;
+                        color: $tertiary-color;
+                        font-size: 0;
+                        line-height: 39px;
+                    }
+                    &.address:after { content: 'New Address'; }
+                    &.transaction:hover:after, &.address:hover:after { 
+                        width: 160px;
+                        padding: 0 12px;
+                        color: $white;
+                        font-size: 12px;
+                    }
+                    &.address:hover:after { width: 130px; }
+                }
+                ul {
+                    display: none;
+                    position: fixed;
+                    bottom: 72px;
+                    right: 40px;
+                    z-index: 2;
+                    max-width: 360px;
+                    margin: 0;
+                    padding: 9px;
+                    background: $light-gray;
+					border-radius: 30px;
+					box-shadow: 0 0 30px 2px rgba(0, 0, 0, 0.3);
+                    @include breakpoint(small only) { 
+                        right: 24px;
+                    }
+                    li {
+                        list-style: none;
+                        margin: 0 0 5px;
+                        padding: 0;
+                        &:last-child { margin-bottom: 0; }
+                        a {
+                            display: block;
+                            padding: 0.75rem 1.5rem;
+                            background: $white;
+							transition: ease 0.15s all;
+                            color: $primary-color;
+                            font-size: 16px;
+                            font-weight: $font-weight-bold;
+                            text-transform: uppercase;
+                            &:hover {
+                                background: $primary-color;
+                                color: $white;
+                            }
+                        }
+						&:first-child a {
+							border-top-left-radius: 24px;
+							border-top-right-radius: 24px;
+						}
+						&:last-child a {
+							border-bottom-left-radius: 24px;
+							border-bottom-right-radius: 24px;
+						}
+                    }
+                }
+                &.active {
+                    ul { display: inline-block; }
+                }
+            }
+			.reveal {
+				padding: 3em;
+				background: $white;
+				h1 {
+					font-size: 32px;
+					text-transform: uppercase;
+				}
+			}
+        }
+    }
+}
+
+.coin-control {
+    display: none;
+    body.coin-control-on & { display: block; }
+}
+
+body.darkTheme {
+	background: #000;
+	color: #939598;
+	a:not(.button) {
+		color: $primary-color;
+		&:hover { color: lighten($primary-color,5%); }
+	}
+	a.button.close-button, button.close-button {
+		background: $dark-gray;
+		color: #000;
+		&:hover {
+			background: $alert-color;
+		}
+	}
+	hr { border-bottom-color: $dark-gray; }
+	header {
+		h1 { color: #939598; }
+		@include breakpoint(small only) { background: #000; }
+	}
+	#frame {
+		section.leftCol {
+			background: #1f1f1f;
+			nav ul li.active a { 
+				background: #000;
+				color: $tertiary-color;
+				svg, .svg {
+					path, rect, poly { 
+						fill: $tertiary-color !important;
+					}
+				}
+				&:hover { background: #000; }
+			}
+			nav ul li a:hover {
+				background: #252525;
+			}
+		}
+		section.rightCol { 
+			background: #000;
+			section.balances { background: #151515; }
+			main table tbody tr td {
+				svg, .svg {
+					path, rect, poly { 
+						fill: #939598 !important;
+					}
+				}
+			}
+			main table tbody tr td a {
+				svg, .svg {
+					path, rect, poly { 
+						fill: $primary-color !important;
+					}
+				}
+				&:hover {
+					svg, .svg {
+						path, rect, poly { 
+							fill: lighten($primary-color,5%) !important;
+						}
+					}
+				}
+			}
+			main.transactions table tbody tr td a {
+				svg, .svg {
+					path, rect, poly { 
+						fill: $text-color !important;
+					}
+				}
+				&:hover {
+					svg, .svg {
+						path, rect, poly { 
+							fill: $primary-color !important;
+						}
+					}
+				}
+			}
+			main table tbody tr:nth-child(even) { background: #151515; }
+			main table tbody tr:hover { background: darken($primary-color, 30%); }
+			main .newCTA > a:before { background: #000; }
+			main .newCTA > a {
+				&.address:hover:after,&.transaction:hover:after { color: #000; }
+			}
+			main.address-book .tabs .tabs-title {
+				a {
+					background: #252525;
+					color: $text-color;
+					&:hover {
+						background: #333;
+					}
+				}
+				&.is-active a {
+					background: $primary-color;
+					color: #000;
+				}
+			}
+			main form {
+				input[type='text'], select { 
+					background-color: darken($dark-gray,20%);
+					&[disabled='true'] { background: darken($secondary-color, 35%); }
+				}
+                input[type='checkbox'] { 
+                    & + label {
+						&:before { background-color: darken($dark-gray,20%); }
+					}
+				}
+			}
+			main .reveal {
+				background: #111;
+				border-color: $primary-color;
+			}
+			main .newCTA.active ul {
+				background: #000;
+				box-shadow: 0 0 90px 0 rgba(255, 255, 255, 0.3);
+				li a {
+					background: darken($dark-gray,20%);
+					color: $text-color;
+					&:hover {
+						background: $tertiary-color;
+						color: $white;
+					}
+				}
+			}
+		}
+	}
+}
