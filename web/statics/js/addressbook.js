@@ -7,39 +7,29 @@ $(window).load(function() {
 function LoadAddresses(){
 	resp = getRequest("addresses",function(resp){
 		obj = JSON.parse(resp)
-		console.log(obj)
-
+		
 		obj.FactoidAddresses.List.forEach(function(address){
-			$('#factoid-addresses-table tbody').append(
-				'<tr>' +
-				'<td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
-				'<td>' + address.Name + ' <a href="edit-address-factoid"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
-				'<td>' + address.Address + '</td>' +
-				'<td>' + address.Balance + '</td>' +
-				'</tr>');
+			$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid"));
 		})
 
 		obj.EntryCreditAddresses.List.forEach(function(address){
-			console.log(address)
-			$('#credit-addresses-table tbody').append(
-				'<tr>' +
-				'<td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
-				'<td>' + address.Name + ' <a href="edit-address-factoid"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
-				'<td>' + address.Address + '</td>' +
-				'<td>' + address.Balance + '</td>' +
-				'</tr>');
+			console.log("ASD")
+			$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits"));
 		})
 
 		obj.ExternalAddresses.List.forEach(function(address){
-			$('#external-addresses-table tbody').append(
-				'<tr>' +
-				'<td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
-				'<td>' + address.Name + ' <a href="edit-address-factoid"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
-				'<td>' + address.Address + '</td>' +
-				'<td>' + address.Balance + '</td>' +
-				'</tr>');
+			$('#external-addresses-table tbody').append(addressTableRow(address, "external"));
 		})
  	})
+}
+
+function addressTableRow(address, type) {
+	return		'<tr>' +
+				'<td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
+				'<td>' + address.Name + ' <a href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
+				'<td>' + address.Address + '</td>' +
+				'<td>' + address.Balance + '</td>' +
+				'</tr>'
 }
 //<tr>
 //  <td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>

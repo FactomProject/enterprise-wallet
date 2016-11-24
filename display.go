@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	FILES_PATH string = "web/"
-	templates  *template.Template
+	FILES_PATH     string = "web/"
+	templates      *template.Template
+	MasterSettings *SettingsStruct
 
 	mux           *http.ServeMux
 	TemplateMutex sync.Mutex
@@ -26,12 +27,18 @@ func ServeWallet(port int) {
 	templates.Funcs(template.FuncMap(funcMap))
 	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
 
+	// Start Settings
+	// TODO: Load from DB
+	MasterSettings = new(SettingsStruct)
+	MasterSettings.Theme = ""
+
 	// Mux for static files
 	mux = http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("./web/statics")))
 
 	http.HandleFunc("/", static(pageHandler))
 	http.HandleFunc("/GET", HandleGETRequests)
+	http.HandleFunc("/POST", HandlePOSTRequests)
 
 	portStr := ":" + strconv.Itoa(port)
 
@@ -60,45 +67,79 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 }
 
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-	TemplateMutex.Lock()
-	defer TemplateMutex.Unlock()
-
+	// Remove any GET data
+	request := strings.Split(r.RequestURI, "?")
 	fmt.Println(r.RequestURI)
 
-	switch r.RequestURI {
+	var err error
+
+	switch request[0] {
 	case "/":
-		templates.ExecuteTemplate(w, "indexPage", "")
+		err = HandleIndexPage(w, r)
 	case "/AddressBook":
-		templates.ExecuteTemplate(w, "addressBook", "")
+		err = HandleAddressBook(w, r)
 	case "/Settings":
-		templates.ExecuteTemplate(w, "settings", "")
+		err = HandleSettings(w, r)
 	case "/create-entry-credits":
-		templates.ExecuteTemplate(w, "createEntryCredits", "")
+		err = HandleCreateEntryCredits(w, r)
 	case "/edit-address-entry-credits":
-		templates.ExecuteTemplate(w, "edit-address-entry-credits", "")
+		err = HandleEditAddressEntryCredits(w, r)
 	case "/edit-address-external":
-		templates.ExecuteTemplate(w, "edit-address-external", "")
+		err = HandleEditAddressExternal(w, r)
 	case "/edit-address-factoid":
-		templates.ExecuteTemplate(w, "edit-address-factoid", "")
+		err = HandleEditAddressFactoids(w, r)
 	case "/import-export-transaction":
-		templates.ExecuteTemplate(w, "import-export-transaction", "")
+		err = HandleImportExportTransaction(w, r)
 	case "/new-address-entry-credits":
-		templates.ExecuteTemplate(w, "new-address-entry-credits", "")
+		err = HandleNewAddressEntryCredits(w, r)
 	case "/new-address-external":
-		templates.ExecuteTemplate(w, "new-address-external", "")
+		err = HandleNewAddressExternal(w, r)
 	case "/new-address-factoid":
-		templates.ExecuteTemplate(w, "new-address-factoid", "")
+		err = HandleNewAddressFactoid(w, r)
 	case "/receive-factoids":
-		templates.ExecuteTemplate(w, "receive-factoids", "")
+		err = HandleRecieveFactoids(w, r)
 	case "/send-factoids":
-		templates.ExecuteTemplate(w, "send-factoids", "")
+		err = HandleSendFactoids(w, r)
 	default:
-		templates.ExecuteTemplate(w, "notFoundError", "")
+		err = HandleNotFoundError(w, r)
+	}
+
+	if err != nil {
+		fmt.Printf("An error has occured")
 	}
 }
 
+type jsonResponse struct {
+	Error   string      `json:"Error"`
+	Content interface{} `json:"Content"`
+}
+
+func newJsonResponse(err string, content interface{}) *jsonResponse {
+	j := new(jsonResponse)
+	j.Error = err
+	j.Content = content
+
+	return j
+}
+
+func (j *jsonResponse) Bytes() []byte {
+	data, err := json.Marshal(j)
+	if err != nil {
+		return nil
+	}
+
+	return data
+}
+
+func jsonResp(content interface{}) []byte {
+	e := newJsonResponse("none", content)
+	return e.Bytes()
+}
+
 func jsonError(err string) []byte {
-	return []byte("{'error':'" + err + "'}")
+	e := newJsonResponse(err, "none")
+	return e.Bytes()
+	//return []byte("{'error':'" + err + "'}")
 }
 
 func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
@@ -118,4 +159,66 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}
+}
+
+func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
+	// Only handles POST
+	if r.Method != "POST" {
+		return
+	}
+
+	// Form:
+	//	request -- Request Function
+	//	json	-- json object
+
+	req := r.FormValue("request")
+	switch req {
+	case "address-name-change":
+		type ANC struct {
+			Address string `json:"Address"`
+			ToName  string `json:"Name"`
+		}
+		j := r.FormValue("json")
+		anc := new(ANC)
+		err := json.Unmarshal([]byte(j), anc)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		err = MasterWallet.ChangeAddressName(anc.Address, anc.ToName)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+	case "display-private-key":
+		type Add struct {
+			Address string `json:"Address"`
+		}
+
+		j := r.FormValue("json")
+		a := new(Add)
+		err := json.Unmarshal([]byte(j), a)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		_, list := MasterWallet.GetGUIAddress(a.Address)
+		if list == 0 {
+			w.Write(jsonError("Not found"))
+			return
+		}
+
+		secret, err := MasterWallet.GetPrivateKey(a.Address)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp(secret))
+	default:
+		w.Write(jsonError("Not a valid request"))
+	}
+
 }

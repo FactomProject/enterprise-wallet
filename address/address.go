@@ -172,6 +172,15 @@ func (addList *AddressList) Remove(removeAnp *AddressNamePair) error {
 	return nil
 }
 
+func (addList *AddressList) RemoveAddress(removeAdd string) error {
+	ranp, err := NewAddress("", removeAdd)
+	if err != nil {
+		return err
+	}
+
+	return addList.Remove(ranp)
+}
+
 func (addList *AddressList) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	var number [8]byte

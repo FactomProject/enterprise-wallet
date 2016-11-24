@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"strings"
 	"sync"
 
 	"github.com/FactomProject/M2WalletGUI/address"
@@ -230,6 +231,50 @@ func (w *WalletDB) GenerateFactoidAddress(name string) (*address.AddressNamePair
 	return anp, nil
 }
 
+func (w *WalletDB) GetPrivateKey(address string) (secret string, err error) {
+	if !factom.IsValidAddress(address) {
+		return "", fmt.Errorf("Not a valid address")
+	}
+
+	if address[:2] == "FA" {
+		return w.getFCTPrivateKey(address)
+	} else if address[:2] == "EC" {
+		return w.getECPrivateKey(address)
+	}
+
+	return "", fmt.Errorf("Not a public address")
+}
+
+func (w *WalletDB) getECPrivateKey(address string) (secret string, err error) {
+	adds, err := w.Wallet.GetAllECAddresses()
+	if err != nil {
+		return "", err
+	}
+
+	for _, ec := range adds {
+		if strings.Compare(ec.String(), address) == 0 {
+			return ec.SecString(), nil
+		}
+	}
+
+	return "", fmt.Errorf("Address not found")
+}
+
+func (w *WalletDB) getFCTPrivateKey(address string) (secret string, err error) {
+	adds, err := w.Wallet.GetAllFCTAddresses()
+	if err != nil {
+		return "", err
+	}
+
+	for _, fa := range adds {
+		if strings.Compare(fa.String(), address) == 0 {
+			return fa.SecString(), nil
+		}
+	}
+
+	return "", fmt.Errorf("Address not found")
+}
+
 func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressNamePair, error) {
 	address, err := w.Wallet.GenerateECAddress()
 	if err != nil {
@@ -249,42 +294,19 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 	return anp, nil
 }
 
+// TODO: Fix, make guiwallet take the remove
 func (w *WalletDB) RemoveAddress(address string) (*address.AddressNamePair, error) {
-	anp, list := w.GetGUIAddress(address)
-	if list > 3 {
-		return nil, fmt.Errorf("This should never happen")
+	anp, err := w.guiWallet.RemoveAddress(address)
+	if err != nil {
+		return nil, err
 	}
 
-	switch list {
-	case 0:
-		return nil, fmt.Errorf("No address found")
-	case 1:
-		err := w.guiWallet.FactoidAddresses.Remove(anp)
-		if err != nil {
-			return nil, err
-		}
-
-		// factom-wallet remove?
-		return anp, nil
-	case 2:
-		err := w.guiWallet.EntryCreditAddresses.Remove(anp)
-		if err != nil {
-			return nil, err
-		}
-
-		// factom-wallet remove?
-		return anp, nil
-	case 3:
-		err := w.guiWallet.ExternalAddresses.Remove(anp)
-		if err != nil {
-			return nil, err
-		}
-
-		// factom-wallet remove?
-		return anp, nil
+	err = w.Save()
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, fmt.Errorf("Impossible to reach.")
+	return anp, nil
 }
 
 func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNamePair, error) {
@@ -306,6 +328,11 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 			return nil, err
 		}
 
+		err = w.Save()
+		if err != nil {
+			return nil, err
+		}
+
 		return anp, nil
 	} else if secret[:2] == "Es" {
 		add, err := factom.GetECAddress(secret)
@@ -319,6 +346,11 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 		}
 
 		anp, err := w.addGUIAddress(name, add.String())
+		if err != nil {
+			return nil, err
+		}
+
+		err = w.Save()
 		if err != nil {
 			return nil, err
 		}
@@ -358,7 +390,16 @@ func (w *WalletDB) addGUIAddress(name string, address string) (*address.AddressN
 // Returns address with associated name
 // List is 0 for not found, 1 for Factoid address, 2 for EC Address, 3 for External
 func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, list int) {
-	return w.guiWallet.GetAddress(address)
+	anp, list, _ = w.guiWallet.GetAddress(address)
+	return
+}
+
+func (w *WalletDB) ChangeAddressName(address string, toName string) error {
+	err := w.guiWallet.ChangeAddressName(address, toName)
+	if err != nil {
+		return err
+	}
+	return w.Save()
 }
 
 func (w *WalletDB) GetTotalGUIAddresses() uint32 {
@@ -431,13 +472,13 @@ func (w *WalletStruct) GetTotalAddressCount() uint32 {
 }
 
 // List is 0 for not found, 1 for FactoidAddressList, 2 for EntryCreditList, 3 for External
-func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair, list int) {
+func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair, list int, index int) {
 	w.RLock()
 	defer w.RUnlock()
 
 	list = 0
 
-	anp, index := w.FactoidAddresses.Get(address)
+	anp, index = w.FactoidAddresses.Get(address)
 	if index != -1 && anp != nil {
 		list = 1
 		return
@@ -456,6 +497,28 @@ func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair,
 	}
 
 	return
+}
+
+func (w *WalletStruct) ChangeAddressName(address string, toName string) error {
+	anp, list, i := w.GetAddress(address)
+
+	w.Lock()
+	defer w.Unlock()
+	if strings.Compare(anp.Address, address) == 0 { // To be sure
+		switch list {
+		case 1:
+			w.FactoidAddresses.List[i].Name = toName
+			return nil
+		case 2:
+			w.EntryCreditAddresses.List[i].Name = toName
+			return nil
+		case 3:
+			w.ExternalAddresses.List[i].Name = toName
+			return nil
+		}
+	}
+
+	return fmt.Errorf("Could not change name")
 }
 
 func (w *WalletStruct) GetAllAddresses() []address.AddressNamePair {
@@ -536,6 +599,47 @@ func (w *WalletStruct) UnmarshalBinaryData(data []byte) (newData []byte, err err
 func (w *WalletStruct) UnmarshalBinary(data []byte) error {
 	_, err := w.UnmarshalBinaryData(data)
 	return err
+}
+
+func (w *WalletStruct) RemoveAddress(address string) (*address.AddressNamePair, error) {
+	anp, list, _ := w.GetAddress(address)
+	if list > 3 {
+		return nil, fmt.Errorf("This should never happen")
+	}
+
+	w.Lock()
+	defer w.Unlock()
+
+	switch list {
+	case 0:
+		return nil, fmt.Errorf("No address found")
+	case 1:
+		err := w.FactoidAddresses.Remove(anp)
+		if err != nil {
+			return nil, err
+		}
+
+		// factom-wallet remove?
+		return anp, nil
+	case 2:
+		err := w.EntryCreditAddresses.Remove(anp)
+		if err != nil {
+			return nil, err
+		}
+
+		// factom-wallet remove?
+		return anp, nil
+	case 3:
+		err := w.ExternalAddresses.Remove(anp)
+		if err != nil {
+			return nil, err
+		}
+
+		// factom-wallet remove?
+		return anp, nil
+	}
+
+	return nil, fmt.Errorf("Impossible to reach.")
 }
 
 // Adds balances to addresses so the GUI can display

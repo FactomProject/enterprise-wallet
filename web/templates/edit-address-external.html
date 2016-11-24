@@ -22,10 +22,10 @@
                                 </div>
                                 <div class="row">
                                     <div class="medium-8 columns">
-                                        <input type="text" disabled="true" name="public-key" value="FA2iH4u6cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8">
+                                        <input id="address-field" type="text" disabled="true" name="public-key" value="{{.Address}}">
                                     </div>
                                     <div class="medium-4 columns">
-                                        <input type="text" name="alias" value="external1">
+                                        <input id="address-name" type="text" name="alias" value="{{.Name}}">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -33,7 +33,7 @@
 
                                     </div>
                                     <div class="medium-4 small-12 columns">
-                                        <a href="#" class="button expanded">Save Changes</a>
+                                        <a id="save-name-change" class="button expanded">Save Changes</a>
                                     </div>
                                 </div>
                                 <hr>
@@ -46,5 +46,5 @@
                         </div>
                     </div>
 
-{{template "templateBottom"}}
+{{template "templateBottom" "edit-address"}}
 {{end}}
