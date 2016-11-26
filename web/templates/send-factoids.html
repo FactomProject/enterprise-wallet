@@ -18,7 +18,7 @@
                                             <label>Send from:</label>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row" id="transaction-to-address">
                                         <div class="small-12 medium-7 large-8 columns">
                                             <div class="input-group">
                                                 <input type="text" name="input1" class="input-group-field" placeholder="Type factoid address">
@@ -41,23 +41,27 @@
                                         <label>Send to:</label>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="small-12 medium-7 large-8 columns">
-                                        <div class="input-group">
-                                            <input type="text" name="output1" class="input-group-field" placeholder="Type factoid address">
-                                            <a data-toggle="addressbook" class="input-group-button button"><i class="fa fa-book"></i></a>
+                                <!-- Address + AMT -->
+                                <div class="row" id="all-outputs">
+                                    <div class="row" id="single-output">
+                                        <div class="small-12 medium-7 large-8 columns">
+                                            <div class="input-group" id="output-factoid-address-container">
+                                                <input id="output-factoid-address" type="text" name="output1" class="input-group-field" placeholder="Type factoid address">
+                                                <a data-toggle="addressbook" class="input-group-button button"><i class="fa fa-book"></i></a>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="small-10 medium-4 large-3 columns">
-                                        <div class="input-group">
-                                            <input type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">
-                                            <span class="input-group-label">FCT</span>
+                                        <div class="small-10 medium-4 large-3 columns">
+                                            <div class="input-group">
+                                                <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">
+                                                <span class="input-group-label">FCT</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="small-2 medium-1 columns">
-                                            <a href="#" class="button expanded newPlus">&nbsp;</a>
+                                        <div class="small-2 medium-1 columns">
+                                                <a id="append-new-output" class="button expanded newPlus">&nbsp;</a>
+                                        </div>
                                     </div>
                                 </div>
+                                <!-- Fee -->
                                 <div class="row">
                                     <div class="small-12 medium-7 large-8 columns">
 
@@ -71,6 +75,7 @@
                                     </div>
                                 </div>
                                 <hr>
+                                <!-- Subtotal -->
                                 <div class="row">
                                     <div class="small-12 medium-7 large-8 columns">
 
@@ -78,7 +83,7 @@
                                     <div class="small-12 medium-4 large-3 columns end">
                                         <label>Total:</label>
                                         <div class="input-group">
-                                            <input type="text" class="input-group-field" disabled="true" name="subtotal" id="subtotal" value="0.108">
+                                            <input type="text" class="input-group-field" disabled="true" name="subtotal" id="subtotal" value="0.000">
                                             <span class="input-group-label">FCT</span>
                                         </div>
                                     </div>
@@ -88,7 +93,7 @@
 
                                     </div>
                                     <div class="small-10 medium-4 large-3 columns">
-                                        <a href="#" class="button expanded">Send Transaction</a>
+                                        <a id="send-entire-transaction" class="button expanded">Send Transaction</a>
                                     </div>
                                     <div class="small-2 medium-1 columns">
                                         
@@ -112,5 +117,5 @@
 						</button>
 					</div>
                     
-{{template "templateBottom"}}
+{{template "templateBottom" "send-factoids"}}
 {{end}}

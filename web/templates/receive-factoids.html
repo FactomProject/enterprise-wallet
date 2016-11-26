@@ -2,40 +2,53 @@
 
 {{$pageTitle := "Receive Factoids"}}
 {{$mainClass := "receive-factoids"}}
-{{$theme := .}}
+{{$theme := .Settings.Theme}}
 {{$activeNav := 1}}
 {{ $info := mkArray $pageTitle $theme $activeNav $mainClass }}
 {{template "templateTop" $info}}
 
 <div class="row">
-                        <div class="columns">
-                            <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
-                            <h1>Receive Factoids</h1>
-                            <div class="row">
-                                <div class="small-12 large-4 columns">
-                                    <img src="img/qr_receiving.png" class="qr-receiving"><br><br>
-                                </div>
-                                <div class="small-12 large-8 columns">
-                                    <form>
-                                        <label>Receiving address: <small><a href="#">Manage Addresses</a></small></label>
-                                        <select id="receiving-address" name="receiving-address">
-                                            <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option>
-                                            <option value="factoid2">factoid2 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option>
-                                            <option value="factoid3">factoid3 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option>
-                                            <option value="factoid4">factoid5 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option>
-                                            <option value="factoid5">factoid6 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option>
-                                            <option value="factoid6">factoid7 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option>
-                                        </select>
-                                    </form>
-                                    <div class="row">
-                                        <div class="columns text-right">
-                                            <a href="#" class="button copy-address">Copy to Clipboard</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="columns">
+        <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+        <h1>Receive Factoids/Entry Credits</h1>
+        <div class="row">
+            <div class="small-12 large-4 columns" id="qrcode">
+                <!-- <img src="img/qr_receiving.png" class="qr-receiving"><br><br> -->
+            </div>
+            <label class="hide" id="selected-address-info"><small></small></label>
+            <div class="small-12 large-8 columns">
+                <form>
+                    <label>Receiving address: <small><a href="#">Manage Addresses</a></small></label>
+{{if .Address}}
+                    <div id="receiving-address-fixed" name="receiving-address" class="pad20">
+                        <small>{{.Name}} ({{.Address}})</small>
+                        <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
                     </div>
+{{else}}
+                    <select id="receiving-address" name="receiving-address">
+                        <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
+                    </select>
+{{end}}
+                </form>
+                <div class="row">
+                    <div class="columns text-right">
+                        <a id="copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-{{template "templateBottom"}}
+{{template "templateBottom" "recieve-factoids"}}
+
+{{if .Address}}
+<script type="text/javascript">
+    window.onload = LoadFixedAddress;
+</script>
+{{else}}
+<script type="text/javascript">
+    window.onload = LoadRecAddresses;
+</script>
+{{end}}
 {{end}}

@@ -155,11 +155,30 @@ func HandleNewAddressExternal(w http.ResponseWriter, r *http.Request) error {
  *  Recieve/Send Factoids *
  **************************/
 
+type RecieveFactoidsStruct struct {
+	Settings *SettingsStruct
+
+	Address string
+	Name    string
+}
+
 func HandleRecieveFactoids(w http.ResponseWriter, r *http.Request) error {
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
 
-	templates.ExecuteTemplate(w, "receive-factoids", "")
+	address := r.FormValue("address")
+	name := r.FormValue("name")
+
+	st := new(RecieveFactoidsStruct)
+	st.Settings = MasterSettings
+
+	st.Address = address
+	st.Name = name
+	if MasterWallet.IsValidAddress(address) {
+		templates.ExecuteTemplate(w, "receive-factoids", st)
+	} else {
+		templates.ExecuteTemplate(w, "receive-factoids", st)
+	}
 	return nil
 }
 

@@ -217,6 +217,43 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(secret))
+	case "is-valid-address":
+		add := r.FormValue("json")
+		v := MasterWallet.IsValidAddress(add)
+		if v {
+			w.Write(jsonResp("true"))
+		} else {
+			w.Write(jsonResp("false"))
+		}
+	case "send-transaction":
+		type SendTransStruct struct {
+			Addresses []string `json:"OutputAddresses"`
+			Amounts   []string `json:"OutputAmounts"`
+		}
+
+		trans := new(SendTransStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), trans)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		name, err := MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		tHash, err := MasterWallet.SendTransaction(name)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp(tHash))
+
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

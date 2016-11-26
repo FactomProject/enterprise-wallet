@@ -410,6 +410,10 @@ func (w *WalletDB) GetAllGUIAddresses() []address.AddressNamePair {
 	return w.guiWallet.GetAllAddresses()
 }
 
+func (w *WalletDB) IsValidAddress(address string) bool {
+	return factom.IsValidAddress(address)
+}
+
 func GetHomeDir() string {
 	// Get the OS specific home directory via the Go standard lib.
 	var homeDir string

@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"sort"
+	"strconv"
 
 	"github.com/FactomProject/factom"
 	//"github.com/FactomProject/factom/wallet"
@@ -35,6 +36,19 @@ func (slice AddressBalancePairs) Swap(i int, j int) {
 
 func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 	return slice[i]
+}
+
+func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts []string) (string, error) {
+	var amts []uint64
+	for _, a := range amounts {
+		amt64, err := strconv.ParseUint(a, 10, 64)
+		if err != nil {
+			return "", err
+		}
+		amts = append(amts, (amt64 * 1e8))
+	}
+
+	return wal.ConstructSendFactoids(toAddresses, amts)
 }
 
 // Constructs factoid transaction

@@ -6,6 +6,7 @@ $(window).load(function() {
 
 function LoadAddresses(){
 	resp = getRequest("addresses",function(resp){
+		console.log(resp)
 		obj = JSON.parse(resp)
 		
 		obj.FactoidAddresses.List.forEach(function(address){
@@ -25,7 +26,7 @@ function LoadAddresses(){
 
 function addressTableRow(address, type) {
 	return		'<tr>' +
-				'<td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
+				'<td><a href="receive-factoids?address=' + address.Address + '&name=' + address.Name + '"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
 				'<td>' + address.Name + ' <a href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
 				'<td>' + address.Address + '</td>' +
 				'<td>' + address.Balance + '</td>' +

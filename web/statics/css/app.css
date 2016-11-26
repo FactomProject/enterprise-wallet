@@ -1561,6 +1561,10 @@ label {
   font-style: italic;
   color: #333; }
 
+.input-group-error {
+  box-shadow: 0 0 3px #CC0000;
+}
+
 .input-group {
   display: table;
   width: 100%;
@@ -3498,6 +3502,19 @@ svg {
     overflow: hidden; }
     .button.newPlus:before, button.newPlus:before {
       content: '+';
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      font-size: 26px;
+      line-height: 39px; }
+  .button.newMinus, button.newPlus {
+    position: relative;
+    overflow: hidden; }
+    .button.newMinus:before, button.newPlus:before {
+      content: '-';
       display: inline-block;
       position: absolute;
       top: 0;
