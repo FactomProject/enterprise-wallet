@@ -11,7 +11,6 @@ function GetDefaultData(){
 }
 
 $("#display-private-key").click(function(){
-	console.log("ASD")
 	jsonOBJ = '{"Address":"' + Address + '"}'
 	postRequest("display-private-key", jsonOBJ, function(resp){
 		obj = JSON.parse(resp)

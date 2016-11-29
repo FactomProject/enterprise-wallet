@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"time"
 )
 
 var (
@@ -31,6 +32,10 @@ func ServeWallet(port int) {
 	// TODO: Load from DB
 	MasterSettings = new(SettingsStruct)
 	MasterSettings.Theme = ""
+
+	// Update the balances every 5 seconds to keep it updated. We can force
+	// an update if we send a transaction or something
+	go doEvery(5*time.Second, updateBalances)
 
 	// Mux for static files
 	mux = http.NewServeMux()
@@ -63,6 +68,17 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		h.ServeHTTP(w, r)
+	}
+}
+
+func updateBalances(time.Time) {
+	MasterWallet.AddBalancesToAddresses()
+}
+
+// For go routines. Calls function once each duration.
+func doEvery(d time.Duration, f func(time.Time)) {
+	for x := range time.Tick(d) {
+		f(x)
 	}
 }
 
@@ -153,9 +169,23 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		data, err := MasterWallet.GetGUIWalletJSON()
 		if err != nil {
 			w.Write(jsonError(err.Error()))
+			return
 		}
 
 		w.Write(data)
+	case "balances":
+		MasterWallet.AddBalancesToAddresses()
+		bals := struct {
+			EC int64
+			FC int64
+		}{MasterWallet.GetECBalance(), MasterWallet.GetFactoidBalance()}
+		data := jsonResp(bals)
+		if data != nil {
+			w.Write(data)
+			return
+		}
+
+		w.Write(jsonError("Error occurred"))
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

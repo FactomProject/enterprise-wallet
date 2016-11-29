@@ -31,7 +31,7 @@ function dropDownOption(address) {
 
 $("#copy-to-clipboard").on('click', function(){
 	var aux = document.createElement("input");
-	console.log($('#selected-address-info').val())
+	//console.log($('#selected-address-info').val())
 	aux.setAttribute("value", $('#selected-address-info').val());
 	document.body.appendChild(aux);
 	aux.select();
@@ -56,7 +56,7 @@ function updateWithGivenAddress(address){
 	$("#selected-address-info").val(splits[0])
 	$("#selected-address-info").text(splits[0])
 
-	console.log($('#selected-address-info').val())
+	//console.log($('#selected-address-info').val())
 	// Remove last QR code
 	$('#qrcode').text("")
 	// Add new QR code

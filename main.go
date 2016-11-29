@@ -49,6 +49,7 @@ func InitiateWalletAndWeb() {
 
 	// For Testing
 	addRandomAddresses()
+	MasterWallet.AddBalancesToAddresses()
 	//
 
 	port := 8091

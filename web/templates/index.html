@@ -4,7 +4,7 @@
 {{$mainClass := "transactions"}}
 {{$theme := .}}
 {{$activeNav := 1}}
-{{ $info := mkArray $pageTitle $theme $activeNav $mainClass }}
+{{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 
 {{template "templateTop" $info}}
 
@@ -90,5 +90,5 @@
     </button>
 </div>
 
-{{template "templateBottom"}}
+{{template "templateBottom" "index"}}
 {{end}}

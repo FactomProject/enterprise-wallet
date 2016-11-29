@@ -6,7 +6,6 @@ $(window).load(function() {
 
 function LoadAddresses(){
 	resp = getRequest("addresses",function(resp){
-		console.log(resp)
 		obj = JSON.parse(resp)
 		
 		obj.FactoidAddresses.List.forEach(function(address){
@@ -14,7 +13,6 @@ function LoadAddresses(){
 		})
 
 		obj.EntryCreditAddresses.List.forEach(function(address){
-			console.log("ASD")
 			$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits"));
 		})
 

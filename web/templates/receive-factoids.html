@@ -4,7 +4,7 @@
 {{$mainClass := "receive-factoids"}}
 {{$theme := .Settings.Theme}}
 {{$activeNav := 1}}
-{{ $info := mkArray $pageTitle $theme $activeNav $mainClass }}
+{{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
 
 <div class="row">

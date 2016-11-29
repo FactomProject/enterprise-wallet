@@ -4,7 +4,7 @@
 {{$mainClass := "send-factoids"}}
 {{$theme := .}}
 {{$activeNav := 2}}
-{{ $info := mkArray $pageTitle $theme $activeNav $mainClass }}
+{{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
 <div class="row">
                         <div class="columns">

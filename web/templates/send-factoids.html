@@ -4,7 +4,7 @@
 {{$mainClass := "send-factoids"}}
 {{$theme := .}}
 {{$activeNav := 1}}
-{{ $info := mkArray $pageTitle $theme $activeNav $mainClass }}
+{{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
 
 <div class="row">
@@ -105,12 +105,15 @@
                     <div class="reveal" id="addressbook" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
 						<h1>Select Address</h1>
 						<form>
-							<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid1<br>
-							<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid2<br>
-							<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid3<br>
-							<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid4<br>
-							<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid5<br>
-							<a href="#" class="button" target="_blank">Continue</a>
+                            <div id="addresses-reveal">
+							<!-- 
+                            <span>
+                                <input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> <span id="address-name" name="factoid1"> factoid1</span>
+                            </span>
+                            <br> 
+                            -->
+                            </div>
+							<div data-toggle="addressbook" class="button" id="addresses-reveal-button">Add Address</div>
 						</form>
 						<button class="close-button" data-close aria-label="Close reveal" type="button">
 							<span aria-hidden="true">&times;</span>

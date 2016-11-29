@@ -5,6 +5,7 @@
 {{$theme := index . 1}}
 {{$activeNav := index . 2 }}
 {{$mainClass := index . 3 }}
+{{$settings := index . 4}}
 
 <!doctype html>
 <html class="no-js" lang="en">
@@ -37,13 +38,13 @@
                         <div class="small-6 columns">
                             <section class="balance factoids dec8">
                                 <i><img src="img/balance_factoids.svg" class="svg" alt="Factoids"></i>
-								<span>5,123<small>.32100001</small></span>
+								<span id="factoid-balance">0.</span><span><small id="factoid-balance-trailing">0</small></span>
                             </section>
                         </div>
                         <div class="small-6 columns">
                             <section class="balance credits">
                                 <i><img src="img/balance_credits.svg" class="svg" alt="Entry Credits"></i>
-                                <span>1,422</span>
+                                <span id="ec-balance">0</span>
                             </section>
                         </div>
                     </div>

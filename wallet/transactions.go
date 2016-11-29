@@ -41,11 +41,11 @@ func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts []string) (string, error) {
 	var amts []uint64
 	for _, a := range amounts {
-		amt64, err := strconv.ParseUint(a, 10, 64)
+		amt64, err := strconv.ParseFloat(a, 64)
 		if err != nil {
 			return "", err
 		}
-		amts = append(amts, (amt64 * 1e8))
+		amts = append(amts, uint64(amt64*1e8))
 	}
 
 	return wal.ConstructSendFactoids(toAddresses, amts)

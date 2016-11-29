@@ -26,5 +26,7 @@ func StartWallet(walletPort int, factomdPort int, guiDBType int, walletDBType in
 	// TODO: Adjust start of WSAPI -- RpcConfig
 	go wsapi.Start(wal.Wallet, fmt.Sprintf(":%d", walletPort), *(factom.RpcConfig))
 
+	wal.AddBalancesToAddresses()
+
 	return wal, nil
 }

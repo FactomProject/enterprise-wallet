@@ -1,45 +1,31 @@
-/*
-<div class="row" id="all-outputs">
-
-<div class="row" id="single-output">
-    <div class="small-12 medium-7 large-8 columns">
-        <div class="input-group">
-            <input id="output-factoid-address" type="text" name="output1" class="input-group-field" placeholder="Type factoid address">
-            <a data-toggle="addressbook" class="input-group-button button"><i class="fa fa-book"></i></a>
-        </div>
-    </div>
-    <div class="small-10 medium-4 large-3 columns">
-        <div class="input-group">
-            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">
-            <span class="input-group-label">FCT</span>
-        </div>
-    </div>
-    <div class="small-2 medium-1 columns">
-            <a id="append-new-output" class="button expanded newPlus">&nbsp;</a>
-    </div>
-</div>
-*/
+function addNewOutputAddress(defaultVal, error) {
+  eClass = ""
+  if(error){
+    eClass = "input-group-error"
+  }
+  $("#all-outputs").append(
+  '<div class="row" id="single-output">' +
+  '    <div class="small-12 medium-7 large-8 columns">' +
+  '        <div class="input-group ' + eClass + '" id="output-factoid-address-container">' +
+  '            <input id="output-factoid-address" type="text" name="output1" class="input-group-field" placeholder="Type factoid address" value="' + defaultVal + '">' +
+  '            <!-- <a data-toggle="addressbook" class="input-group-button button"><i class="fa fa-book"></i></a> -->' +
+  '        </div>' +
+  '    </div>' +
+  '    <div class="small-10 medium-4 large-3 columns">' +
+  '        <div class="input-group">' +
+  '            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">' +
+  '            <span class="input-group-label">FCT</span>' +
+  '        </div>' +
+  '    </div>' +
+  '    <div class="small-2 medium-1 columns">' +
+  '            <a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>' +
+  '    </div>' +
+  '</div>')
+}
 
 // Add new output address
 $("#append-new-output").click(function(){
-	$("#all-outputs").append(
-'<div class="row" id="single-output">' +
-'    <div class="small-12 medium-7 large-8 columns">' +
-'        <div class="input-group input-group-error" id="output-factoid-address-container">' +
-'            <input id="output-factoid-address" type="text" name="output1" class="input-group-field" placeholder="Type factoid address">' +
-'            <a data-toggle="addressbook" class="input-group-button button"><i class="fa fa-book"></i></a>' +
-'        </div>' +
-'    </div>' +
-'    <div class="small-10 medium-4 large-3 columns">' +
-'        <div class="input-group">' +
-'            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">' +
-'            <span class="input-group-label">FCT</span>' +
-'        </div>' +
-'    </div>' +
-'    <div class="small-2 medium-1 columns">' +
-'            <a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>' +
-'    </div>' +
-'</div>')
+  addNewOutputAddress("", true)
 })
 
 // Remove output address
@@ -90,4 +76,67 @@ $("#send-entire-transaction").on('click', function(){
 	postRequest("send-transaction", j, function(resp){
 		console.log(resp)
 	})
+})
+
+// Load the Reveal
+$(window).load(function() {
+    LoadAddresses()
+});
+
+function LoadAddresses(){
+  resp = getRequest("addresses",function(resp){
+    obj = JSON.parse(resp)
+    
+    obj.FactoidAddresses.List.forEach(function(address){
+      $('#addresses-reveal').append(factoidAddressRadio(address, "factoid"));
+    })
+
+    /*obj.EntryCreditAddresses.List.forEach(function(address){
+      $('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits"));
+    })*/
+
+    obj.ExternalAddresses.List.forEach(function(address){
+      if(address.Address.startsWith("FA")){
+        $('#addresses-reveal').append(factoidAddressRadio(address, "external"));
+      }
+    })
+  })
+}
+
+function factoidAddressRadio(address){
+return '<span>' +
+'  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '"> ' + address.Name + '</span>' +
+'</span>' +
+'<br> '
+}
+
+$('#addresses-reveal').on("mouseover", "#address-name", function(){
+  $(this).css("font-size", "90%")
+  $(this).text($(this).parent().find("#address").val());
+})
+
+$('#addresses-reveal').on("mouseout", "#address-name", function(){
+  $(this).text($(this).attr("name"));
+  $(this).css("font-size", "100%")
+})
+
+done = false
+
+$("#addresses-reveal-button").on("click", function(){
+  newAddress = $("input[name='address']:checked").val()
+
+  done = false
+  $("#all-outputs #single-output").each(function(){
+    if(!done) {
+      addressDOM = $(this).find("#output-factoid-address")
+      add = addressDOM.val()
+      if(add == "") {
+        addressDOM.val(newAddress)
+        done = true
+      }
+    }
+  })
+
+  // No empty slot found
+  addNewOutputAddress(newAddress, false)
 })
