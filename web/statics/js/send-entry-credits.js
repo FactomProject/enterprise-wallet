@@ -8,14 +8,14 @@ function addNewOutputAddress(defaultVal, error) {
   '<div class="row" id="single-output">' +
   '    <div class="small-12 medium-7 large-8 columns">' +
   '        <div class="input-group ' + eClass + '" id="output-factoid-address-container">' +
-  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type factoid address" value="' + defaultVal + '"></pre>' +
+  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type entry credit address" value="' + defaultVal + '"></pre>' +
   '            <!-- <a data-toggle="addressbook" class="input-group-button button" id="addressbook-' + counter + '"><i class="fa fa-book"></i></a> -->' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-10 medium-4 large-3 columns">' +
   '        <div class="input-group">' +
-  '            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">' +
-  '            <span class="input-group-label">FCT</span>' +
+  '            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of entry credits">' +
+  '            <span class="input-group-label">EC</span>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-2 medium-1 columns">' +
@@ -39,12 +39,7 @@ $("#all-outputs").on('click','#remove-new-output', function(){
 $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
   var self = $(this);
   self.val(self.val().replace(/[^0-9\.]/g, ''));
-  if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57)) {
-    evt.preventDefault();
-  }
-
-  decSplit = $(this).val().split(".")
-  if(decSplit.length > 2) {
+  if ((evt.which < 48 || evt.which > 57)) {
     evt.preventDefault();
   }
 });
@@ -61,7 +56,7 @@ $("#all-outputs").on('click', '#output-factoid-address-container', function(){
 $("#send-entire-transaction").on('click', function(){
 	// var transObject = new Object()
 	var transObject = {
-    TransType:"factoid",
+    TransType:"ec",
 		OutputAddresses:[],
 		OutputAmounts:[]
 	}
@@ -89,23 +84,23 @@ function LoadAddresses(){
   resp = getRequest("addresses",function(resp){
     obj = JSON.parse(resp)
     
-    obj.FactoidAddresses.List.forEach(function(address){
-      $('#addresses-reveal').append(factoidAddressRadio(address, "factoid"));
-    })
-
-    /*obj.EntryCreditAddresses.List.forEach(function(address){
-      $('#addresses-reveal').append(factoidAddressRadio(address, "entry-credits"));
+    /*obj.FactoidAddresses.List.forEach(function(address){
+      $('#addresses-reveal').append(factoidECRadio(address, "factoid"));
     })*/
 
+    obj.EntryCreditAddresses.List.forEach(function(address){
+      $('#addresses-reveal').append(factoidECRadio(address, "entry-credits"));
+    })
+
     obj.ExternalAddresses.List.forEach(function(address){
-      if(address.Address.startsWith("FA")){
-        $('#addresses-reveal').append(factoidAddressRadio(address, "external"));
+      if(address.Address.startsWith("EC")){
+        $('#addresses-reveal').append(factoidECRadio(address, "external"));
       }
     })
   })
 }
 
-function factoidAddressRadio(address, type){
+function factoidECRadio(address, type){
 return '<pre>' +
 '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
 '</pre>'

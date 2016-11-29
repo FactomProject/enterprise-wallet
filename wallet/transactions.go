@@ -51,6 +51,19 @@ func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts 
 	return wal.ConstructSendFactoids(toAddresses, amts)
 }
 
+func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, amounts []string) (string, error) {
+	var amts []uint64
+	for _, a := range amounts {
+		amt64, err := strconv.ParseUint(a, 10, 64)
+		if err != nil {
+			return "", err
+		}
+		amts = append(amts, amt64)
+	}
+
+	return wal.ConstructConvertToEC(toAddresses, amts)
+}
+
 // Constructs factoid transaction
 // Transaction name is hash of all the addresses. More than 1 transaction to
 // an address(es) should not be open, but combined.

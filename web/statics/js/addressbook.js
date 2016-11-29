@@ -7,6 +7,7 @@ $(window).load(function() {
 function LoadAddresses(){
 	resp = getRequest("addresses",function(resp){
 		obj = JSON.parse(resp)
+		//console.log(resp)
 		
 		obj.FactoidAddresses.List.forEach(function(address){
 			$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid"));

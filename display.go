@@ -257,6 +257,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 	case "send-transaction":
 		type SendTransStruct struct {
+			TransType string   `json:"TransType"`
 			Addresses []string `json:"OutputAddresses"`
 			Amounts   []string `json:"OutputAmounts"`
 		}
@@ -270,9 +271,21 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name, err := MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
-		if err != nil {
-			w.Write(jsonError(err.Error()))
+		name := ""
+		if trans.TransType == "factoid" {
+			name, err = MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
+			if err != nil {
+				w.Write(jsonError(err.Error()))
+				return
+			}
+		} else if trans.TransType == "ec" {
+			name, err = MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
+			if err != nil {
+				w.Write(jsonError(err.Error()))
+				return
+			}
+		} else {
+			w.Write(jsonError("Not a valid type"))
 			return
 		}
 
