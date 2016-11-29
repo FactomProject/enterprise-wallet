@@ -8,5 +8,5 @@ Must launch from M2GUIWallet directory until static files are compiled into Go.
  - Run 'M2WalletGUI', it will populate 5 random factoid and ec addresses, as well as add 1 external.
  - localhost:8091
  
-This is the current setup for testing
+This is the current setup for testing. Map databases are used
  
