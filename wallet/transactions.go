@@ -89,6 +89,9 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 
 	var total uint64 = 0
 	for i, address := range toAddresses {
+		if !wal.IsValidAddress(address) || address[:2] != "FA" {
+			return "", fmt.Errorf("Invalid address given")
+		}
 		wal.Wallet.AddOutput(trans, address, amounts[i])
 		total += amounts[i]
 	}
@@ -200,6 +203,9 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 
 	var total uint64 = 0
 	for i, address := range toAddresses {
+		if !wal.IsValidAddress(address) || address[:2] != "EC" {
+			return "", fmt.Errorf("Invalid address given")
+		}
 		amt := rate * amounts[i]
 		wal.Wallet.AddECOutput(trans, address, amt)
 		total += amt

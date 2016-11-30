@@ -61,17 +61,44 @@ $("#send-entire-transaction").on('click', function(){
 		OutputAmounts:[]
 	}
 
+  errMessage = ""
+  faErr = false
+  amtErr = false
+
 	$("#all-outputs #single-output").each(function(){
 		add = $(this).find("#output-factoid-address").val()
+    if(!add.startsWith("EC")) {
+      $(this).find("#output-factoid-address-container").addClass("input-group-error")
+      faErr = true
+      err = true
+    }
+
 		amt = $(this).find("#output-factoid-amount").val()
-		
+		if(amt == 0 || amt == undefined) {
+      amtErr = true
+      $(this).find("#output-factoid-amount").addClass("input-group-error")
+    }
+
 		transObject.OutputAddresses.push(add)
 		transObject.OutputAmounts.push(amt)
 	})
 
+  if(err){
+    if(faErr){errMessage += "Addresses must start with 'EC'. "}
+    if(amtErr){errMessage += "Amounts should not be 0. "}
+    SetGeneralError("Error(s): " + errMessage)
+    return
+  }
+
 	j = JSON.stringify(transObject)
 	postRequest("send-transaction", j, function(resp){
 		console.log(resp)
+    obj = JSON.parse(resp)
+    if(obj.Error == "none") {
+      SetGeneralSuccess("Transaction sent, still working on better confirmation")
+    } else {
+      SetGeneralError("Error: " + obj.Error)
+    }
 	})
 })
 

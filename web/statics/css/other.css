@@ -11,3 +11,12 @@
 .percent95 {
 	font-size: 95%;
 }
+
+.disabled-input {
+	cursor: not-allowed !important;
+	color:#A0A0A0 !important;
+}
+
+.input-group-error {
+  box-shadow: 0 0 3px #CC0000 !important;
+}

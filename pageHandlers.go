@@ -147,6 +147,14 @@ func HandleImportExportTransaction(w http.ResponseWriter, r *http.Request) error
  *  New Addresses  *
  *******************/
 
+func HandleNewAddress(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	templates.ExecuteTemplate(w, "new-address", NewPlaceHolderStruct())
+	return nil
+}
+
 func HandleNewAddressFactoid(w http.ResponseWriter, r *http.Request) error {
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()

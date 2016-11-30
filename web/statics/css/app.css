@@ -1561,10 +1561,6 @@ label {
   font-style: italic;
   color: #333; }
 
-.input-group-error {
-  box-shadow: 0 0 3px #CC0000;
-}
-
 .input-group {
   display: table;
   width: 100%;
@@ -3850,7 +3846,7 @@ header {
         background: #e6e6e6;
         border: solid 1px transparent;
         color: #656666; }
-        #frame section.rightCol main form input[type='text'][disabled='true'], #frame section.rightCol main form select[disabled='true'] {
+        #frame section.rightCol main form input[type='text'][disabled='true'], #frame section.rightCol main form input[type='text'][readonly='true'], #frame section.rightCol main form select[disabled='true'], #frame section.rightCol main form select[readonly='true'] {
           background: #f9ebc3;
           border-color: transparent;
           color: #d37d41; }

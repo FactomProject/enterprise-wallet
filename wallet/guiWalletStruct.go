@@ -88,6 +88,9 @@ func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair,
 
 func (w *WalletStruct) ChangeAddressName(address string, toName string) error {
 	anp, list, i := w.GetAddress(address)
+	if list == 0 || anp == nil || i == -1 {
+		return fmt.Errorf("Address not found")
+	}
 
 	w.Lock()
 	defer w.Unlock()

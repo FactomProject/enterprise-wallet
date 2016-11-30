@@ -112,6 +112,8 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleNewAddressExternal(w, r)
 	case "/new-address-factoid":
 		err = HandleNewAddressFactoid(w, r)
+	case "/new-address":
+		err = HandleNewAddress(w, r)
 	case "/receive-factoids":
 		err = HandleRecieveFactoids(w, r)
 	case "/send-factoids":
@@ -220,6 +222,8 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
+		} else {
+			w.Write(jsonResp("Success"))
 		}
 	case "display-private-key":
 		type Add struct {
@@ -254,6 +258,43 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			w.Write(jsonResp("true"))
 		} else {
 			w.Write(jsonResp("false"))
+		}
+	case "generate-new-address-factoid":
+		name := r.FormValue("json")
+		anp, err := MasterWallet.GenerateFactoidAddress(name)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
+	case "generate-new-address-ec":
+		name := r.FormValue("json")
+		anp, err := MasterWallet.GenerateEntryCreditAddress(name)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
+	case "new-address":
+		type NewAddressStruct struct {
+			Name   string `json:"Name"`
+			Secret string `json:"Secret"`
+		}
+
+		nas := new(NewAddressStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), nas)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, err := MasterWallet.AddAddress(nas.Name, nas.Secret)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
 		}
 	case "send-transaction":
 		type SendTransStruct struct {

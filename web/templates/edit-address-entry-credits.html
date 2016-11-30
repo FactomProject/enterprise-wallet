@@ -21,7 +21,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="medium-8 columns">
-                                        <input id="address-field" type="text" disabled="true" name="public-key" value="{{.Address}}">
+                                        <pre><input id="address-field" type="text" disabled="true" name="public-key" value="{{.Address}}" class="percent95"></pre>
                                     </div>
                                     <div class="medium-4 columns">
                                         <input id="address-name" type="text" name="alias" value="{{.Name}}">
@@ -41,10 +41,18 @@
                                         <a id="display-private-key" class="button expanded">Display Private Key</a>
                                     </div>
                                     <div class="large-8 medium-6 small-12 columns">
-                                        <input id="private-key-field"  type="text" name="private-key" disabled="true" value="">
+                                        <pre><input id="private-key-field"  type="text" name="private-key" readonly="true" value="" class="percent95"></pre>
                                     </div>
                                 </div>
                             </form>
+                            <div class="row">
+                                <div class="columns text-right">
+                                    <a id="copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
+                                </div>
+                            </div>
+                            <div id="error-zone" class="callout alert text-center" style="display:none">An error has occured</div>
+                            <div id="success-zone" class="callout success text-center" style="display:none">
+                            </div>
                         </div>
                     </div>
 

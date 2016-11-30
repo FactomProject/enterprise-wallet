@@ -59,3 +59,16 @@ function formatFC(fcBalance){
 
   return decSplit
 }
+
+// On most pages
+function SetGeneralError(err) {
+  $("#success-zone").slideUp(100)
+  $("#error-zone").text(err)
+  $("#error-zone").slideDown(100)
+}
+
+function SetGeneralSuccess(mes) {
+  $("#error-zone").slideUp(100)
+  $("#success-zone").text(mes)
+  $("#success-zone").slideDown(100)
+}

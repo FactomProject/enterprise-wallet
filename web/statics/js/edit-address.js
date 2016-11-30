@@ -8,6 +8,7 @@ $(window).load(function() {
 function GetDefaultData(){
 	Name = $("#address-name").val()
 	Address = $("#address-field").val()
+	console.log(Name, Address)
 }
 
 $("#display-private-key").click(function(){
@@ -16,6 +17,7 @@ $("#display-private-key").click(function(){
 		obj = JSON.parse(resp)
 		if (obj.Error != "none") {
 			$("#private-key-field").val(obj.Error)
+			SetGeneralError("Error: " + obj.Error)
 		} else {
 			$("#private-key-field").val(obj.Content)
 		}
@@ -28,8 +30,24 @@ $("#save-name-change").click(function(){
 
 	if (NewName != Name) {
 		postRequest("address-name-change", jsonOBJ, function(resp){
-			console.log("NameChangeResponse:" + resp)
+			obj = JSON.parse(resp)
+			if (obj.Error != "none") {
+				SetGeneralError("Error: " + obj.Error)
+			} else {
+				SetGeneralSuccess(obj.Content + ": The name has been changed")
+			}
 		})
+	} else {
+		SetGeneralError("Newname is the same as the original")
 	}
 })
 
+$("#copy-to-clipboard").on('click', function(){
+	var aux = document.createElement("input");
+	//console.log($('#selected-address-info').val())
+	aux.setAttribute("value", $('#private-key-field').val());
+	document.body.appendChild(aux);
+	aux.select();
+	document.execCommand("copy");
+	document.body.removeChild(aux);
+})
