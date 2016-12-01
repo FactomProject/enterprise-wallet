@@ -20,6 +20,7 @@ import (
 	// "github.com/FactomProject/factom/wallet/wsapi"
 	"encoding/json"
 	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/database/mapdb"
 )
 
 const (
@@ -31,6 +32,7 @@ const (
 var (
 	GUI_DB    = MAP
 	WALLET_DB = MAP
+	TX_DB     = MAP
 )
 
 // Wallet interacting with LDB and factom/wallet
@@ -101,9 +103,19 @@ func NewWalletDB() (*WalletDB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	w.Wallet = wal
 
-	txdb, err := wallet.NewTXBoltDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks.cache"))
+	var txdb *wallet.TXDatabaseOverlay
+	switch TX_DB {
+	case MAP:
+		txdb = wallet.NewTXOverlay(new(mapdb.MapDB))
+		err = nil
+	case LDB:
+	case BOLT:
+		txdb, err = wallet.NewTXBoltDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks.cache"))
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("Could not add transaction database to wallet:", err)
 	} else {
