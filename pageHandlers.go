@@ -180,24 +180,24 @@ func HandleNewAddressExternal(w http.ResponseWriter, r *http.Request) error {
 }
 
 /**************************
- *  Recieve/Send Factoids *
+ *  Receive/Send Factoids *
  **************************/
 
-type RecieveFactoidsStruct struct {
+type ReceiveFactoidsStruct struct {
 	Settings *SettingsStruct
 
 	Address string
 	Name    string
 }
 
-func HandleRecieveFactoids(w http.ResponseWriter, r *http.Request) error {
+func HandleReceiveFactoids(w http.ResponseWriter, r *http.Request) error {
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
 
 	address := r.FormValue("address")
 	name := r.FormValue("name")
 
-	st := new(RecieveFactoidsStruct)
+	st := new(ReceiveFactoidsStruct)
 	st.Settings = MasterSettings
 
 	st.Address = address

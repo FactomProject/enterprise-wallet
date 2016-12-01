@@ -36,6 +36,11 @@ func TestDBInteraction(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 
+	err = RelatedTransTest(wal)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
 	// End Tests
 
 	/*err = wal.Close()
@@ -76,6 +81,11 @@ func DBAddingExternalAddress(wal *WalletDB) error {
 
 	return nil
 
+}
+
+func RelatedTransTest(wal *WalletDB) error {
+	_, err := wal.GetRelatedTransactions()
+	return err
 }
 
 func DBAddAndCountTest(wal *WalletDB) error {

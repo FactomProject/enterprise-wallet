@@ -9,12 +9,14 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"sort"
 	"strings"
 
 	"github.com/FactomProject/M2WalletGUI/address"
 	"github.com/FactomProject/M2WalletGUI/wallet/database"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet"
+	"github.com/FactomProject/factomd/common/primitives"
 	// "github.com/FactomProject/factom/wallet/wsapi"
 	"encoding/json"
 	"github.com/FactomProject/factomd/common/interfaces"
@@ -41,8 +43,8 @@ type WalletDB struct {
 	TransactionDB *wallet.TXDatabaseOverlay // Used to display transactions
 
 	// List of transactions related to any address in address book
-	cachedTransactions []interfaces.ITransaction
-	cachedHeight       int64
+	cachedTransactions []DisplayTransaction
+	cachedHeight       uint32
 }
 
 // For now is same as New
@@ -101,7 +103,7 @@ func NewWalletDB() (*WalletDB, error) {
 	}
 	w.Wallet = wal
 
-	txdb, err := wallet.NewTXBoltDB(fmt.Sprint(GetHomeDir(), "/.factom/wallet/factoid_blocks.cache"))
+	txdb, err := wallet.NewTXBoltDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks.cache"))
 	if err != nil {
 		return nil, fmt.Errorf("Could not add transaction database to wallet:", err)
 	} else {
@@ -115,9 +117,204 @@ func NewWalletDB() (*WalletDB, error) {
 		return nil, err
 	}
 
+	//w.cachedTransactions = make(interfaces.ITransaction)
+	w.cachedHeight = 0
+
 	// go wsapi.Start(w.Wallet, fmt.Sprintf(":%d", 8089), *(factom.RpcConfig))
 
 	return w, nil
+}
+
+type TransactionAddressInfo struct {
+	Name    string
+	Address string
+	Amount  uint64
+	Type    string // FCT or EC
+}
+
+func NewTransactionAddressInfo(name string, address string, amount uint64, tokenType string) *TransactionAddressInfo {
+	t := new(TransactionAddressInfo)
+	t.Name = name
+	t.Address = address
+	t.Amount = amount
+	t.Type = tokenType
+
+	return t
+}
+
+// Names are "" if not in wallet
+type DisplayTransaction struct {
+	Inputs     []TransactionAddressInfo
+	TotalInput uint64
+
+	Outputs        []TransactionAddressInfo
+	TotalFCTOutput uint64
+	TotalECOutput  uint64
+
+	TxID   string
+	Height uint32
+	Action string
+	Date   string
+	Time   string
+
+	//ITrans interfaces.ITransaction
+}
+
+// for sorting
+type DisplayTransactions []DisplayTransaction
+
+func (slice DisplayTransactions) Len() int {
+	return len(slice)
+}
+
+func (slice DisplayTransactions) Less(i, j int) bool {
+	// Reverse, as higher height = newer
+	return slice[i].Height > slice[j].Height
+}
+
+func (slice DisplayTransactions) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
+func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTransaction, error) {
+	if t == nil {
+		return nil, fmt.Errorf("Transaction is nil")
+	}
+
+	_, err := w.TransactionDB.GetAllTXs()
+	if err != nil {
+		return nil, err
+	}
+
+	dt := new(DisplayTransaction)
+	//dt.ITrans = t
+	dt.TotalInput = 0
+	dt.TotalFCTOutput = 0
+	dt.TotalECOutput = 0
+	dt.Height = t.GetBlockHeight()
+	dt.TxID = t.GetHash().String()
+	dt.Inputs = make([]TransactionAddressInfo, 0)
+	dt.Outputs = make([]TransactionAddressInfo, 0)
+	dt.Action = ""
+	dt.Date = t.GetTimestamp().GetTime().Format(("02/01/2006"))
+	dt.Time = t.GetTimestamp().GetTime().Format(("15:04:05"))
+
+	ins := t.GetInputs()
+	// Inputs
+	for _, in := range ins {
+		add := primitives.ConvertFctAddressToUserStr(in.GetAddress())
+		anp, _ := w.GetGUIAddress(add)
+		name := ""
+		if anp != nil {
+			name = anp.Name
+			dt.Action = "sent"
+		}
+
+		amt := in.GetAmount()
+		dt.TotalInput += amt
+
+		dt.Inputs = append(dt.Inputs, *NewTransactionAddressInfo(name, add, amt, "FCT"))
+	}
+
+	outs := t.GetOutputs()
+	// FCT Outputs
+	for _, out := range outs {
+		add := primitives.ConvertFctAddressToUserStr(out.GetAddress())
+		anp, _ := w.GetGUIAddress(add)
+		name := ""
+		if anp != nil {
+			name = anp.Name
+			if dt.Action == "sent" {
+				dt.Action = "both"
+			} else {
+				dt.Action = "received"
+			}
+		}
+
+		amt := out.GetAmount()
+		dt.TotalFCTOutput += amt
+
+		dt.Outputs = append(dt.Outputs, *NewTransactionAddressInfo(name, add, amt, "FCT"))
+	}
+
+	ecOuts := t.GetECOutputs()
+	// EC Outputs
+	for _, ecOut := range ecOuts {
+		add := primitives.ConvertECAddressToUserStr(ecOut.GetAddress())
+		anp, _ := w.GetGUIAddress(add)
+		name := ""
+		if anp != nil {
+			name = anp.Name
+			if dt.Action == "sent" {
+				dt.Action = "converted"
+			} else {
+				dt.Action = "converted"
+			}
+		}
+
+		amt := ecOut.GetAmount()
+		dt.TotalECOutput += amt
+
+		dt.Outputs = append(dt.Outputs, *NewTransactionAddressInfo(name, add, amt, "EC"))
+	}
+
+	return dt, nil
+}
+
+// Currently no caching
+func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
+
+	/*block, err := w.Wallet.TXDB().DBO.FetchFBlockHead()
+	fmt.Println(block, err)
+	if err != nil {
+		fmt.Println("Exit 1")
+		return err
+	}
+	// Last update
+	start := w.cachedHeight
+	heights, err := factom.GetHeights()
+	if err != nil {
+		fmt.Println("Exit 2")
+		return err
+	}
+
+	end := heights.LeaderHeight
+	_ = end
+	_ = start*/
+	// TODO: Caching
+
+	// ## No cache solution ##
+	// Need to prevent Duplicates
+	transMap := make(map[string]interfaces.ITransaction)
+	var transList []DisplayTransaction
+	adds := w.GetAllGUIAddresses()
+	for _, a := range adds {
+		transactions, err := w.Wallet.TXDB().GetTXAddress(a.Address)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, trans := range transactions {
+			i, _ := transMap[trans.GetHash().String()]
+			if i == nil {
+				transMap[trans.GetHash().String()] = trans
+				dt, err := w.NewDisplayTransaction(trans)
+				if err != nil {
+					return nil, err
+				}
+				transList = append(transList, *dt)
+			}
+		}
+	}
+
+	// ## End no cache ##
+
+	// Update to current
+	//h := block.GetDBHeight()
+	//w.cachedHeight = h
+
+	sort.Sort(DisplayTransactions(transList))
+	return transList, nil
 }
 
 func (w *WalletDB) GetGUIWalletJSON() ([]byte, error) {

@@ -66,7 +66,7 @@ func TestAddressList(t *testing.T) {
 		t.Fatalf("Failed: Not same")
 	}
 
-	err = addList.Remove(addList.List[0])
+	err = addList.Remove(&(addList.List[0]))
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -75,7 +75,7 @@ func TestAddressList(t *testing.T) {
 		t.Fatalf("Failed: Not same")
 	}
 
-	err = addList2.Remove(addList2.List[0])
+	err = addList2.Remove(&(addList2.List[0]))
 	if err != nil {
 		t.Fatalf(err.Error())
 	}

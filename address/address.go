@@ -46,6 +46,14 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 	return add, nil
 }
 
+func (anp *AddressNamePair) ChangeName(name string) error {
+	if len(name) > maxNameLength {
+		return fmt.Errorf("Name too long, must be less than %d characters", maxNameLength)
+	}
+	anp.Name = name
+	return nil
+}
+
 func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
 	if strings.Compare(anp.Name, b.Name) == 0 {
 		if strings.Compare(anp.Address, b.Address) == 0 {
@@ -140,6 +148,7 @@ func (addList *AddressList) AddANP(anp *AddressNamePair) error {
 }
 
 func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
+	// We check for valid factom address higher up, this is just a basic check
 	if len(name) == 0 || len(address) != 52 {
 		return nil, errors.New("Nil AddressNamePair")
 	}

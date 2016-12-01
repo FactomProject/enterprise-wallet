@@ -115,7 +115,7 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	case "/new-address":
 		err = HandleNewAddress(w, r)
 	case "/receive-factoids":
-		err = HandleRecieveFactoids(w, r)
+		err = HandleReceiveFactoids(w, r)
 	case "/send-factoids":
 		err = HandleSendFactoids(w, r)
 	default:
@@ -188,6 +188,16 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonError("Error occurred"))
+	case "related-transactions":
+		trans, err := MasterWallet.GetRelatedTransactions()
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(trans))
+		}
+	// TODO: Remove
+	case "test-error":
+		w.Write(jsonError("This is an error for tests"))
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

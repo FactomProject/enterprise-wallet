@@ -82,8 +82,9 @@ $("#send-entire-transaction").on('click', function(){
 
 		amt = $(this).find("#output-factoid-amount").val()
 		if(amt == 0 || amt == undefined) {
-      amtErr = true
       $(this).find("#output-factoid-amount").addClass("input-group-error")
+      amtErr = true
+      err = true
     }
 
 		transObject.OutputAddresses.push(add)
@@ -137,7 +138,7 @@ function LoadAddresses(){
 function factoidAddressRadio(address, type){
 return '<pre>' +
 '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
-'</pre>'
+'</pre><br />'
 }
 
 $('#addresses-reveal').on("mouseover", "#address-name", function(){

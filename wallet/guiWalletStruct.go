@@ -37,6 +37,26 @@ func (w *WalletStruct) AddAddress(name string, address string, list int) (*addre
 		return nil, fmt.Errorf("Invalid list")
 	}
 
+	switch list {
+	case 1: // Factoid
+		if address[:2] != "FA" {
+			return nil, fmt.Errorf("Not a valid factoid address")
+		}
+	case 2: // EC
+		if address[:2] != "EC" {
+			return nil, fmt.Errorf("Not a valid entry credit address")
+		}
+	case 3: // Either
+		if !(address[:2] == "EC" || address[:2] == "FA") {
+			return nil, fmt.Errorf("Not a valid address")
+		}
+	}
+
+	valid := factom.IsValidAddress(address)
+	if !valid {
+		return nil, fmt.Errorf("Not a valid address")
+	}
+
 	w.Lock()
 	defer w.Unlock()
 
@@ -97,13 +117,23 @@ func (w *WalletStruct) ChangeAddressName(address string, toName string) error {
 	if strings.Compare(anp.Address, address) == 0 { // To be sure
 		switch list {
 		case 1:
-			w.FactoidAddresses.List[i].Name = toName
+			//w.FactoidAddresses.List[i].Name = toName
+			err := w.FactoidAddresses.List[i].ChangeName(toName)
+			if err != nil {
+				return err
+			}
 			return nil
 		case 2:
-			w.EntryCreditAddresses.List[i].Name = toName
+			err := w.EntryCreditAddresses.List[i].ChangeName(toName)
+			if err != nil {
+				return err
+			}
 			return nil
 		case 3:
-			w.ExternalAddresses.List[i].Name = toName
+			err := w.ExternalAddresses.List[i].ChangeName(toName)
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 	}

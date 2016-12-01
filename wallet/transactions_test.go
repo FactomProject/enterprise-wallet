@@ -90,7 +90,6 @@ func TestConvertToEC(t *testing.T) {
 		recs = append(recs, recAnp.Address)
 		//amts = append(amts, 1000e8)
 		amts = append(amts, 10) //1e8)
-		fmt.Println(recAnp.Address)
 	}
 
 	/*

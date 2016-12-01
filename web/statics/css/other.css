@@ -20,3 +20,43 @@
 .input-group-error {
   box-shadow: 0 0 3px #CC0000 !important;
 }
+
+.loader {
+	margin: auto 0;
+    border: 16px solid #e6e6e6; /* Light grey */
+    border-top: 16px solid #f9ebc3; /* Yellow */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader-container{
+	display:table;
+	width:100%;
+	height:100%;
+} 
+
+.loader-body {
+	display:table-cell;
+	vertical-align:middle;
+}
+
+.green {
+	color:green;
+}
+
+.red {
+	color:red;
+}
+
+pre {
+	display:inline;
+}
