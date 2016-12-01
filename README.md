@@ -8,9 +8,9 @@ Must launch from M2GUIWallet directory until static files are compiled into Go.
 
 ## To Launch for testing
  - Run 'factomd'
- - Run 'M2WalletGUI', it will populate 5 random factoid and ec addresses, as well as add 1 external.
-    - **Must** run from the /M2WalletGUI directory as the web files are not yet compiled in.
-    - Just to repeat, **must** run from /M2WalletGUI directory.
+ - Run 'M2GUIWallet', it will populate 5 random factoid and ec addresses, as well as add 1 external.
+    - **Must** run from the /M2GUIWallet directory as the web files are not yet compiled in.
+    - Just to repeat, **must** run from /M2GUIWallet directory.
  - localhost:8091 to get to wallet
 
 

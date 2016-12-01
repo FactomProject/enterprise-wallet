@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/FactomProject/M2WalletGUI/address"
+	"github.com/FactomProject/M2GUIWallet/address"
 	"github.com/FactomProject/factom"
 )
 

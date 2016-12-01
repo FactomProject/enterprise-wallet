@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	. "github.com/FactomProject/M2WalletGUI/address"
+	. "github.com/FactomProject/M2GUIWallet/address"
 	ed "github.com/FactomProject/ed25519"
 	"github.com/FactomProject/factom"
 )

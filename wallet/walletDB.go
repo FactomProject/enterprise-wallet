@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/FactomProject/M2WalletGUI/address"
-	"github.com/FactomProject/M2WalletGUI/wallet/database"
+	"github.com/FactomProject/M2GUIWallet/address"
+	"github.com/FactomProject/M2GUIWallet/wallet/database"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet"
 	"github.com/FactomProject/factomd/common/primitives"
