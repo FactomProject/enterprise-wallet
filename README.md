@@ -19,8 +19,10 @@ Must launch from M2GUIWallet directory until static files are compiled into Go.
  - 11 Addresses are preloaded on startup, 5 Random Factoid, 5 random Entry credit, and 1 factoid addresses with factoids in it (in local networks that is)
 
 
- ### Features not working as intended or not Working
+
+### Features not working as intended or not Working
   - Import/Export Transactions is **not working**
   - Displaying all transactions is not working as intended
     - The display is wrong too, testing the waters with some ideas and working with Tanner
   - Confirmation pages are **not working**. Basic confirmation in a green success box is all that is implemented right now
+  - Settings do **not work**
