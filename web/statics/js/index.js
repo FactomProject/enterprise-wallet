@@ -35,57 +35,71 @@ function LoadTransactions() {
 
 function AppendNewTransaction(trans, index){
 	console.log(trans)
-	inputs = ""
-	outputs = ""
-	token = ""
-	personalGain = 0
-	personalLoss = 0
-	personalECGain = 0
 
-	// Transactions with sent and received to addresses will appear as 2 seperate ones
+	// Transactions are split into 3 transactions if sent/recieve/converted is all happening.
+	// function appendTrans(pic, index, amt, token, date, addrs)
+	if(trans.Action[0] == true) { // Sent
+		pic = "sent"
+		amt = 0
+		token = "FCT"
+		addrs = ""
 
-	for(var i = 0; i < trans.Inputs.length; i++) {
-		if(trans.Inputs[i].Name != "") {
-			inputs += '<div class="nick red">' + trans.Inputs[i].Name + '<pre class="show-for-large"> (' + trans.Inputs[i].Address + ')</pre></div>'
-			personalLoss += trans.Inputs[i].Amount * -1
-		}
-	}	
-	amountLost = (trans.TotalInput / 1e8) * -1
-	token = "FCT"
+		for(var i = 0; i < trans.Inputs.length; i++) {
+			if(trans.Inputs[i].Name != "") {
+				addrs += '<div class="nick">' + trans.Inputs[i].Name + '<pre class="show-for-large"> (' + trans.Inputs[i].Address + ')</pre></div>'
+				amt += trans.Inputs[i].Amount / 1e8
+			}
+		}	
 
-	for(var i = 0; i < trans.Outputs.length; i++) {
-		if(trans.Outputs[i].Name != "") {
-			if(trans.Outputs[i].Address.startsWith("FA")){
-				outputs += '<div class="nick green">' + trans.Outputs[i].Name + '<pre class="show-for-large percent95"> (' + trans.Outputs[i].Address + ')</pre></div>'
-				personalGain += trans.Outputs[i].Amount
-			} else {
-				outputs += '<div class="nick green">' + trans.Outputs[i].Name + '<pre class="show-for-large percent95"> (' + trans.Outputs[i].Address + ')</pre></div>'
-				personalECGain += trans.Outputs[i].Amount
+		appendTrans(pic, index, amt*-1, token, trans.Date, addrs)
+	}
+
+	if(trans.Action[1] == true) { // Received
+		pic = "received"
+		amt = 0
+		token = "FCT"
+		addrs = ""
+
+		for(var i = 0; i < trans.Outputs.length; i++) {
+			if(trans.Outputs[i].Name != "") {
+				if(trans.Outputs[i].Address.startsWith("FA")){
+					addrs += '<div class="nick">' + trans.Outputs[i].Name + '<pre class="show-for-large percent95"> (' + trans.Outputs[i].Address + ')</pre></div>'
+					amt += trans.Outputs[i].Amount / 1e8
+				}
 			}
 		}
-	}
-	amountGained = trans.TotalFCTOutput / 1e8
-	token = "FCT"
 
-	personalAmt = (personalGain + personalLoss) / 1e8
-	pic = "sent"
-	if(personalAmt >= 0) {
-		pic = "received"
+		appendTrans(pic, index, amt, token, trans.Date, addrs)
 	}
 
-	if(personalECGain > 0) {
+	if(trans.Action[2] == true) { // Converted
 		pic = "converted"
-		trans.Action = "converted"
-	}
+		amt = 0
+		token = "FCT"
+		addrs = ""
 
+		for(var i = 0; i < trans.Outputs.length; i++) {
+			if(trans.Outputs[i].Name != "") {
+				if(trans.Outputs[i].Address.startsWith("EC")){
+					addrs += '<div class="nick">' + trans.Outputs[i].Name + '<pre class="show-for-large percent95"> (' + trans.Outputs[i].Address + ')</pre></div>'
+					amt += trans.Outputs[i].Amount / 1e8
+				}
+			}
+		}
+
+		appendTrans(pic, index, amt, token, trans.Date, addrs)
+	}
+}
+
+function appendTrans(pic, index, amt, token, date, addrs) {
 	$("#transaction-list").append(
-       '<tr>' +
-            '<td><a data-toggle="transDetails"><i class="transIcon ' + trans.Action + '"><img src="img/transaction_' + pic + '.svg" class="svg"></i></a></td>' +
-            '<td>' + trans.Date + ' : <a value="' + CurrentCount + '" id="transaction-link" data-toggle="transDetails">' + trans.Action.capitalize() + '</a>' +
-            inputs + outputs + '</td>' +
-            '<td style="word-wrap: break-word;">' + Number(personalAmt.toFixed(4)) + token + '</td>' +
-        '</tr>'
-	)
+   '<tr>' +
+        '<td><a data-toggle="transDetails"><i class="transIcon ' + pic + '"><img src="img/transaction_' + pic + '.svg" class="svg"></i></a></td>' +
+        '<td>' + date + ' : <a value="' + index + '" id="transaction-link" data-toggle="transDetails">' + pic.capitalize() + '</a>' +
+        addrs + '</td>' +
+        '<td style="word-wrap: break-word;">' + Number(amt.toFixed(4)) + token + '</td>' +
+    '</tr>'
+)
 }
 
 

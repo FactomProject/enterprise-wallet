@@ -161,7 +161,7 @@ type DisplayTransaction struct {
 
 	TxID   string
 	Height uint32
-	Action string
+	Action [3]bool // Sent, recieved, converted
 	Date   string
 	Time   string
 
@@ -203,8 +203,8 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	dt.TxID = t.GetHash().String()
 	dt.Inputs = make([]TransactionAddressInfo, 0)
 	dt.Outputs = make([]TransactionAddressInfo, 0)
-	dt.Action = ""
-	dt.Date = t.GetTimestamp().GetTime().Format(("02/01/2006"))
+	dt.Action = [3]bool{false, false, false}
+	dt.Date = t.GetTimestamp().GetTime().Format(("01/02/2006"))
 	dt.Time = t.GetTimestamp().GetTime().Format(("15:04:05"))
 
 	ins := t.GetInputs()
@@ -215,7 +215,7 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 		name := ""
 		if anp != nil {
 			name = anp.Name
-			dt.Action = "sent"
+			dt.Action[0] = true
 		}
 
 		amt := in.GetAmount()
@@ -232,11 +232,7 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 		name := ""
 		if anp != nil {
 			name = anp.Name
-			if dt.Action == "sent" {
-				dt.Action = "both"
-			} else {
-				dt.Action = "received"
-			}
+			dt.Action[1] = true
 		}
 
 		amt := out.GetAmount()
@@ -253,11 +249,7 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 		name := ""
 		if anp != nil {
 			name = anp.Name
-			if dt.Action == "sent" {
-				dt.Action = "converted"
-			} else {
-				dt.Action = "converted"
-			}
+			dt.Action[2] = true
 		}
 
 		amt := ecOut.GetAmount()
