@@ -127,6 +127,7 @@ func LoadTestWallet() error {
 
 	GUI_DB = MAP
 	WALLET_DB = MAP
+	TX_DB = MAP
 
 	wal, err := TestHelper.Start()
 	//wal, err := LoadWalletDB()

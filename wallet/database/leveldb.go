@@ -5,12 +5,12 @@ package database
  *  Controls LevelDB functions  *
  *                              *
  ********************************/
-
+/*
 import (
 	"os"
 	"sync"
 
-	"github.com/FactomProject/goleveldb/leveldb"
+	"github.com/FactomProject/factomd/database/leveldb"
 	"github.com/FactomProject/goleveldb/leveldb/opt"
 )
 
@@ -71,3 +71,4 @@ func NewLevelDB(filename string) (IDatabase, error) {
 
 	return db, nil
 }
+*/

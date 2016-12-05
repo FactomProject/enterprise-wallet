@@ -39,7 +39,7 @@ var (
 //   The LDB doesn't need to be updated often, so we save after every add and only
 //   deal with cached version
 type WalletDB struct {
-	GUIlDB        database.IDatabase        // GUI DB
+	GUIlDB        interfaces.IDatabase      //database.IDatabase        // GUI DB
 	guiWallet     *WalletStruct             // Cached version on GUI LDB
 	Wallet        *wallet.Wallet            // Wallet from factom/wallet
 	TransactionDB *wallet.TXDatabaseOverlay // Used to display transactions
@@ -58,14 +58,15 @@ func NewWalletDB() (*WalletDB, error) {
 	w := new(WalletDB)
 
 	// TODO: Adjust this path
-	var db database.IDatabase
+	var db interfaces.IDatabase
 	var err error
 	switch GUI_DB { // Decides type of wallet DB
 	case MAP:
 		db, err = database.NewMapDB()
 	case LDB:
-		db, err = database.NewLevelDB(GetHomeDir() + "/.factom/m2/gui_wallet_ldb")
+		db, err = database.NewOrOpenLevelDBWallet(GetHomeDir() + "/.factom/m2/gui_wallet_ldb")
 	case BOLT:
+		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + "/.factom/m2/gui_wallet_bolt")
 	}
 	if err != nil {
 		return nil, err
@@ -74,20 +75,14 @@ func NewWalletDB() (*WalletDB, error) {
 	w.GUIlDB = db
 
 	w.guiWallet = NewWallet()
-	data, err := w.GUIlDB.Get([]byte("wallet"))
-	if err == nil {
-		err = w.guiWallet.UnmarshalBinary(data)
-	}
-	if err != nil {
-		data, err := w.guiWallet.MarshalBinary()
+	data, err := w.GUIlDB.Get([]byte("gui-wallet"), []byte("wallet"), new(WalletStruct))
+	if err != nil || data == nil {
+		err = w.GUIlDB.Put([]byte("gui-wallet"), []byte("wallet"), w.guiWallet)
 		if err != nil {
 			return nil, err
 		}
-
-		err = w.GUIlDB.Put([]byte("wallet"), data)
-		if err != nil {
-			return nil, err
-		}
+	} else {
+		w.guiWallet = data.(*WalletStruct)
 	}
 
 	// TODO: Adjust this path
@@ -112,6 +107,7 @@ func NewWalletDB() (*WalletDB, error) {
 		txdb = wallet.NewTXOverlay(new(mapdb.MapDB))
 		err = nil
 	case LDB:
+		txdb, err = wallet.NewTXLevelDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks_level"))
 	case BOLT:
 		txdb, err = wallet.NewTXBoltDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks.cache"))
 	}
@@ -406,12 +402,7 @@ func (w *WalletDB) Close() error {
 }
 
 func (w *WalletDB) Save() error {
-	data, err := w.guiWallet.MarshalBinary()
-	if err != nil {
-		return err
-	}
-
-	err = w.GUIlDB.Put([]byte("wallet"), data)
+	err := w.GUIlDB.Put([]byte("gui-wallet"), []byte("wallet"), w.guiWallet)
 	if err != nil {
 		return err
 	}

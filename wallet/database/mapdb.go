@@ -5,7 +5,7 @@ package database
  *    Controls Map functions    *
  *                              *
  ********************************/
-
+/*
 import (
 	"crypto/sha256"
 	"encoding/hex"
@@ -66,4 +66,4 @@ func NewMapDB() (IDatabase, error) {
 	db.mapDB = make(map[string][]byte)
 
 	return db, nil
-}
+}*/
