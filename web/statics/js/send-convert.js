@@ -1,4 +1,15 @@
-// NO LONGER USED
+// Used for sending factoids or converting to entry credits
+PageTokenABR = "FCT"
+PageToken = "factoids"
+AddressPrefix = "FA"
+PageTransType = "factoid"
+
+if($("#token-header").attr("value") == "1") {
+  PageTokenABR = "EC"
+  PageToken = "entry credits"
+  AddressPrefix = "EC"
+  PageTransType = "ec"
+}
 
 counter = 1
 function addNewOutputAddress(defaultVal, error) {
@@ -17,7 +28,7 @@ function addNewOutputAddress(defaultVal, error) {
   '    <div class="small-10 medium-4 large-3 columns">' +
   '        <div class="input-group">' +
   '            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '">' +
-  '            <span class="input-group-label">' + PageToken + '</span>' +
+  '            <span class="input-group-label">' + PageTokenABR + '</span>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-2 medium-1 columns">' +
@@ -60,56 +71,140 @@ $("#all-outputs").on('click', '#output-factoid-address-container', function(){
 	$(this).removeClass("input-group-error")
 })
 
-$("#send-entire-transaction").on('click', function(){
-	// var transObject = new Object()
-	var transObject = {
-    TransType:"factoid",
-		OutputAddresses:[],
-		OutputAmounts:[]
-	}
+$("#make-entire-transaction").on('click', function(){
+  if(Input) {
+    MakeTransaction()
+  }
+})
+
+function MakeTransaction() {
+  // var transObject = new Object()
+  var transObject = {
+    TransType:PageTransType,
+    OutputAddresses:[],
+    OutputAmounts:[]
+  }
 
   errMessage = ""
   faErr = false
   amtErr = false
 
 
-	$("#all-outputs #single-output").each(function(){
+  $("#all-outputs #single-output").each(function(){
     err = false
-		add = $(this).find("#output-factoid-address").val()
-    if(!add.startsWith("FA")) {
+    add = $(this).find("#output-factoid-address").val()
+    if(!add.startsWith(AddressPrefix)) {
       $(this).find("#output-factoid-address-container").addClass("input-group-error")
       faErr = true
       err = true
     }
 
-		amt = $(this).find("#output-factoid-amount").val()
-		if(amt == 0 || amt == undefined) {
+    amt = $(this).find("#output-factoid-amount").val()
+    if(amt == 0 || amt == undefined) {
       $(this).find("#output-factoid-amount").addClass("input-group-error")
       amtErr = true
       err = true
     }
 
-		transObject.OutputAddresses.push(add)
-		transObject.OutputAmounts.push(amt)
-	})
+    transObject.OutputAddresses.push(add)
+    transObject.OutputAmounts.push(amt)
+  })
 
   if(err){
-    if(faErr){errMessage += "Addresses must start with 'FA'. "}
+    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
     if(amtErr){errMessage += "Amounts should not be 0. "}
     SetGeneralError("Error(s): " + errMessage)
     return
   }
 
-	j = JSON.stringify(transObject)
-	postRequest("send-transaction", j, function(resp){
-		console.log(resp)
+  j = JSON.stringify(transObject)
+  postRequest("make-transaction", j, function(resp){
+    console.log(resp)
     obj = JSON.parse(resp)
     if(obj.Error == "none") {
-      SetGeneralSuccess("Transaction sent, still working on better confirmation")
+      disableInput()
+      ShowNewButtons()
+      totalInput = obj.Content.Total / 1e8
+      feeFact = obj.Content.Fee / 1e8
+      total = totalInput + feeFact 
+      $("#transaction-total").attr("value", total)
+      $("#transaction-fee").attr("value", feeFact)
+      SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
     } else {
       SetGeneralError("Error: " + obj.Error)
     }
-	})
+  })
+}
+
+$("#send-entire-transaction").on('click', function(){
+  SendTransaction()
+})
+
+function SendTransaction() {
+  // var transObject = new Object()
+  var transObject = {
+    TransType:PageTransType,
+    OutputAddresses:[],
+    OutputAmounts:[]
+  }
+
+  errMessage = ""
+  faErr = false
+  amtErr = false
+
+
+  $("#all-outputs #single-output").each(function(){
+    err = false
+    add = $(this).find("#output-factoid-address").val()
+    if(!add.startsWith(AddressPrefix)) {
+      $(this).find("#output-factoid-address-container").addClass("input-group-error")
+      faErr = true
+      err = true
+    }
+
+    amt = $(this).find("#output-factoid-amount").val()
+    if(amt == 0 || amt == undefined) {
+      $(this).find("#output-factoid-amount").addClass("input-group-error")
+      amtErr = true
+      err = true
+    }
+
+    transObject.OutputAddresses.push(add)
+    transObject.OutputAmounts.push(amt)
+  })
+
+  if(err){
+    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
+    if(amtErr){errMessage += "Amounts should not be 0. "}
+    SetGeneralError("Error(s): " + errMessage)
+    return
+  }
+
+  j = JSON.stringify(transObject)
+  postRequest("send-transaction", j, function(resp){
+    console.log(resp)
+    obj = JSON.parse(resp)
+    if(obj.Error == "none") {
+      disableInput()
+      HideNewButtons()
+      
+      SetGeneralSuccess('Transaction Sent')
+    } else {
+      enableInput()
+      HideNewButtons()
+      $("#transaction-fee").attr("value", "???")
+      $("#transaction-total").attr("value", "???")
+      SetGeneralError("Error: " + obj.Error)
+    }
+  })
+}
+
+$("#edit-transaction").on('click', function(){
+  enableInput()
+  HideNewButtons()
+  $("#transaction-fee").attr("value", "???")
+  $("#transaction-total").attr("value", "???")
+  HideMessages()
 })
 
 // Load the Reveal
@@ -201,3 +296,59 @@ $("#addresses-reveal-button").on("click", function(){
     addNewOutputAddress(newAddress, false)
   }
 })
+
+function HideNewButtons() {
+  $("#edit-transaction").slideUp(100)
+  $("#send-entire-transaction").slideUp(100)
+}
+
+function ShowNewButtons() {
+  $("#edit-transaction").slideDown(100)
+  $("#send-entire-transaction").slideDown(100)
+}
+
+Input = true
+
+function disableInput() {
+  Input = false
+  $(".input-group").each(function(){
+    $(this).addClass("disabled-input")
+    $(this).prop("disabled", true)
+  })
+
+  $(".input-group-field").each(function(){
+    $(this).addClass("disabled-input")
+    $(this).prop("disabled", true)
+  })
+
+  $("#addressbook-button").addClass("disabled-input")
+  $("#addressbook-button").prop("disabled", true)
+  $("#make-entire-transaction").addClass("disabled-input")
+  $("#make-entire-transaction").prop("disabled", true)
+}
+
+function enableInput() {
+  Input = true
+  $(".input-group").each(function(){
+    $(this).removeClass("disabled-input")
+    $(this).prop("disabled", false)
+  })
+
+  $(".input-group-field").each(function(){
+    $(this).removeClass("disabled-input")
+    $(this).prop("disabled", false)
+  })
+
+  $("#transaction-fee").prop("disabled", true)
+  $("#transaction-total").prop("disabled", true)
+
+  $("#addressbook-button").removeClass("disabled-input")
+  $("#addressbook-button").prop("disabled", false)
+  $("#make-entire-transaction").removeClass("disabled-input")
+  $("#make-entire-transaction").prop("disabled", false)
+}
+
+function HideMessages(){
+  $("#error-zone").slideUp(100)
+  $("#success-zone").slideUp(100)
+}

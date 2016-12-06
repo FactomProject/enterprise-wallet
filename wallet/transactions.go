@@ -9,6 +9,8 @@ import (
 	"strconv"
 
 	"github.com/FactomProject/factom"
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 	//"github.com/FactomProject/factom/wallet"
 )
 
@@ -38,12 +40,68 @@ func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 	return slice[i]
 }
 
-func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts []string) (string, error) {
+// Doublechecks the transaction is the same (with amounts and addresses)
+// This is to confirm an already constructed transaction
+func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []string) (string, error) {
+	name := hashStringList(toAddresses)
+	name = name[:32]
+
+	trans := wal.Wallet.GetTransactions()
+	t, ok := trans[name]
+	if ok || t != nil {
+		var outs []interfaces.ITransAddress
+		faOuts := t.GetOutputs()
+		ecOuts := t.GetECOutputs()
+
+		for _, f := range faOuts {
+			outs = append(outs, f)
+		}
+		for _, e := range ecOuts {
+			outs = append(outs, e)
+		}
+
+		if len(outs) != len(amounts) {
+			return name, fmt.Errorf("A change in the amount of outputs has been detected")
+		}
+		for i, o := range outs {
+			amt, err := strconv.Atoi(amounts[i])
+			if err != nil {
+				return name, fmt.Errorf("Amount was not able to be converted into a number")
+			}
+
+			compAddr := ""
+			if toAddresses[i][:2] == "FA" {
+				compAddr = primitives.ConvertFctAddressToUserStr(o.GetAddress())
+				amt = amt * 1e8
+				if o.GetAmount() != uint64(amt) {
+					return name, fmt.Errorf("A change in the amount of an output has been detected")
+				}
+			} else {
+				compAddr = primitives.ConvertECAddressToUserStr(o.GetAddress())
+				// Compare amt, but rate changes
+			}
+
+			if compAddr != toAddresses[i] {
+				return name, fmt.Errorf("A change in the address of an output has been detected")
+			}
+		}
+	} else {
+		return name, fmt.Errorf("No transaction found that matches the output addresses")
+	}
+	return name, nil
+}
+
+type ReturnTransStruct struct {
+	Total uint64 `json:"Total"`
+	Fee   uint64 `json:"Fee"`
+}
+
+func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts []string) (string, *ReturnTransStruct, error) {
 	var amts []uint64
 	for _, a := range amounts {
 		amt64, err := strconv.ParseFloat(a, 64)
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
 		amts = append(amts, uint64(amt64*1e8))
 	}
@@ -51,17 +109,21 @@ func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts 
 	return wal.ConstructSendFactoids(toAddresses, amts)
 }
 
-func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, amounts []string) (string, error) {
+func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, amounts []string) (string, *ReturnTransStruct, error) {
 	var amts []uint64
 	for _, a := range amounts {
 		amt64, err := strconv.ParseUint(a, 10, 64)
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
 		amts = append(amts, amt64)
 	}
 
 	return wal.ConstructConvertToEC(toAddresses, amts)
+}
+
+func (wal *WalletDB) DeleteTransaction(trans string) error {
+	return wal.Wallet.DeleteTransaction(trans)
 }
 
 // Constructs factoid transaction
@@ -72,25 +134,31 @@ func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, a
 //		amounts = list of amounts to each output, indicies must match
 // Returns:
 //		Transaction Name, error
-func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint64) (string, error) {
+func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint64) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(amounts) {
-		return "", fmt.Errorf("Lengths of address to amount does not match")
+		return "", nil, fmt.Errorf("Lengths of address to amount does not match")
 	} else if len(toAddresses) == 0 {
-		return "", fmt.Errorf("No recepient given")
+		return "", nil, fmt.Errorf("No recepient given")
 	}
 
 	// Add outputs, find total being sent
 	trans := hashStringList(toAddresses)
 	trans = trans[:32]
+
+	transMap := wal.Wallet.GetTransactions()
+	if t, _ := transMap[trans]; t != nil {
+		wal.DeleteTransaction(trans)
+	}
+
 	err := wal.Wallet.NewTransaction(trans)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	var total uint64 = 0
 	for i, address := range toAddresses {
 		if !wal.IsValidAddress(address) || address[:2] != "FA" {
-			return "", fmt.Errorf("Invalid address given")
+			return trans, nil, fmt.Errorf("Invalid address given")
 		}
 		wal.Wallet.AddOutput(trans, address, amounts[i])
 		total += amounts[i]
@@ -100,7 +168,7 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 	// Pay with largest first
 	faAddresses, err := wal.Wallet.GetAllFCTAddresses()
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	var balances []AddressBalancePair
@@ -109,7 +177,7 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 		addr := address.String()
 		balance, err := factom.GetFactoidBalance(addr)
 		if err != nil {
-			return "", err
+			return trans, nil, err
 		}
 		balances = append(balances, AddressBalancePair{addr, uint64(balance)})
 	}
@@ -122,7 +190,7 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 	var i int
 	for i = 0; totalLeft > 0; {
 		if i >= len(list) {
-			return "", fmt.Errorf("Not enough factoids to cover the transaction")
+			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
 		}
 		if list[i].Balance > totalLeft {
 			wal.Wallet.AddInput(trans, list[i].Address, totalLeft)
@@ -140,37 +208,41 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 
 	transStruct := wal.Wallet.GetTransactions()[trans]
 	if transStruct == nil {
-		return "", fmt.Errorf("Transaction not found")
+		return trans, nil, fmt.Errorf("Transaction not found")
 	}
 
 	rate, err := factom.GetRate()
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	fee, err := transStruct.CalculateFee(rate)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	for list[i].Balance < fee {
 		i++
 		if i >= len(list) {
-			return "", fmt.Errorf("Not enough factoids to cover the transaction")
+			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
 		}
 	}
 
 	err = wal.Wallet.AddFee(trans, list[i].Address, rate)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	err = wal.Wallet.SignTransaction(trans)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
-	return trans, nil
+	r := new(ReturnTransStruct)
+	r.Total = total
+	r.Fee = fee
+
+	return trans, r, nil
 }
 
 // Constructs Convert Entry Credits
@@ -180,31 +252,37 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 //		amount = amount of EC to send
 // Returns:
 //		Transaction Name, error
-func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64) (string, error) {
+func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(amounts) {
-		return "", fmt.Errorf("Lengths of address to amount does not match")
+		return "", nil, fmt.Errorf("Lengths of address to amount does not match")
 	} else if len(toAddresses) == 0 {
-		return "", fmt.Errorf("No recepient given")
+		return "", nil, fmt.Errorf("No recepient given")
 	}
 
 	// Add outputs, find total being sent
 	trans := hashStringList(toAddresses)
 	trans = trans[:32]
+
+	transMap := wal.Wallet.GetTransactions()
+	if t, _ := transMap[trans]; t != nil {
+		wal.DeleteTransaction(trans)
+	}
+
 	err := wal.Wallet.NewTransaction(trans)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	// Cost in Factoids
 	rate, err := factom.GetRate()
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	var total uint64 = 0
 	for i, address := range toAddresses {
 		if !wal.IsValidAddress(address) || address[:2] != "EC" {
-			return "", fmt.Errorf("Invalid address given")
+			return trans, nil, fmt.Errorf("Invalid address given")
 		}
 		amt := rate * amounts[i]
 		wal.Wallet.AddECOutput(trans, address, amt)
@@ -215,7 +293,7 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 	// Pay with largest first
 	faAddresses, err := wal.Wallet.GetAllFCTAddresses()
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	var balances []AddressBalancePair
@@ -224,7 +302,7 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 		addr := address.String()
 		balance, err := factom.GetFactoidBalance(addr)
 		if err != nil {
-			return "", err
+			return trans, nil, err
 		}
 		balances = append(balances, AddressBalancePair{addr, uint64(balance)})
 	}
@@ -237,7 +315,7 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 	var i int
 	for i = 0; totalLeft > 0; {
 		if i >= len(balList) {
-			return "", fmt.Errorf("Not enough factoids to cover the transaction")
+			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
 		}
 		if balList[i].Balance > totalLeft {
 			wal.Wallet.AddInput(trans, balList[i].Address, totalLeft)
@@ -257,7 +335,7 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 
 	fee, err := transStruct.CalculateFee(rate)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	for i < len(balList) {
@@ -270,15 +348,19 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 
 	err = wal.Wallet.AddFee(trans, list[i].Address, rate)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
 	err = wal.Wallet.SignTransaction(trans)
 	if err != nil {
-		return "", err
+		return trans, nil, err
 	}
 
-	return trans, nil
+	r := new(ReturnTransStruct)
+	r.Total = total
+	r.Fee = fee
+
+	return trans, r, nil
 }
 
 func (wal *WalletDB) GetAddressBalance(address string) (uint64, error) {

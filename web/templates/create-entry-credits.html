@@ -10,7 +10,7 @@
 <div class="row">
     <div class="columns">
         <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
-        <h1>Create Entry Credits</h1>
+        <h1 id="token-header" value="1">Create Entry Credits</h1>
         <form>
             <div class="coin-control">
                 <div class="row">
@@ -47,7 +47,7 @@
                     <div class="small-12 medium-7 large-8 columns">
                         <div class="input-group" id="output-factoid-address-container">
                             <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type entry credit address"></pre>
-                            <a data-toggle="addressbook" class="input-group-button button" id="addressbook-0"><i class="fa fa-book"></i></a>
+                            <a id="addressbook-button" data-toggle="addressbook" class="input-group-button button" id="addressbook-0"><i class="fa fa-book"></i></a>
                         </div>
                     </div>
                     <div class="small-10 medium-4 large-3 columns">
@@ -69,7 +69,7 @@
                 <div class="small-12 medium-4 large-3 columns end">
                     <label>Fee:</label>
                     <div class="input-group">
-                        <input type="text" class="input-group-field" disabled="true" name="fee" value="0.108">
+                        <input id="transaction-fee" type="text" class="input-group-field" disabled="true" name="fee" value="???">
                         <span class="input-group-label">FCT</span>
                     </div>
                 </div>
@@ -78,13 +78,17 @@
             <!-- Subtotal -->
             <div class="row">
                 <div class="small-12 medium-7 large-8 columns">
+                    <div>
+                        <a id="send-entire-transaction" class="button " style="display:none">Send Transaction</a>
+                        <a id="edit-transaction" class="button " style="display:none">Edit Transaction</a>
+                    </div>
                     <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
                     <div id="success-zone" class="callout success text-center" style="display:none"></div>
                 </div>
                 <div class="small-12 medium-4 large-3 columns end">
                     <label>Total:</label>
                     <div class="input-group">
-                        <input type="text" class="input-group-field" disabled="true" name="subtotal" id="subtotal" value="0.000">
+                        <input id="transaction-total" type="text" class="input-group-field" disabled="true" name="subtotal" id="subtotal" value="???">
                         <span class="input-group-label">FCT</span>
                     </div>
                 </div>
@@ -94,7 +98,7 @@
 
                 </div>
                 <div class="small-10 medium-4 large-3 columns">
-                    <a id="send-entire-transaction" class="button expanded">Convert to Entry Credits</a>
+                    <a id="make-entire-transaction" class="button expanded">View Transaction</a>
                 </div>
                 <div class="small-2 medium-1 columns">
                     
@@ -121,5 +125,5 @@
     </button>
 </div>
 
-{{template "templateBottom" "send-entry-credits"}}
+{{template "templateBottom" "send-convert"}}
 {{end}}

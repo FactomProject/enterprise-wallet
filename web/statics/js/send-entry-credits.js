@@ -1,3 +1,5 @@
+// NO LONGER USED
+
 counter = 1
 function addNewOutputAddress(defaultVal, error) {
   eClass = ""

@@ -312,6 +312,60 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write(jsonResp(anp))
 		}
+	case "make-transaction":
+		type SendTransStruct struct {
+			TransType string   `json:"TransType"`
+			Addresses []string `json:"OutputAddresses"`
+			Amounts   []string `json:"OutputAmounts"`
+		}
+
+		trans := new(SendTransStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), trans)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		type ReturnTransStruct struct {
+			Name  string `json:"Name"`
+			Total uint64 `json:"Total"`
+			Fee   uint64 `json:"Fee"`
+		}
+
+		var r ReturnTransStruct
+
+		name := ""
+		if trans.TransType == "factoid" {
+			newName, rt, err := MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
+			if err != nil {
+				MasterWallet.DeleteTransaction(name)
+				w.Write(jsonError(err.Error()))
+				return
+			}
+
+			name = newName
+			r.Total = rt.Total
+			r.Fee = rt.Fee
+		} else if trans.TransType == "ec" {
+			newName, rt, err := MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
+			if err != nil {
+				MasterWallet.DeleteTransaction(name)
+				w.Write(jsonError(err.Error()))
+				return
+			}
+
+			name = newName
+			r.Total = rt.Total
+			r.Fee = rt.Fee
+		} else {
+			w.Write(jsonError("Not a valid type"))
+			return
+		}
+
+		r.Name = name
+		w.Write(jsonResp(r))
 	case "send-transaction":
 		type SendTransStruct struct {
 			TransType string   `json:"TransType"`
@@ -328,23 +382,31 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name := ""
-		if trans.TransType == "factoid" {
-			name, err = MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
-			if err != nil {
-				w.Write(jsonError(err.Error()))
-				return
-			}
-		} else if trans.TransType == "ec" {
-			name, err = MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
-			if err != nil {
-				w.Write(jsonError(err.Error()))
-				return
-			}
-		} else {
-			w.Write(jsonError("Not a valid type"))
+		name, err := MasterWallet.CheckTransactionAndGetName(trans.Addresses, trans.Amounts)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
 			return
 		}
+
+		/*
+			if trans.TransType == "factoid" {
+				name, _, err = MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
+				if err != nil {
+					MasterWallet.DeleteTransaction(name)
+					w.Write(jsonError(err.Error()))
+					return
+				}
+			} else if trans.TransType == "ec" {
+				name, _, err = MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
+				if err != nil {
+					MasterWallet.DeleteTransaction(name)
+					w.Write(jsonError(err.Error()))
+					return
+				}
+			} else {
+				w.Write(jsonError("Not a valid type"))
+				return
+			}*/
 
 		tHash, err := MasterWallet.SendTransaction(name)
 		if err != nil {
