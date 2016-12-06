@@ -11,6 +11,7 @@ import (
 	"os/user"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/FactomProject/M2GUIWallet/address"
 	"github.com/FactomProject/M2GUIWallet/wallet/database"
@@ -44,9 +45,13 @@ type WalletDB struct {
 	Wallet        *wallet.Wallet            // Wallet from factom/wallet
 	TransactionDB *wallet.TXDatabaseOverlay // Used to display transactions
 
-	// List of transactions related to any address in address book
-	cachedTransactions []DisplayTransaction
-	cachedHeight       uint32
+	// Used to cache related transactions
+	// This is rebuilt upon every launch
+	relatedTransactionLock sync.RWMutex                       // For all variables associated with related transaction caching
+	cachedTransactions     []DisplayTransaction               // All sorted transactions already found
+	cachedHeight           uint32                             // Last FBlock height used
+	transMap               map[string]interfaces.ITransaction // Prevent duplicate transactions
+	addrMap                map[string]string                  // Find addresses quick, All addresses already searched for up to last FBlock
 }
 
 // For now is same as New
@@ -116,21 +121,23 @@ func NewWalletDB() (*WalletDB, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not add transaction database to wallet:", err)
-	} else {
-		w.Wallet.AddTXDB(txdb)
 	}
 
+	w.Wallet.AddTXDB(txdb)
+
 	w.TransactionDB = w.Wallet.TXDB()
+	if w.TransactionDB != nil { // Update DB
+		w.TransactionDB.GetAllTXs()
+	}
 
 	err = w.UpdateGUIDB()
 	if err != nil {
 		return nil, err
 	}
 
-	//w.cachedTransactions = make(interfaces.ITransaction)
+	w.transMap = make(map[string]interfaces.ITransaction)
+	w.addrMap = make(map[string]string)
 	w.cachedHeight = 0
-
-	// go wsapi.Start(w.Wallet, fmt.Sprintf(":%d", 8089), *(factom.RpcConfig))
 
 	return w, nil
 }
@@ -263,30 +270,138 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	return dt, nil
 }
 
+/*
+	cachedTransactions []DisplayTransaction               // All sorted transactions already found
+	cachedHeight       uint32                             // Last FBlock height used
+	transMap           map[string]interfaces.ITransaction // Prevent duplicate transactions
+	addrMap            map[string]string                  // Find addresses quick
+*/
+
 // Currently no caching
 func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
+	w.relatedTransactionLock.Lock()
+	defer w.relatedTransactionLock.Unlock()
 
-	/*block, err := w.Wallet.TXDB().DBO.FetchFBlockHead()
-	fmt.Println(block, err)
+	// Get current Fblock height
+	block, err := w.TransactionDB.DBO.FetchFBlockHead()
 	if err != nil {
-		fmt.Println("Exit 1")
-		return err
-	}
-	// Last update
-	start := w.cachedHeight
-	heights, err := factom.GetHeights()
-	if err != nil {
-		fmt.Println("Exit 2")
-		return err
+		return nil, err
 	}
 
-	end := heights.LeaderHeight
-	_ = end
-	_ = start*/
-	// TODO: Caching
+	var oldHeight uint32
+	if block != nil {
+		oldHeight = w.cachedHeight
+		w.cachedHeight = block.GetDatabaseHeight()
+	} else {
+		return nil, fmt.Errorf("An error has occured getting the latest Fblock")
+	}
 
+	transactions, err := w.TransactionDB.GetTXRange(int(oldHeight), int(w.cachedHeight))
+	if err != nil {
+		return nil, err
+	}
+
+	var newTransactions []DisplayTransaction
+	// Sort throught new transactions for any related
+	for _, trans := range transactions {
+		added := false
+		for i := 0; i < 3; i++ {
+			var addresses []string
+			switch i {
+			case 0:
+				addrs := trans.GetInputs()
+				for _, a := range addrs {
+					addresses = append(addresses, primitives.ConvertFctAddressToUserStr(a.GetAddress()))
+				}
+			case 1:
+				addrs := trans.GetOutputs()
+				for _, a := range addrs {
+					addresses = append(addresses, primitives.ConvertFctAddressToUserStr(a.GetAddress()))
+				}
+			case 2:
+				addrs := trans.GetECOutputs()
+				for _, a := range addrs {
+					addresses = append(addresses, primitives.ConvertECAddressToUserStr(a.GetAddress()))
+				}
+			}
+
+			for _, addr := range addresses { // If it makes through this loop will check next set of addresses
+				_, ok := w.addrMap[addr]
+				if ok {
+					dt, err := w.NewDisplayTransaction(trans)
+					if err != nil {
+						break // Error with transaction
+					}
+
+					edt, _ := w.transMap[trans.GetHash().String()]
+					if edt == nil {
+						newTransactions = append(newTransactions, *dt)
+						w.transMap[trans.GetHash().String()] = trans
+					}
+					added = true
+					break // Transaction added
+				}
+			}
+
+			if added {
+				break // Transaction added, break out of this transaction
+			}
+		}
+	}
+
+	sort.Sort(DisplayTransactions(newTransactions))
+	w.cachedTransactions = append(newTransactions, w.cachedTransactions...)
+
+	// Find all new addresses, need to do additional handling
+	var moreTransactions []interfaces.ITransaction
+	anps := w.GetAllGUIAddresses()
+	var newAddrs []string
+	for _, a := range anps {
+		addr, ok := w.addrMap[a.Address]
+		if ok || len(addr) > 1 { // Found
+
+		} else { // New addr
+			w.addrMap[a.Address] = a.Address
+			newAddrs = append(newAddrs, a.Address)
+			trans, err := w.TransactionDB.GetTXAddress(a.Address)
+			if err == nil {
+				if len(trans) > 0 {
+					moreTransactions = append(moreTransactions, trans...)
+				}
+			}
+		}
+	}
+
+	// Binary search and insert new transactions from new addresses
+	for _, t := range moreTransactions {
+		edt, _ := w.transMap[t.GetHash().String()]
+		if edt != nil {
+			continue
+		}
+
+		i := sort.Search(len(w.cachedTransactions), func(i int) bool { return w.cachedTransactions[i].TxID == t.GetHash().String() })
+		if i < len(w.cachedTransactions) && w.cachedTransactions[i].TxID == t.GetHash().String() {
+			// t is present at w.cachedTransactions[i], already there
+		} else {
+			// t is not present in w.cachedTransactions,
+			// but i is the index where it would be inserted.
+			dt, err := w.NewDisplayTransaction(t)
+			if err != nil {
+				break // Error with transaction
+			}
+			w.transMap[t.GetHash().String()] = t
+			temp := w.cachedTransactions[i:]
+			w.cachedTransactions = append(w.cachedTransactions[:i], *dt)
+			w.cachedTransactions = append(w.cachedTransactions, temp...)
+		}
+	}
+
+	return w.cachedTransactions, nil
+}
+
+// No caching, independed of cache variables
+func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, error) {
 	// ## No cache solution ##
-	// Need to prevent Duplicates
 	transMap := make(map[string]interfaces.ITransaction)
 	var transList []DisplayTransaction
 	adds := w.GetAllGUIAddresses()
@@ -308,12 +423,6 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 			}
 		}
 	}
-
-	// ## End no cache ##
-
-	// Update to current
-	//h := block.GetDBHeight()
-	//w.cachedHeight = h
 
 	sort.Sort(DisplayTransactions(transList))
 	return transList, nil
@@ -343,7 +452,7 @@ func (w *WalletDB) UpdateGUIDB() error {
 	for _, fa := range faAdds {
 		_, list := w.GetGUIAddress(fa.String())
 		if list == 0 {
-			names = append(names, "FAImported-Undefined")
+			names = append(names, "FA-Imported-From-CLI")
 			addresses = append(addresses, fa.String())
 		}
 	}
@@ -351,7 +460,7 @@ func (w *WalletDB) UpdateGUIDB() error {
 	for _, ec := range ecAdds {
 		_, list := w.GetGUIAddress(ec.String())
 		if list == 0 {
-			names = append(names, "ECImported-Undefined")
+			names = append(names, "EC-Imported-From-CLI")
 			addresses = append(addresses, ec.String())
 		}
 	}

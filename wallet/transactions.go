@@ -287,7 +287,11 @@ func (wal *WalletDB) GetAddressBalance(address string) (uint64, error) {
 }
 
 func (wal *WalletDB) SendTransaction(trans string) (string, error) {
-	return factom.SendTransaction(trans)
+	transObj, err := factom.SendTransaction(trans)
+	if err != nil {
+		return "", err
+	}
+	return transObj.TxID, nil
 }
 
 func hashStringList(list []string) string {

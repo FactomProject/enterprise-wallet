@@ -152,6 +152,22 @@ func (w *WalletStruct) GetAllAddresses() []address.AddressNamePair {
 	return anpList
 }
 
+func (w *WalletStruct) GetAllAddressesFromList(list int) []address.AddressNamePair {
+	w.RLock()
+	defer w.RUnlock()
+	var anpList []address.AddressNamePair
+	switch list {
+	case 1:
+		anpList = append(anpList, w.FactoidAddresses.List...)
+	case 2:
+		anpList = append(anpList, w.EntryCreditAddresses.List...)
+	case 3:
+		anpList = append(anpList, w.ExternalAddresses.List...)
+	}
+
+	return anpList
+}
+
 func (w *WalletStruct) IsSameAs(b *WalletStruct) bool {
 	w.RLock()
 	defer w.RUnlock()

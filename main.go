@@ -60,7 +60,7 @@ func InitiateWalletAndWeb() {
 		MasterSettings = data.(*SettingsStruct)
 	}
 
-	// For Testing
+	// For Testing adds random addresses
 	addRandomAddresses()
 	MasterWallet.AddBalancesToAddresses()
 	//

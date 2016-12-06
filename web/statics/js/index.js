@@ -4,6 +4,8 @@ $(window).load(function() {
 
 CurrentCount = 0
 ContentLen = 0
+LoopstopIncrement = 10 // Amount to load on scroll
+Loopstop = 15
 var Transactions
 Done = false
 
@@ -21,16 +23,25 @@ function LoadTransactions() {
 		ContentLen = obj.Content.length
 		Transactions = obj.Content
 
-		// Load past 50 transactions, then stop. Only load more if they scroll
-		loopstop = 50
-		if(ContentLen < 50) {
-			loopstop = ContentLen
+		// Load past x transactions, then stop. Only load more if they scroll
+		if(ContentLen < Loopstop) {
+			Loopstop = ContentLen
 		}
-		for(; CurrentCount < loopstop; CurrentCount++) {
+		for(; CurrentCount < Loopstop; CurrentCount++) {
 			AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
 		}
 
 	})
+}
+
+function LoadCached() {
+		// Load past x transactions, then stop. Only load more if they scroll
+		if(ContentLen < Loopstop) {
+			Loopstop = ContentLen
+		}
+		for(; CurrentCount < Loopstop; CurrentCount++) {
+			AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
+		}
 }
 
 function AppendNewTransaction(trans, index){
@@ -102,6 +113,15 @@ function appendTrans(pic, index, amt, token, date, addrs) {
 )
 }
 
+$("main").bind('scroll', function() {
+	//console.log($("main").outerHeight(), $("main").scrollTop(), $("main").innerHeight(), $("main").prop('scrollHeight'), $("main").prop('offsetHeight'))
+	// Total Height
+	// $("main").prop('scrollHeight')
+	if($("main").scrollTop() + $("main").innerHeight() >= .8 * $("main").prop('scrollHeight')) {
+		Loopstop += LoopstopIncrement
+		LoadCached()
+	}
+});
 
 $("#transaction-list").on('click', '#transaction-link', function(){
 	$("#transDetails #details").html(getTransDetails($(this).attr("value")))

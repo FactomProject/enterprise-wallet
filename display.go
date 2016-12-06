@@ -73,6 +73,7 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 
 func updateBalances(time.Time) {
 	MasterWallet.AddBalancesToAddresses()
+	MasterWallet.UpdateGUIDB()
 }
 
 // For go routines. Calls function once each duration.
@@ -176,7 +177,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 
 		w.Write(data)
 	case "balances":
-		MasterWallet.AddBalancesToAddresses()
+		//MasterWallet.AddBalancesToAddresses()
 		bals := struct {
 			EC int64
 			FC int64
