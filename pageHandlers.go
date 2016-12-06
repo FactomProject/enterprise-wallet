@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/FactomProject/factom"
 )
@@ -22,7 +24,53 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 // Every Handle struct must have settings
 // This is used on every page
 type SettingsStruct struct {
+	// Marshaled
+	DarkTheme bool
+	KeyExport bool // Allow export of private key
+
+	// Not marshaled
 	Theme string // darkTheme or ""
+}
+
+func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
+	buf := new(bytes.Buffer)
+
+	var b []byte
+
+	b = strconv.AppendBool(b, s.DarkTheme)
+	b = strconv.AppendBool(b, s.KeyExport)
+
+	buf.Write(b)
+
+	return buf.Next(buf.Len()), nil
+}
+
+func (s *SettingsStruct) UnmarshalBinary(data []byte) error {
+	_, err := s.UnmarshalBinaryData(data)
+	return err
+}
+
+func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
+	newData = data
+
+	b, err := strconv.ParseBool(string(newData[:4]))
+	if err != nil {
+		return data, err
+	}
+	s.DarkTheme = b
+	newData = newData[4:]
+
+	if b {
+		s.Theme = "darkTheme"
+	}
+
+	b, err = strconv.ParseBool(string(newData[:4]))
+	if err != nil {
+		return data, err
+	}
+	s.KeyExport = b
+	newData = newData[4:]
+	return
 }
 
 /*

@@ -3,7 +3,7 @@
 
 {{$pageTitle := "New External Address"}}
 {{$mainClass := "send-factoids'"}}
-{{$theme := .}}
+{{$theme := .Settings.Theme}}
 {{$activeNav := 2}}
 {{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}

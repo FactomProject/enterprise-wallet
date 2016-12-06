@@ -74,6 +74,7 @@ func NewWalletDB() (*WalletDB, error) {
 
 	w.GUIlDB = db
 
+	// Adds Wallet
 	w.guiWallet = NewWallet()
 	data, err := w.GUIlDB.Get([]byte("gui-wallet"), []byte("wallet"), new(WalletStruct))
 	if err != nil || data == nil {
@@ -101,6 +102,7 @@ func NewWalletDB() (*WalletDB, error) {
 
 	w.Wallet = wal
 
+	// TODO: Adjust this path
 	var txdb *wallet.TXDatabaseOverlay
 	switch TX_DB {
 	case MAP:

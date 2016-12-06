@@ -20,6 +20,11 @@ var (
 	TemplateMutex sync.Mutex
 )
 
+func SaveSettings() error {
+	err := MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+	return err
+}
+
 // TODO: Compile statics into Go
 func ServeWallet(port int) {
 	templates = template.New("main")
@@ -27,11 +32,6 @@ func ServeWallet(port int) {
 	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts}
 	templates.Funcs(template.FuncMap(funcMap))
 	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
-
-	// Start Settings
-	// TODO: Load from DB
-	MasterSettings = new(SettingsStruct)
-	MasterSettings.Theme = ""
 
 	// Update the balances every 5 seconds to keep it updated. We can force
 	// an update if we send a transaction or something
@@ -240,6 +240,11 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			Address string `json:"Address"`
 		}
 
+		if !MasterSettings.KeyExport {
+			w.Write(jsonResp("Displaying private key disabled in settings"))
+			return
+		}
+
 		j := r.FormValue("json")
 		a := new(Add)
 		err := json.Unmarshal([]byte(j), a)
@@ -347,7 +352,35 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(tHash))
+	case "adjust-settings":
+		type SettingsToggle struct {
+			Bools []bool `json:"Values"` // A list of the boolean settings
+		}
 
+		st := new(SettingsToggle)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), st)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		MasterSettings.DarkTheme = st.Bools[0]
+		if st.Bools[0] {
+			MasterSettings.Theme = "darkTheme"
+		} else {
+			MasterSettings.Theme = ""
+		}
+		MasterSettings.KeyExport = st.Bools[1]
+
+		err = SaveSettings()
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp("Settings updated"))
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

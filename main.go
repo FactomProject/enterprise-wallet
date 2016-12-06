@@ -34,18 +34,31 @@ func InitiateWalletAndWeb() {
 	// DB Types
 	walletDB := wallet.MAP // WalletDB is DB used by wallet wsapi
 	guiDB := wallet.MAP    // Holds names associated with addresses for gui
+	txDB := wallet.MAP     // Holds transactions cache
 
 	fmt.Printf("Starting wallet waspi on localhost:%d\n", walletPort)
-	fmt.Printf("Wallet DB using %s, GUI DB using %s\n", IntToStringDBType(walletDB), IntToStringDBType(guiDB))
+	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", IntToStringDBType(walletDB), IntToStringDBType(guiDB), IntToStringDBType(txDB))
 
 	// Can adjust starting variables
 	// This will also start wallet wsapi
-	wal, err := wallet.StartWallet(walletPort, factomdPort, walletDB, guiDB)
+	wal, err := wallet.StartWallet(walletPort, factomdPort, walletDB, guiDB, txDB)
 	if err != nil {
 		panic("Error in starting wallet: " + err.Error())
 	}
 
 	MasterWallet = wal
+
+	// Start Settings
+	MasterSettings = new(SettingsStruct)
+	data, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+	if err != nil || data == nil {
+		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+		if err != nil {
+			panic("Error in loading settings: " + err.Error())
+		}
+	} else {
+		MasterSettings = data.(*SettingsStruct)
+	}
 
 	// For Testing
 	addRandomAddresses()

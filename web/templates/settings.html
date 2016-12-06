@@ -13,16 +13,16 @@
     <div class="row">
         <div class="columns">
             <p>
-                <input type="checkbox" id="coin-control" name="coin-control" value="true">
-                <label for="coin-control">Enable coin-control (specific or multiple input addresses for new transaction)</label>
+                <input type="checkbox" id="coin-control" name="coin-control" value="true" disabled>
+                <label class="disabled-input" for="coin-control">Enable coin-control (specific or multiple input addresses for new transaction)</label>
                 <br>
-                <input type="checkbox" id="import-export" name="import-export" value="true">
-                <label for="import-export">Enable ability to import/export transactions</label>
+                <input type="checkbox" id="import-export" name="import-export" value="true" disabled>
+                <label class="disabled-input" for="import-export">Enable ability to import/export transactions</label>
                 <br>
-                <input type="checkbox" id="export-keys" name="export-keys" value="true">
+                <input type="checkbox" id="export-keys" name="export-keys" value="true" {{if .Settings.KeyExport}} checked{{end}}>
                 <label for="export-keys">Enable ability to export public keys</label>
                 <br>
-                <input type="checkbox" id="darkTheme" name="darkThme" value="true">
+                <input type="checkbox" id="darkTheme" name="darkThme" value="true" {{if .Settings.DarkTheme}} checked{{end}}>
                 <label for="darkTheme">Enable dark theme</label>
             </p>
         </div>
@@ -30,16 +30,18 @@
     <div class="row">
         <div class="columns">
             <br>
-            <a href="#" class="button">Save Changes</a>
+            <a id="save-changes" class="button">Save Changes</a>
         </div>
     </div>
     <hr>
     <div class="row">
         <div class="columns">
-            <a href="#" class="button">Export Seed to file</a>
+            <a class="button" disabled>Export Seed to file</a>
         </div>
     </div>
+    <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
+    <div id="success-zone" class="callout success text-center" style="display:none"></div>
 </form>
 
-{{template "templateBottom"}}
+{{template "templateBottom" "settings"}}
 {{end}}
