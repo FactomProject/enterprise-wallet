@@ -39,9 +39,10 @@
 }
 
 .loader-container{
+    text-align: center;
 	display:table;
 	width:100%;
-	height:100%;
+	height:80%;
 } 
 
 .loader-body {
@@ -59,4 +60,12 @@
 
 pre {
 	display:inline;
+}
+
+.loading-message {
+    margin: auto 0;
+    text-align: center;
+    margin-left:auto;
+    margin-right:auto;
+    width: 100%;
 }

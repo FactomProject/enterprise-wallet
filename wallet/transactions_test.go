@@ -46,7 +46,7 @@ func TestSendFactoids(t *testing.T) {
 	*/
 
 	//20000e8
-	trans, err := TestWallet.ConstructSendFactoids(recs, amts)
+	trans, _, err := TestWallet.ConstructSendFactoids(recs, amts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +100,7 @@ func TestConvertToEC(t *testing.T) {
 	*/
 
 	//20000e8
-	trans, err := TestWallet.ConstructConvertToEC(recs, amts)
+	trans, _, err := TestWallet.ConstructConvertToEC(recs, amts)
 	if err != nil {
 		t.Fatal(err)
 	}

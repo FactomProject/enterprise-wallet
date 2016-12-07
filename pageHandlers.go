@@ -38,7 +38,13 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	var b []byte
 
 	b = strconv.AppendBool(b, s.DarkTheme)
+	if s.DarkTheme {
+		b = append(b, 0x00)
+	}
 	b = strconv.AppendBool(b, s.KeyExport)
+	if s.KeyExport {
+		b = append(b, 0x00)
+	}
 
 	buf.Write(b)
 
@@ -53,23 +59,31 @@ func (s *SettingsStruct) UnmarshalBinary(data []byte) error {
 func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
 
-	b, err := strconv.ParseBool(string(newData[:4]))
+	booldata := newData[:5]
+	if booldata[4] == 0x00 {
+		booldata = booldata[:4]
+	}
+	b, err := strconv.ParseBool(string(booldata))
 	if err != nil {
 		return data, err
 	}
 	s.DarkTheme = b
-	newData = newData[4:]
+	newData = newData[5:]
 
 	if b {
 		s.Theme = "darkTheme"
 	}
 
-	b, err = strconv.ParseBool(string(newData[:4]))
+	booldata = newData[:5]
+	if booldata[4] == 0x00 {
+		booldata = booldata[:4]
+	}
+	b, err = strconv.ParseBool(string(booldata))
 	if err != nil {
 		return data, err
 	}
 	s.KeyExport = b
-	newData = newData[4:]
+	newData = newData[5:]
 	return
 }
 

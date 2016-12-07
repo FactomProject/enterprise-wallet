@@ -213,6 +213,17 @@ func (w *WalletStruct) MarshalBinary() ([]byte, error) {
 func (w *WalletStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	w.Lock()
 	defer w.Unlock()
+
+	if w.FactoidAddresses == nil {
+		w.FactoidAddresses = address.NewAddressList()
+	}
+	if w.EntryCreditAddresses == nil {
+		w.EntryCreditAddresses = address.NewAddressList()
+	}
+	if w.ExternalAddresses == nil {
+		w.ExternalAddresses = address.NewAddressList()
+	}
+
 	newData = data
 	newData, err = w.FactoidAddresses.UnmarshalBinaryData(newData)
 	if err != nil {

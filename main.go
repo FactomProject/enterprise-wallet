@@ -10,6 +10,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/FactomProject/M2GUIWallet/wallet"
 	"github.com/FactomProject/factomd/util"
@@ -17,7 +20,25 @@ import (
 
 var MasterWallet *wallet.WalletDB
 
+func close() {
+	fmt.Println("Shutting down")
+	if MasterWallet == nil {
+		return
+	}
+	err := MasterWallet.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func main() {
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		close()
+		os.Exit(1)
+	}()
 	InitiateWalletAndWeb()
 }
 
@@ -62,15 +83,12 @@ func InitiateWalletAndWeb() {
 
 	// For Testing adds random addresses
 	addRandomAddresses()
-	MasterWallet.AddBalancesToAddresses()
+	//MasterWallet.AddBalancesToAddresses()
 	//
 
 	port := 8091
 	fmt.Printf("Starting wallet on localhost:%d\n", port)
 	ServeWallet(port)
-
-	// Exiting, need to make an exit condition, just a placeholder and reminder for now
-	wal.Close()
 }
 
 func addRandomAddresses() {

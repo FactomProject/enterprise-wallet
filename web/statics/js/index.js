@@ -13,7 +13,6 @@ function LoadTransactions() {
 	getRequest("related-transactions", function(resp){
 		$("#loading-container").remove()
 		obj = JSON.parse(resp)
-		console.log(obj)
 
 		if(obj.Error != "none"){
 			SetGeneralError(obj.Error)
@@ -45,7 +44,6 @@ function LoadCached() {
 }
 
 function AppendNewTransaction(trans, index){
-	console.log(trans)
 
 	// Transactions are split into 3 transactions if sent/recieve/converted is all happening.
 	// function appendTrans(pic, index, amt, token, date, addrs)
@@ -131,6 +129,21 @@ $("#transaction-list").on('click', '#transaction-link', function(){
 })
 
 function getTransDetails(index){
+	trans = Transactions[index]
+	inputs =  ""
+	outputs = ""
+	ecOutputs = ""
+
+	htmlBody = '' +
+	'<div>Date Sent:' + trans.Date + ' at ' + trans.Time + '</div>' +
+	'<div>Total FCT Sent: ' + (trans.TotalInput / 1e8).toFixed(4) + '</div>' +
+	'<div>Transaction Hash: ' + trans.TxID + '</div>'
+
+
+	return htmlBody
+}
+
+function getTransDetailsOld(index){
 	trans = Transactions[index]
 	inputs =  ""
 	outputs = ""

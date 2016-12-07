@@ -33,9 +33,12 @@ func ServeWallet(port int) {
 	templates.Funcs(template.FuncMap(funcMap))
 	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
 
-	// Update the balances every 5 seconds to keep it updated. We can force
+	// Update the balances every 10 seconds to keep it updated. We can force
 	// an update if we send a transaction or something
-	go doEvery(5*time.Second, updateBalances)
+	go doEvery(10*time.Second, updateBalances)
+
+	// Load the initial transaction DB. This takes some time, should start before user hits first page
+	go MasterWallet.TransactionDB.GetAllTXs()
 
 	// Mux for static files
 	mux = http.NewServeMux()
@@ -45,7 +48,7 @@ func ServeWallet(port int) {
 	http.HandleFunc("/GET", HandleGETRequests)
 	http.HandleFunc("/POST", HandlePOSTRequests)
 
-	portStr := ":" + strconv.Itoa(port)
+	portStr := "localhost:" + strconv.Itoa(port)
 
 	fmt.Println("Starting Wallet on http://localhost" + portStr + "/")
 	http.ListenAndServe(portStr, nil)

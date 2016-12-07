@@ -69,9 +69,9 @@ func NewWalletDB() (*WalletDB, error) {
 	case MAP:
 		db, err = database.NewMapDB()
 	case LDB:
-		db, err = database.NewOrOpenLevelDBWallet(GetHomeDir() + "/.factom/m2/gui_wallet_ldb")
+		db, err = database.NewOrOpenLevelDBWallet(GetHomeDir() + guiLDBPath)
 	case BOLT:
-		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + "/.factom/m2/gui_wallet_bolt")
+		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + guiBoltPath)
 	}
 	if err != nil {
 		return nil, err
@@ -93,13 +93,13 @@ func NewWalletDB() (*WalletDB, error) {
 
 	// TODO: Adjust this path
 	var wal *wallet.Wallet
-	switch GUI_DB { // Decides type of wallet DB
+	switch WALLET_DB { // Decides type of wallet DB
 	case MAP:
 		wal, err = wallet.NewMapDBWallet()
 	case LDB:
-		wal, err = wallet.NewOrOpenLevelDBWallet(GetHomeDir() + "/.factom/m2/gui_wallet_testing")
+		wal, err = wallet.NewOrOpenLevelDBWallet(GetHomeDir() + walletLDBPath)
 	case BOLT:
-		wal, err = wallet.NewOrOpenBoltDBWallet(GetHomeDir() + "/.factom/m2/gui_wallet_testing.db")
+		wal, err = wallet.NewOrOpenBoltDBWallet(GetHomeDir() + walletBoltPath)
 	}
 	if err != nil {
 		return nil, err
@@ -114,9 +114,9 @@ func NewWalletDB() (*WalletDB, error) {
 		txdb = wallet.NewTXOverlay(new(mapdb.MapDB))
 		err = nil
 	case LDB:
-		txdb, err = wallet.NewTXLevelDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks_level"))
+		txdb, err = wallet.NewTXLevelDB(GetHomeDir() + txdbLDBPath)
 	case BOLT:
-		txdb, err = wallet.NewTXBoltDB(fmt.Sprint(GetHomeDir(), "/.factom/m2/wallet/factoid_blocks.cache"))
+		txdb, err = wallet.NewTXBoltDB(GetHomeDir() + txdbBoltPath)
 	}
 
 	if err != nil {
@@ -127,7 +127,7 @@ func NewWalletDB() (*WalletDB, error) {
 
 	w.TransactionDB = w.Wallet.TXDB()
 	if w.TransactionDB != nil { // Update DB
-		w.TransactionDB.GetAllTXs()
+		//w.TransactionDB.GetAllTXs()
 	}
 
 	err = w.UpdateGUIDB()
@@ -283,9 +283,22 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 	defer w.relatedTransactionLock.Unlock()
 
 	// Get current Fblock height
-	block, err := w.TransactionDB.DBO.FetchFBlockHead()
-	if err != nil {
-		return nil, err
+	var err error
+	var block interfaces.IFBlock
+	for i := 0; i < 2; i++ { // 2 tries, if fails first, updates transactions and trys again
+		block, err = w.TransactionDB.DBO.FetchFBlockHead()
+		if err != nil {
+			return nil, err
+		}
+		if block == nil {
+			if i == 0 {
+				w.TransactionDB.GetAllTXs()
+			} else {
+				return nil, fmt.Errorf("Error with loading transaction database.")
+			}
+		} else {
+			break
+		}
 	}
 
 	var oldHeight uint32
@@ -293,7 +306,8 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 		oldHeight = w.cachedHeight
 		w.cachedHeight = block.GetDatabaseHeight()
 	} else {
-		return nil, fmt.Errorf("An error has occured getting the latest Fblock")
+		w.TransactionDB.GetAllTXs() // UpdateDB
+		return nil, fmt.Errorf("Error with loading transaction database.")
 	}
 
 	transactions, err := w.TransactionDB.GetTXRange(int(oldHeight), int(w.cachedHeight))
@@ -493,6 +507,12 @@ func (w *WalletDB) Close() error {
 		errString = errString + "; " + err.Error()
 	}
 	err = w.GUIlDB.Close()
+	if err != nil {
+		errCount++
+		errString = errString + "; " + err.Error()
+	}
+
+	err = w.TransactionDB.Close()
 	if err != nil {
 		errCount++
 		errString = errString + "; " + err.Error()
