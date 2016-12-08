@@ -13,12 +13,12 @@ var _ = fmt.Sprint("")
 var TestWallet *WalletDB
 
 func TestSendFactoids(t *testing.T) {
-	LoadTestWallet()
+	LoadTestWallet(8089)
 	var err error
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
 	anp, list := TestWallet.GetGUIAddress("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q")
-	if list == 0 {
+	if list == -1 {
 		anp, err = TestWallet.AddAddress("Sand", "Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK")
 		if err != nil {
 			t.Fatal(err)
@@ -67,12 +67,12 @@ func TestSendFactoids(t *testing.T) {
 }
 
 func TestConvertToEC(t *testing.T) {
-	LoadTestWallet()
+	LoadTestWallet(8089)
 	var err error
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
 	anp, list := TestWallet.GetGUIAddress("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q")
-	if list == 0 {
+	if list == -1 {
 		anp, err = TestWallet.AddAddress("Sand", "Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK")
 		if err != nil {
 			t.Fatal(err)
@@ -120,7 +120,8 @@ func TestConvertToEC(t *testing.T) {
 	_ = anp
 }
 
-func LoadTestWallet() error {
+// do 8089
+func LoadTestWallet(port int) error {
 	if TestWallet != nil { // If already instantiated
 		return nil
 	}
@@ -129,7 +130,7 @@ func LoadTestWallet() error {
 	WALLET_DB = MAP
 	TX_DB = MAP
 
-	wal, err := TestHelper.Start()
+	wal, err := TestHelper.Start(port)
 	//wal, err := LoadWalletDB()
 	if err != nil {
 		return err

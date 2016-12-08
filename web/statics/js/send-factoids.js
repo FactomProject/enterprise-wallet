@@ -36,18 +36,26 @@ $("#all-outputs").on('click','#remove-new-output', function(){
 	jQuery(this).parent().parent().remove()
 })
 
-// Ensure factoids being sent are valid, this is not a security feature, but an ease of use
+// Ensure factoids/ec being sent are valid, this is not a security feature, but an ease of use
 // feature
 $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
-  var self = $(this);
-  self.val(self.val().replace(/[^0-9\.]/g, ''));
-  if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57)) {
-    evt.preventDefault();
-  }
+  if(PageTokenABR == "FCT") {
+    var self = $(this);
+    self.val(self.val().replace(/[^0-9\.]/g, ''));
+    if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57)) {
+      //evt.preventDefault();
+    }
 
-  decSplit = $(this).val().split(".")
-  if(decSplit.length > 2) {
-    evt.preventDefault();
+    decSplit = $(this).val().split(".")
+    if(decSplit.length > 2) {
+      evt.preventDefault();
+    }
+  } else {
+    var self = $(this);
+    self.val(self.val().replace(/[^0-9\.]/g, ''));
+    if ((evt.which < 48 || evt.which > 57)) {
+      //evt.preventDefault();
+    }
   }
 });
 

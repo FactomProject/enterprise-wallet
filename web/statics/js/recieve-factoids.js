@@ -1,3 +1,4 @@
+// Load drop down if we were not directed with a specific link
 function LoadRecAddresses(){
 	resp = getRequest("addresses",function(resp){
 		obj = JSON.parse(resp)
@@ -20,6 +21,7 @@ function LoadRecAddresses(){
  	})
 }
 
+// If we only have 1 address, then we don't want to load dropdown
 function LoadFixedAddress(){
 	add = $("#receiving-address-fixed small").text()
 	updateWithGivenAddress(add)
@@ -29,9 +31,9 @@ function dropDownOption(address) {
 	return		'<option value="' + address.Name + '">' + address.Name + ' (' + address.Address + ')</option>'
 }
 
+// Copy to clipboard
 $("#copy-to-clipboard").on('click', function(){
 	var aux = document.createElement("input");
-	//console.log($('#selected-address-info').val())
 	aux.setAttribute("value", $('#selected-address-info').val());
 	document.body.appendChild(aux);
 	aux.select();
@@ -56,7 +58,6 @@ function updateWithGivenAddress(address){
 	$("#selected-address-info").val(splits[0])
 	$("#selected-address-info").text(splits[0])
 
-	//console.log($('#selected-address-info').val())
 	// Remove last QR code
 	$('#qrcode').text("")
 	// Add new QR code

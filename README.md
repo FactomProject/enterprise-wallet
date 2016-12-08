@@ -22,7 +22,4 @@ Must launch from M2GUIWallet directory until static files are compiled into Go.
 
 ### Features not working as intended or not Working
   - Import/Export Transactions is **not working**
-  - Displaying all transactions is not working as intended
-    - The display is wrong too, testing the waters with some ideas and working with Tanner
-  - Confirmation pages are **not working**. Basic confirmation in a green success box is all that is implemented right now
-  - Settings do **not work**
+  - Settings do **not all work**

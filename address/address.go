@@ -18,7 +18,7 @@ const maxNameLength int = 20
 // Name/Address pair
 type AddressNamePair struct {
 	Name    string // Length maxNameLength Characters
-	Address string // Length 52 Characters
+	Address string
 
 	// Not Marshaled
 	Balance float64 // Unused except for JSON return
@@ -27,8 +27,6 @@ type AddressNamePair struct {
 func NewAddress(name string, address string) (*AddressNamePair, error) {
 	if len(name) > maxNameLength {
 		return nil, fmt.Errorf("Name must be max %d characters", maxNameLength)
-	} else if len(address) != 52 {
-		return nil, errors.New("Address must be 52 characters")
 	}
 
 	if !factom.IsValidAddress(address) {
@@ -118,7 +116,7 @@ func NewAddressList() *AddressList {
 
 // Searches for Address
 func (addList *AddressList) Get(address string) (*AddressNamePair, int) {
-	if len(address) != 52 {
+	if !factom.IsValidAddress(address) {
 		return nil, -1
 	}
 
@@ -131,7 +129,7 @@ func (addList *AddressList) Get(address string) (*AddressNamePair, int) {
 }
 
 func (addList *AddressList) AddANP(anp *AddressNamePair) error {
-	if len(anp.Name) == 0 || len(anp.Address) != 52 {
+	if len(anp.Name) == 0 || !factom.IsValidAddress(anp.Address) {
 		return errors.New("Nil AddressNamePair")
 	}
 
@@ -149,7 +147,7 @@ func (addList *AddressList) AddANP(anp *AddressNamePair) error {
 
 func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
 	// We check for valid factom address higher up, this is just a basic check
-	if len(name) == 0 || len(address) != 52 {
+	if len(name) == 0 {
 		return nil, errors.New("Nil AddressNamePair")
 	}
 
@@ -170,24 +168,15 @@ func (addList *AddressList) Add(name string, address string) (*AddressNamePair, 
 
 }
 
-func (addList *AddressList) Remove(removeAnp *AddressNamePair) error {
-	_, i := addList.Get(removeAnp.Address)
+func (addList *AddressList) Remove(removeAdd string) error {
+	_, i := addList.Get(removeAdd)
 	if i == -1 {
 		return errors.New("Not found")
 	}
 	addList.Length--
-
 	addList.List = append(addList.List[:i], addList.List[i+1:]...)
+
 	return nil
-}
-
-func (addList *AddressList) RemoveAddress(removeAdd string) error {
-	ranp, err := NewAddress("", removeAdd)
-	if err != nil {
-		return err
-	}
-
-	return addList.Remove(ranp)
 }
 
 func (addList *AddressList) MarshalBinary() (data []byte, err error) {

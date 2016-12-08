@@ -19,16 +19,16 @@
             <div class="small-12 large-8 columns">
                 <form>
                     <label>Receiving address: <small><a href="/AddressBook">Manage Addresses</a></small></label>
-{{if .Address}}
+            {{if .Address}}
                     <div id="receiving-address-fixed" name="receiving-address" class="pad20">
                         <small>{{.Name}} <br><pre>({{.Address}})</pre></small>
                         <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
                     </div>
-{{else}}
+            {{else}}
                     <select id="receiving-address" name="receiving-address">
                         <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
                     </select>
-{{end}}
+            {{end}}
                 </form>
                 <div class="row">
                     <div class="columns text-right">

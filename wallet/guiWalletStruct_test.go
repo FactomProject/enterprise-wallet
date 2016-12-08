@@ -14,7 +14,7 @@ import (
 	//"github.com/FactomProject/factom/wallet"
 )
 
-func TestGUIWallet(t *testing.T) {
+func TestGUIWalletFromWallet(t *testing.T) {
 	w := NewWallet()
 
 	// Not valid addresses
@@ -85,6 +85,65 @@ func TestGUIWallet(t *testing.T) {
 	if err != nil {
 		t.Fatal("Rejected a valid address")
 	}
+}
+
+func TestGUIWallet(t *testing.T) {
+	gw := NewWallet()
+	_, err := gw.AddAddress("1", "FA2SDU3UhBwrBR2q7jbFAbxnqUW6s5Z2cX6cakdQ6U53uSLRoPLR", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = gw.AddAddress("1", "FA39udanfmkZXZxPUjMWqmXvdUNKSN9D3UCTnNsJX9B4n7dadCUb", 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = gw.AddAddress("1", "EC32x9uN4xMEMQbw66oob2de94z3b1JWhn23E9srgG3aCzhCCa3P", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = gw.AddAddress("1", "EC3FmWu7iX85r6UvTaqBEZgNNGAmNE1Vd2ZXRGaxHr1g8jRcS6TQ", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	list := gw.GetAllAddresses()
+	if len(list) != 4 {
+		t.Fatal("List wrong length")
+	}
+
+	count := gw.GetTotalAddressCount()
+	if count != 4 {
+		t.Fatal("List wrong length")
+	}
+
+	list = gw.GetAllAddressesFromList(1)
+	if len(list) != 1 {
+		t.Fatal("List wrong length")
+	}
+	list = gw.GetAllAddressesFromList(2)
+	if len(list) != 2 {
+		t.Fatal("List wrong length")
+	}
+	list = gw.GetAllAddressesFromList(3)
+	if len(list) != 1 {
+		t.Fatal("List wrong length")
+	}
+
+	data, err := gw.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gw2 := NewWallet()
+	err = gw2.UnmarshalBinary(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !gw2.IsSameAs(gw) {
+		t.Fatal("Not same, but are")
+	}
+
 }
 
 // Valid

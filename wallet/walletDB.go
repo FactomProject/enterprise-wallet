@@ -48,11 +48,11 @@ type WalletDB struct {
 
 	// Used to cache related transactions
 	// This is rebuilt upon every launch
-	relatedTransactionLock sync.RWMutex                       // For all variables associated with related transaction caching
-	cachedTransactions     []DisplayTransaction               // All sorted transactions already found
-	cachedHeight           uint32                             // Last FBlock height used
-	transMap               map[string]interfaces.ITransaction // Prevent duplicate transactions
-	addrMap                map[string]string                  // Find addresses quick, All addresses already searched for up to last FBlock
+	relatedTransactionLock sync.RWMutex                  // For all variables associated with related transaction caching
+	cachedTransactions     []DisplayTransaction          // All sorted transactions already found
+	cachedHeight           uint32                        // Last FBlock height used
+	transMap               map[string]DisplayTransaction // Prevent duplicate transactions
+	addrMap                map[string]string             // Find addresses quick, All addresses already searched for up to last FBlock
 }
 
 // For now is same as New
@@ -63,7 +63,6 @@ func LoadWalletDB() (*WalletDB, error) {
 func NewWalletDB() (*WalletDB, error) {
 	w := new(WalletDB)
 
-	// TODO: Adjust this path
 	var db interfaces.IDatabase
 	var err error
 	switch GUI_DB { // Decides type of wallet DB
@@ -92,7 +91,6 @@ func NewWalletDB() (*WalletDB, error) {
 		w.guiWallet = data.(*WalletStruct)
 	}
 
-	// TODO: Adjust this path
 	var wal *wallet.Wallet
 	switch WALLET_DB { // Decides type of wallet DB
 	case MAP:
@@ -108,7 +106,6 @@ func NewWalletDB() (*WalletDB, error) {
 
 	w.Wallet = wal
 
-	// TODO: Adjust this path
 	var txdb *wallet.TXDatabaseOverlay
 	switch TX_DB {
 	case MAP:
@@ -136,7 +133,7 @@ func NewWalletDB() (*WalletDB, error) {
 		return nil, err
 	}
 
-	w.transMap = make(map[string]interfaces.ITransaction)
+	w.transMap = make(map[string]DisplayTransaction)
 	w.addrMap = make(map[string]string)
 	w.cachedHeight = 0
 
@@ -273,14 +270,9 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	return dt, nil
 }
 
-/*
-	cachedTransactions []DisplayTransaction               // All sorted transactions already found
-	cachedHeight       uint32                             // Last FBlock height used
-	transMap           map[string]interfaces.ITransaction // Prevent duplicate transactions
-	addrMap            map[string]string                  // Find addresses quick
-*/
-
-// Currently no caching
+// This function grabs all transactions related to any address in the address book
+// and sorts them by time.Time. If a new address is added, this will grab all transactions
+// from that new address and insert them.
 func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 	w.relatedTransactionLock.Lock()
 	defer w.relatedTransactionLock.Unlock()
@@ -309,10 +301,11 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 		oldHeight = w.cachedHeight
 		w.cachedHeight = block.GetDatabaseHeight()
 	} else {
-		w.TransactionDB.GetAllTXs() // UpdateDB
+		w.TransactionDB.GetAllTXs() // UpdateDB for next attempt if user tries again
 		return nil, fmt.Errorf("Error with loading transaction database.")
 	}
 
+	// Get all new transaction to go through
 	transactions, err := w.TransactionDB.GetTXRange(int(oldHeight), int(w.cachedHeight))
 	if err != nil {
 		return nil, err
@@ -350,10 +343,10 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 						break // Error with transaction
 					}
 
-					edt, _ := w.transMap[trans.GetHash().String()]
-					if edt == nil {
+					_, ok := w.transMap[dt.TxID]
+					if !ok {
 						newTransactions = append(newTransactions, *dt)
-						w.transMap[trans.GetHash().String()] = trans
+						w.transMap[dt.TxID] = *dt
 					}
 					added = true
 					break // Transaction added
@@ -366,11 +359,13 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 		}
 	}
 
+	// Sort the new ones
 	sort.Sort(DisplayTransactions(newTransactions))
+	// Prepend them to the old cache
 	w.cachedTransactions = append(newTransactions, w.cachedTransactions...)
 
-	// Find all new addresses, need to do additional handling
-	var moreTransactions []interfaces.ITransaction
+	// Find all new addresses, need to do additional handling and inserting
+	var moreTransactions []DisplayTransaction
 	anps := w.GetAllGUIAddresses()
 	var newAddrs []string
 	for _, a := range anps {
@@ -383,35 +378,38 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 			trans, err := w.TransactionDB.GetTXAddress(a.Address)
 			if err == nil {
 				if len(trans) > 0 {
-					moreTransactions = append(moreTransactions, trans...)
+					for _, t := range trans {
+						dt, _ := w.NewDisplayTransaction(t)
+						moreTransactions = append(moreTransactions, *dt)
+					}
+					//moreTransactions = append(moreTransactions, trans...)
 				}
 			}
 		}
 	}
 
+	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
 	for _, t := range moreTransactions {
-		edt, _ := w.transMap[t.GetHash().String()]
-		if edt != nil {
-			continue
-		}
-
-		// TODO: Check binary search
 		i := sort.Search(len(w.cachedTransactions), func(i int) bool {
-			return !(w.cachedTransactions[i].ExactTime.Before(t.GetTimestamp().GetTime()))
+			return !(w.cachedTransactions[i].ExactTime.Before(t.ExactTime))
 		})
-		if i < len(w.cachedTransactions) && w.cachedTransactions[i].TxID == t.GetHash().String() {
-			// t is present at w.cachedTransactions[i], already there
+
+		if i < len(w.cachedTransactions) && w.cachedTransactions[i].TxID == t.TxID {
+			// t is present at w.cachedTransactions[i], already there. We need to update the 'Actions'
+			// field. If we have the same transaction as before, we don't need to add a new one, but update
+			// the existing
+			for counter := 0; counter < 3; counter++ {
+				// If one or other is true, we want to keep that
+				w.cachedTransactions[i].Action[counter] = w.cachedTransactions[i].Action[counter] || t.Action[counter]
+			}
 		} else {
 			// t is not present in w.cachedTransactions,
 			// but i is the index where it would be inserted.
-			dt, err := w.NewDisplayTransaction(t)
-			if err != nil {
-				break // Error with transaction
-			}
-			w.transMap[t.GetHash().String()] = t
+			w.transMap[t.TxID] = t // Add to cache
+			// Insert
 			temp := w.cachedTransactions[i:]
-			w.cachedTransactions = append(w.cachedTransactions[:i], *dt)
+			w.cachedTransactions = append(w.cachedTransactions[:i], t)
 			w.cachedTransactions = append(w.cachedTransactions, temp...)
 		}
 	}
@@ -419,7 +417,8 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 	return w.cachedTransactions, nil
 }
 
-// No caching, independed of cache variables
+// No cache solution, not going to use it. It is too slow, but was used in early phases and kept
+// for testing comparisons as this should be all inclusive and correct
 func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, error) {
 	// ## No cache solution ##
 	transMap := make(map[string]interfaces.ITransaction)
@@ -465,26 +464,34 @@ func (w *WalletDB) UpdateGUIDB() error {
 		return err
 	}
 
+	var addMap map[string]string
+	addMap = make(map[string]string)
+
 	var names []string
 	var addresses []string
+
+	guiAdds := w.GetAllGUIAddresses()
 
 	// Add addresses to GUI from cli
 	for _, fa := range faAdds {
 		_, list := w.GetGUIAddress(fa.String())
-		if list == 0 {
+		if list == -1 {
 			names = append(names, "FA-Imported-From-CLI")
 			addresses = append(addresses, fa.String())
 		}
+		addMap[fa.String()] = fa.String()
 	}
 
 	for _, ec := range ecAdds {
 		_, list := w.GetGUIAddress(ec.String())
-		if list == 0 {
+		if list == -1 {
 			names = append(names, "EC-Imported-From-CLI")
 			addresses = append(addresses, ec.String())
 		}
+		addMap[ec.String()] = ec.String()
 	}
 
+	// Add in new guys
 	if len(names) > 0 {
 		err = w.addBatchGUIAddresses(names, addresses)
 		if err != nil {
@@ -492,7 +499,12 @@ func (w *WalletDB) UpdateGUIDB() error {
 		}
 	}
 
-	// Todo: Remove addresses that were deleted in cli?
+	// Missing from CLI? We need to remove them here
+	for _, guiAdd := range guiAdds {
+		if _, ok := addMap[guiAdd.Address]; !ok {
+			w.RemoveAddress(guiAdd.Address)
+		}
+	}
 
 	return w.Save()
 }
@@ -621,7 +633,7 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 	return anp, nil
 }
 
-// TODO: Fix, make guiwallet take the remove
+// TODO: Fix, make wallet take the remove
 func (w *WalletDB) RemoveAddress(address string) (*address.AddressNamePair, error) {
 	anp, err := w.guiWallet.RemoveAddress(address)
 	if err != nil {

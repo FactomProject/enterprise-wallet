@@ -78,12 +78,12 @@ func (w *WalletStruct) GetTotalAddressCount() uint32 {
 	return w.FactoidAddresses.Length + w.EntryCreditAddresses.Length + w.ExternalAddresses.Length
 }
 
-// List is 0 for not found, 1 for FactoidAddressList, 2 for EntryCreditList, 3 for External
+// List is -1 for not found, 1 for FactoidAddressList, 2 for EntryCreditList, 3 for External
 func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair, list int, index int) {
 	w.RLock()
 	defer w.RUnlock()
 
-	list = 0
+	list = -1
 
 	anp, index = w.FactoidAddresses.Get(address)
 	if index != -1 && anp != nil {
@@ -108,7 +108,7 @@ func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair,
 
 func (w *WalletStruct) ChangeAddressName(address string, toName string) error {
 	anp, list, i := w.GetAddress(address)
-	if list == 0 || anp == nil || i == -1 {
+	if list == -1 || anp == nil || i == -1 {
 		return fmt.Errorf("Address not found")
 	}
 
@@ -261,7 +261,7 @@ func (w *WalletStruct) RemoveAddress(address string) (*address.AddressNamePair, 
 	case 0:
 		return nil, fmt.Errorf("No address found")
 	case 1:
-		err := w.FactoidAddresses.Remove(anp)
+		err := w.FactoidAddresses.Remove(address)
 		if err != nil {
 			return nil, err
 		}
@@ -269,7 +269,7 @@ func (w *WalletStruct) RemoveAddress(address string) (*address.AddressNamePair, 
 		// factom-wallet remove?
 		return anp, nil
 	case 2:
-		err := w.EntryCreditAddresses.Remove(anp)
+		err := w.EntryCreditAddresses.Remove(address)
 		if err != nil {
 			return nil, err
 		}
@@ -277,7 +277,7 @@ func (w *WalletStruct) RemoveAddress(address string) (*address.AddressNamePair, 
 		// factom-wallet remove?
 		return anp, nil
 	case 3:
-		err := w.ExternalAddresses.Remove(anp)
+		err := w.ExternalAddresses.Remove(address)
 		if err != nil {
 			return nil, err
 		}

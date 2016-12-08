@@ -258,7 +258,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		_, list := MasterWallet.GetGUIAddress(a.Address)
-		if list == 0 {
+		if list == -1 {
 			w.Write(jsonError("Not found"))
 			return
 		}
@@ -390,26 +390,6 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			w.Write(jsonError(err.Error()))
 			return
 		}
-
-		/*
-			if trans.TransType == "factoid" {
-				name, _, err = MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
-				if err != nil {
-					MasterWallet.DeleteTransaction(name)
-					w.Write(jsonError(err.Error()))
-					return
-				}
-			} else if trans.TransType == "ec" {
-				name, _, err = MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
-				if err != nil {
-					MasterWallet.DeleteTransaction(name)
-					w.Write(jsonError(err.Error()))
-					return
-				}
-			} else {
-				w.Write(jsonError("Not a valid type"))
-				return
-			}*/
 
 		tHash, err := MasterWallet.SendTransaction(name)
 		if err != nil {

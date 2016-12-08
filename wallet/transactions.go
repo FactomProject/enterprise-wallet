@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/FactomProject/factom"
+	"github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
 	//"github.com/FactomProject/factom/wallet"
@@ -44,7 +45,7 @@ func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 // This is to confirm an already constructed transaction
 func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []string) (string, error) {
 	name := hashStringList(toAddresses)
-	name = name[:32]
+	name = name[:32] // name of transaction
 
 	trans := wal.Wallet.GetTransactions()
 	t, ok := trans[name]
@@ -143,7 +144,7 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 
 	// Add outputs, find total being sent
 	trans := hashStringList(toAddresses)
-	trans = trans[:32]
+	trans = trans[:32] // Name of transaction
 
 	transMap := wal.Wallet.GetTransactions()
 	if t, _ := transMap[trans]; t != nil {
@@ -171,7 +172,7 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 		return trans, nil, err
 	}
 
-	var balances []AddressBalancePair
+	var list []AddressBalancePair
 
 	for _, address := range faAddresses {
 		addr := address.String()
@@ -179,15 +180,15 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 		if err != nil {
 			return trans, nil, err
 		}
-		balances = append(balances, AddressBalancePair{addr, uint64(balance)})
+		list = append(list, AddressBalancePair{addr, uint64(balance)})
 	}
 
-	balList := AddressBalancePairs(balances)
-	sort.Sort(sort.Reverse(balList))
-	list := []AddressBalancePair(balList)
+	// Sort to get largest balances first
+	sort.Sort(sort.Reverse(AddressBalancePairs(list)))
 
 	totalLeft := total
 	var i int
+	// While factoids still needed to cover transaction, go through addresses
 	for i = 0; totalLeft > 0; {
 		if i >= len(list) {
 			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
@@ -221,10 +222,13 @@ func (wal *WalletDB) ConstructSendFactoids(toAddresses []string, amounts []uint6
 		return trans, nil, err
 	}
 
-	for list[i].Balance < fee {
-		i++
-		if i >= len(list) {
+	// The last addresse we used to pay, we need to check if it can cover the fee
+	if list[i].Balance < fee { // If it cannot, lets find one that can
+		i, err = checkForAddressForFee(list, transStruct, i, rate)
+		if i == -1 || err != nil { // We don't have an address that can pay for the fee.
 			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
+		} else {
+			wal.Wallet.AddInput(trans, list[i].Address, 0)
 		}
 	}
 
@@ -261,7 +265,7 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 
 	// Add outputs, find total being sent
 	trans := hashStringList(toAddresses)
-	trans = trans[:32]
+	trans = trans[:32] // Name of transaction
 
 	transMap := wal.Wallet.GetTransactions()
 	if t, _ := transMap[trans]; t != nil {
@@ -338,11 +342,19 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 		return trans, nil, err
 	}
 
-	for i < len(balList) {
-		if list[i].Balance < fee {
-			i++
+	// The last addresse we used to pay, we need to check if it can cover the fee
+	if list[i].Balance < fee { // If it cannot, lets find one that can
+		oldI := i
+		i, err = checkForAddressForFee(list, transStruct, i, rate)
+		if i == -1 || err != nil { // We don't have an address that can pay for the fee.
+			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
 		} else {
-			break
+			if i != oldI { // It shouldn't, but doesn't hurt to double check
+				err = wal.Wallet.AddInput(trans, list[i].Address, 0)
+				if err != nil {
+					return trans, nil, err
+				}
+			}
 		}
 	}
 
@@ -362,6 +374,65 @@ func (wal *WalletDB) ConstructConvertToEC(toAddresses []string, amounts []uint64
 
 	return trans, r, nil
 }
+
+// A lot of parameters. This function is reused for EC and FCT transations. All it does it, if the last address input cannnot cover the fee
+// this finds an address that can.
+//	Parameters:
+//		list = List of addresses
+//		transStruct = The transaction structure that can calculate a fee
+//		i = Last address in the list we have inputted into the transation
+//		rate = current fee rate
+func checkForAddressForFee(list []AddressBalancePair, transStruct *factoid.Transaction, i int, rate uint64) (indexToPay int, err error) {
+	if i >= len(list) { // Out of addresses? Sorry, no transaction
+		return -1, fmt.Errorf("Not enough factoids to cover the transaction")
+	}
+
+	// Ok, how much would another address input increase the fee to?
+	fakeAddr := factoid.NewAddress(primitives.Sha([]byte("A fake address")).Bytes())
+	transStruct.AddInput(fakeAddr, 0)          // We do not use this address, just need a new fee calc
+	fee, err := transStruct.CalculateFee(rate) // We have the rate from earlier
+	if err != nil {
+		return -1, err
+	}
+
+	// So that is the fee, lets check if we have anything
+	for list[i].Balance < fee {
+		i++
+		if i >= len(list) {
+			return -1, fmt.Errorf("Not enough factoids to cover the transaction")
+		}
+	}
+
+	// Sweet, we got one. Lets return the index of it
+	return i, nil
+}
+
+// Initial attempt.
+/*// The last addresse we used to pay, we need to check if it can cover the fee
+if list[i].Balance < fee { // If it cannot, lets find one that can
+	if i >= len(list) { // Out of addresses? Sorry, no transaction
+		return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
+	}
+
+	fakeAddr := factoid.NewAddress(primitives.Sha([]byte("A fake address")).Bytes())
+	// Ok, how much would another address input increase the fee to?
+	transStruct.AddInput(fakeAddr, 0)         // We may not use this address, just need a new fee calc
+	fee, err = transStruct.CalculateFee(rate) // We have the rate from earlier
+	if err != nil {
+		return trans, nil, err
+	}
+
+	// So that is the fee, lets check if we have anything
+	for list[i].Balance < fee {
+		i++
+		if i >= len(list) {
+			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
+		}
+	}
+
+	// Lets add it to the transaction and continue
+	wal.Wallet.AddInput(trans, list[i].Address, 0)
+}*/
 
 func (wal *WalletDB) GetAddressBalance(address string) (uint64, error) {
 	bal, err := factom.GetFactoidBalance(address)
