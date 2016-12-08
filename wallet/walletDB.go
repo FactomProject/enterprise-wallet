@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/FactomProject/M2GUIWallet/address"
 	"github.com/FactomProject/M2GUIWallet/wallet/database"
@@ -168,11 +169,12 @@ type DisplayTransaction struct {
 	TotalFCTOutput uint64
 	TotalECOutput  uint64
 
-	TxID   string
-	Height uint32
-	Action [3]bool // Sent, recieved, converted
-	Date   string
-	Time   string
+	TxID      string
+	Height    uint32
+	Action    [3]bool // Sent, recieved, converted
+	Date      string
+	Time      string
+	ExactTime time.Time
 
 	//ITrans interfaces.ITransaction
 }
@@ -186,7 +188,7 @@ func (slice DisplayTransactions) Len() int {
 
 func (slice DisplayTransactions) Less(i, j int) bool {
 	// Reverse, as higher height = newer
-	return slice[i].Height > slice[j].Height
+	return slice[i].ExactTime.Before(slice[j].ExactTime)
 }
 
 func (slice DisplayTransactions) Swap(i, j int) {
@@ -215,6 +217,7 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	dt.Action = [3]bool{false, false, false}
 	dt.Date = t.GetTimestamp().GetTime().Format(("01/02/2006"))
 	dt.Time = t.GetTimestamp().GetTime().Format(("15:04:05"))
+	dt.ExactTime = t.GetTimestamp().GetTime()
 
 	ins := t.GetInputs()
 	// Inputs
@@ -393,7 +396,10 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 			continue
 		}
 
-		i := sort.Search(len(w.cachedTransactions), func(i int) bool { return w.cachedTransactions[i].TxID == t.GetHash().String() })
+		// TODO: Check binary search
+		i := sort.Search(len(w.cachedTransactions), func(i int) bool {
+			return !(w.cachedTransactions[i].ExactTime.Before(t.GetTimestamp().GetTime()))
+		})
 		if i < len(w.cachedTransactions) && w.cachedTransactions[i].TxID == t.GetHash().String() {
 			// t is present at w.cachedTransactions[i], already there
 		} else {
