@@ -110,7 +110,7 @@ svg { height: auto; overflow: hidden; }
         font-size: 18px;
         line-height: 12px;
     }
-    &.newPlus {
+    &.newPlus, &.newMinus {
         position: relative;
         overflow: hidden;
         &:before {
@@ -125,6 +125,7 @@ svg { height: auto; overflow: hidden; }
             line-height: 39px;
         }
     }
+	&.newMinus:before { content: '-'; }
     &.alert:hover { background: #EA6752; }
     &.close-button {
         top: 1rem;
@@ -323,15 +324,7 @@ header {
                 position: relative;
 				padding-left: 92px;
                 text-align: left;
-                //@include breakpoint(medium only) { margin-left: 56px; }
-//                h4 {
-//                    margin: 0;
-//                    color: $primary-color;
-//                    font-size: 18px;
-//                    font-weight: $font-weight-bold;
-//                    text-transform: uppercase;
-//                    @include breakpoint(medium only) { font-size: 14px; }
-//                }
+				@include breakpoint(medium only) { padding-left: 48px; }
                 span {
 					position: relative;
 					top: 0.5rem;
@@ -401,6 +394,7 @@ header {
             }
             &::-webkit-scrollbar-button { display: none; }
             &.transactions, &.address-book { 
+				overflow: visible;
                 padding: 0;
                 border: solid 8px transparent;
                 border-top: none;
@@ -441,7 +435,7 @@ header {
                         text-transform: uppercase;
                         a { 
                             color: lighten($primary-color, 20%);
-                            &:hover { color: $white; }
+                            &:hover { color: $primary-color; }
                         }
                     }
                 }
@@ -779,6 +773,27 @@ header {
 					font-size: 32px;
 					text-transform: uppercase;
 				}
+				&#transDetails {
+					width: 800px;
+					table {
+						thead, tfoot { display: block; }
+						table {
+							tr.total {
+								border-top: solid 1px $medium-gray;
+							}
+							td { 
+								padding-top: 3px;
+								padding-bottom: 3px;
+								font-family: monospace;
+								font-size: 14px;
+							}
+						}
+						tr:hover table { 
+							tr:nth-child(even) { background: none; }
+							tr:hover { background: $white; }
+						}
+					}
+				}
 			}
         }
     }
@@ -896,6 +911,10 @@ body.darkTheme {
 			main .reveal {
 				background: #111;
 				border-color: $primary-color;
+				thead, tfoot { 
+					background: #222;
+					border-color: #333;
+				}
 			}
 			main .newCTA.active ul {
 				background: #000;
