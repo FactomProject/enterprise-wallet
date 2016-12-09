@@ -279,8 +279,9 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 
 	// Get current Fblock height
 	var err error
+	var i int
 	var block interfaces.IFBlock
-	for i := 0; i < 2; i++ { // 2 tries, if fails first, updates transactions and trys again
+	for i = 0; i < 2; i++ { // 2 tries, if fails first, updates transactions and trys again
 		block, err = w.TransactionDB.DBO.FetchFBlockHead()
 		if err != nil {
 			return nil, err
@@ -315,7 +316,7 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 	// Sort throught new transactions for any related
 	for _, trans := range transactions {
 		added := false
-		for i := 0; i < 3; i++ {
+		for i = 0; i < 3; i++ {
 			var addresses []string
 			switch i {
 			case 0:
@@ -391,7 +392,7 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
 	for _, t := range moreTransactions {
-		i := sort.Search(len(w.cachedTransactions), func(i int) bool {
+		i = sort.Search(len(w.cachedTransactions), func(i int) bool {
 			return !(w.cachedTransactions[i].ExactTime.Before(t.ExactTime))
 		})
 

@@ -203,7 +203,8 @@ function SendTransaction() {
       disableInput()
       HideNewButtons()
       
-      SetGeneralSuccess('Transaction Sent')
+      SetGeneralSuccess('Transaction Sent, transaction ID: ' + obj.Content )
+      ShowNewTransaction()
     } else {
       enableInput()
       HideNewButtons()
@@ -321,6 +322,14 @@ function ShowNewButtons() {
   $("#edit-transaction").slideDown(100)
   $("#send-entire-transaction").slideDown(100)
 }
+
+function ShowNewTransaction() {
+  $("#new-transaction").slideDown(100)
+}
+
+$("#new-transaction").on('click', function(){
+  location.reload()
+})
 
 Input = true
 
