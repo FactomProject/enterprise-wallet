@@ -17,11 +17,17 @@ function addNewOutputAddress(defaultVal, error) {
   if(error){
     eClass = "input-group-error"
   }
+  
+  str = "factoid"
+  if(PageTokenABR != "FCT") {
+    str = "entry credit"
+  }
+
   $("#all-outputs").append(
   '<div class="row" id="single-output">' +
   '    <div class="small-12 medium-7 large-8 columns">' +
   '        <div class="input-group ' + eClass + '" id="output-factoid-address-container">' +
-  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type factoid address" value="' + defaultVal + '"></pre>' +
+  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type ' + str + ' address" value="' + defaultVal + '"></pre>' +
   '            <!-- <a data-toggle="addressbook" class="input-group-button button" id="addressbook-' + counter + '"><i class="fa fa-book"></i></a> -->' +
   '        </div>' +
   '    </div>' +
