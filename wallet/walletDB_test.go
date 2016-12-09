@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
+	"time"
 
 	ad "github.com/FactomProject/M2GUIWallet/address"
 	. "github.com/FactomProject/M2GUIWallet/wallet"
@@ -15,7 +16,162 @@ import (
 	//"github.com/FactomProject/factom/wallet"
 )
 
+var longtest = true
 var _ = fmt.Sprintf("")
+
+// Testing the inserting order
+func TestGetRelatedTransaction(t *testing.T) {
+	if !longtest {
+		return
+	}
+	err := LoadTestWallet(8074)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	anp, list := TestWallet.GetGUIAddress("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q")
+	if list == -1 {
+		anp, err = TestWallet.AddAddress("Sand", "Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK")
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Fs1uHDWjYANSxXUtbdkLVkhHboaPRz1tADqs7iB16kQq5VTCvKZS FA2BpB5btNeoSXu2ARqCcF7qkn1XJr5BmDXLjYxd5YsoDH5wU2VU // 1000 from sand
+	// Fs3FyjVtnfJV3jZQq7fpYns89fGZtxADARqvwcNGsJrKRubhQ8t7 FA3VSGBDaT3sJ1jv8Be9ABCWw9MgKjUsJcJY2pJTUDXsGMERUtpV // Rest from sand
+	// Fs2qf5WTcctcfmestdJUF5dH6geuwBvzVaCGL2458SkJzZKsCU8z FA3HRq8jFUhzN9c8iKTBBfXyNyijSnov1ZLJtJMKTXFQNmncWZoE
+	type AddSecPub struct {
+		Sec string
+		Pub string
+	}
+
+	var Add1 = AddSecPub{"Fs1uHDWjYANSxXUtbdkLVkhHboaPRz1tADqs7iB16kQq5VTCvKZS", "FA2BpB5btNeoSXu2ARqCcF7qkn1XJr5BmDXLjYxd5YsoDH5wU2VU"}
+	var Add2 = AddSecPub{"Fs3FyjVtnfJV3jZQq7fpYns89fGZtxADARqvwcNGsJrKRubhQ8t7", "FA3VSGBDaT3sJ1jv8Be9ABCWw9MgKjUsJcJY2pJTUDXsGMERUtpV"}
+	var Add3 = AddSecPub{"Fs2qf5WTcctcfmestdJUF5dH6geuwBvzVaCGL2458SkJzZKsCU8z", "FA3HRq8jFUhzN9c8iKTBBfXyNyijSnov1ZLJtJMKTXFQNmncWZoE"}
+
+	_, err = TestWallet.AddAddress("Temp", Add2.Sec)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	// Send 3 Transactions
+	tx1, err := sendTrans(Add1.Pub, 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(2 * time.Second)
+
+	tx2, err := sendTrans(Add2.Pub, 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(2 * time.Second)
+
+	tx3, err := sendTrans(Add3.Pub, 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Ok we have some transactions around
+	TestWallet = nil // Need fresh
+	LoadTestWallet(8078)
+
+	TestWallet.UpdateGUIDB()
+	transactions, err := TestWallet.GetRelatedTransactions()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	anp, err = TestWallet.AddAddress("Third", Add3.Sec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var _, _, _ = tx1, tx2, tx3
+	// Let a block pass
+	time.Sleep(10 * time.Second)
+
+	correctTrans, _ := TestWallet.GetRelatedTransactionsNoCaching()
+	transactions, err = TestWallet.GetRelatedTransactions()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !DisplayTransactions(correctTrans).IsSimilarTo(transactions) {
+		printtxID(correctTrans)
+		fmt.Println("-")
+		printtxID(transactions)
+		t.Fatal("Not Same")
+	}
+
+	// This tx is before other
+	anp, err = TestWallet.AddAddress("First", Add1.Sec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	correctTrans, _ = TestWallet.GetRelatedTransactionsNoCaching()
+	transactions, err = TestWallet.GetRelatedTransactions()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !DisplayTransactions(correctTrans).IsSimilarTo(transactions) {
+		t.Fatal("Not Same")
+	}
+
+	// This tx is between both
+	anp, err = TestWallet.AddAddress("Second", Add2.Sec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	correctTrans, _ = TestWallet.GetRelatedTransactionsNoCaching()
+	transactions, err = TestWallet.GetRelatedTransactions()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !DisplayTransactions(correctTrans).IsSimilarTo(transactions) {
+		t.Fatal("Not Same")
+	}
+
+	_ = anp
+
+}
+
+func printtxID(transactions []DisplayTransaction) {
+	for _, t := range transactions {
+		fmt.Println(t.TxID + " -- " + t.Time)
+	}
+}
+
+func findTrans(transactions []DisplayTransaction, txid string) int {
+	for i, t := range transactions {
+		if t.TxID == txid {
+			return i
+		}
+	}
+	return -1
+}
+
+func sendTrans(address string, amt uint64) (string, error) {
+	toAddresses := []string{address}
+	amounts := []uint64{amt * 1e8}
+	name, _, err := TestWallet.ConstructSendFactoids(toAddresses, amounts)
+	if err != nil {
+		return "", err
+	}
+
+	tx, err := TestWallet.SendTransaction(name)
+	if err != nil {
+		return "", err
+	}
+
+	return tx, nil
+}
 
 func TestGUIUpdate(t *testing.T) {
 	var err error

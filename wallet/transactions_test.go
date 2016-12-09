@@ -13,7 +13,7 @@ var _ = fmt.Sprint("")
 var TestWallet *WalletDB
 
 func TestSendFactoids(t *testing.T) {
-	LoadTestWallet(8089)
+	LoadTestWallet(8075)
 	var err error
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
@@ -67,7 +67,7 @@ func TestSendFactoids(t *testing.T) {
 }
 
 func TestConvertToEC(t *testing.T) {
-	LoadTestWallet(8089)
+	LoadTestWallet(8076)
 	var err error
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q

@@ -157,6 +157,22 @@ func NewTransactionAddressInfo(name string, address string, amount uint64, token
 	return t
 }
 
+func (a *TransactionAddressInfo) IsSameAs(b TransactionAddressInfo) bool {
+	if a.Name != b.Name {
+		return false
+	}
+	if a.Address != b.Address {
+		return false
+	}
+	if a.Amount != b.Amount {
+		return false
+	}
+	if a.Type != b.Type {
+		return false
+	}
+	return true
+}
+
 // Names are "" if not in wallet
 type DisplayTransaction struct {
 	Inputs     []TransactionAddressInfo
@@ -176,6 +192,58 @@ type DisplayTransaction struct {
 	//ITrans interfaces.ITransaction
 }
 
+func (a *DisplayTransaction) IsSameAs(b DisplayTransaction) bool {
+	if !a.IsSimilarTo(b) {
+		return false
+	}
+
+	for i := 0; i < 3; i++ {
+		if a.Action[i] != b.Action[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Does not count actions
+func (a *DisplayTransaction) IsSimilarTo(b DisplayTransaction) bool {
+	if len(a.Inputs) != len(b.Inputs) {
+		return false
+	}
+	if len(a.Outputs) != len(b.Outputs) {
+		return false
+	}
+
+	for i := 0; i < len(a.Inputs); i++ {
+		if !a.Inputs[i].IsSameAs(b.Inputs[i]) {
+			return false
+		}
+	}
+	if a.TotalInput != b.TotalInput {
+		return false
+	}
+	for i := 0; i < len(a.Outputs); i++ {
+		if !a.Outputs[i].IsSameAs(b.Outputs[i]) {
+			return false
+		}
+	}
+	if a.TotalFCTOutput != b.TotalFCTOutput {
+		return false
+	}
+	if a.TotalECOutput != b.TotalECOutput {
+		return false
+	}
+	if a.TxID != b.TxID {
+		return false
+	}
+	if a.Height != b.Height {
+		return false
+	}
+
+	return true
+}
+
 // for sorting
 type DisplayTransactions []DisplayTransaction
 
@@ -184,12 +252,29 @@ func (slice DisplayTransactions) Len() int {
 }
 
 func (slice DisplayTransactions) Less(i, j int) bool {
-	// Reverse, as higher height = newer
 	return slice[i].ExactTime.Before(slice[j].ExactTime)
 }
 
 func (slice DisplayTransactions) Swap(i, j int) {
 	slice[i], slice[j] = slice[j], slice[i]
+}
+
+func (slice DisplayTransactions) IsSameAs(comp DisplayTransactions) bool {
+	for i := 0; i < slice.Len(); i++ {
+		if !slice[i].IsSameAs(comp[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func (slice DisplayTransactions) IsSimilarTo(comp DisplayTransactions) bool {
+	for i := 0; i < slice.Len(); i++ {
+		if !slice[i].IsSimilarTo(comp[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTransaction, error) {
@@ -208,7 +293,7 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	dt.TotalFCTOutput = 0
 	dt.TotalECOutput = 0
 	dt.Height = t.GetBlockHeight()
-	dt.TxID = t.GetHash().String()
+	dt.TxID = t.GetSigHash().String()
 	dt.Inputs = make([]TransactionAddressInfo, 0)
 	dt.Outputs = make([]TransactionAddressInfo, 0)
 	dt.Action = [3]bool{false, false, false}
@@ -392,9 +477,11 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
 	for _, t := range moreTransactions {
-		i = sort.Search(len(w.cachedTransactions), func(i int) bool {
-			return !(w.cachedTransactions[i].ExactTime.Before(t.ExactTime))
-		})
+		if _, ok := w.transMap[t.TxID]; ok {
+			continue
+		}
+
+		i = w.findTransactionIndex(t)
 
 		if i < len(w.cachedTransactions) && w.cachedTransactions[i].TxID == t.TxID {
 			// t is present at w.cachedTransactions[i], already there. We need to update the 'Actions'
@@ -409,13 +496,31 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 			// but i is the index where it would be inserted.
 			w.transMap[t.TxID] = t // Add to cache
 			// Insert
-			temp := w.cachedTransactions[i:]
-			w.cachedTransactions = append(w.cachedTransactions[:i], t)
-			w.cachedTransactions = append(w.cachedTransactions, temp...)
+			w.cachedTransactions = append(w.cachedTransactions[:i], append([]DisplayTransaction{t}, w.cachedTransactions[i:]...)...)
 		}
 	}
 
 	return w.cachedTransactions, nil
+}
+
+// Binary search
+func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
+	low := 0
+	high := len(w.cachedTransactions) - 1
+
+	for low <= high {
+		mid := low + ((high - low) / 2)
+		if w.cachedTransactions[mid].TxID == t.TxID {
+			return mid
+		}
+		if !w.cachedTransactions[mid].ExactTime.Before(t.ExactTime) {
+			high = mid - 1
+		} else {
+			low = mid + 1
+		}
+	}
+
+	return low
 }
 
 // No cache solution, not going to use it. It is too slow, but was used in early phases and kept
@@ -426,7 +531,7 @@ func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, erro
 	var transList []DisplayTransaction
 	adds := w.GetAllGUIAddresses()
 	for _, a := range adds {
-		transactions, err := w.Wallet.TXDB().GetTXAddress(a.Address)
+		transactions, err := w.TransactionDB.GetTXAddress(a.Address)
 		if err != nil {
 			return nil, err
 		}
