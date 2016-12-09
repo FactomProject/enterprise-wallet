@@ -12,6 +12,10 @@
 	font-size: 95%;
 }
 
+a:hover {
+    color:#417ba4 !important;
+}
+
 .disabled-input {
 	cursor: not-allowed !important;
 	color:#A0A0A0 !important;
