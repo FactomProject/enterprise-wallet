@@ -29,7 +29,7 @@ func SaveSettings() error {
 func ServeWallet(port int) {
 	templates = template.New("main")
 	// Put function into templates
-	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts}
+	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts, "compareStrings": compareStrings}
 	templates.Funcs(template.FuncMap(funcMap))
 	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
 
@@ -60,6 +60,10 @@ func mkArray(args ...interface{}) []interface{} {
 }
 
 func compareInts(a int, b int) bool {
+	return (a == b)
+}
+
+func compareStrings(a string, b string) bool {
 	return (a == b)
 }
 

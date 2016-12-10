@@ -16,7 +16,7 @@ import (
 	//"github.com/FactomProject/factom/wallet"
 )
 
-var longtest = true
+var longtest = false
 var _ = fmt.Sprintf("")
 
 // Testing the inserting order

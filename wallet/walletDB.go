@@ -667,7 +667,7 @@ func (w *WalletDB) GenerateFactoidAddress(name string) (*address.AddressNamePair
 		return nil, err
 	}
 
-	anp, err := w.guiWallet.AddAddress(name, address.String(), 1)
+	anp, err := w.guiWallet.AddSeededAddress(name, address.String(), 1)
 	if err != nil {
 		return nil, err
 	}
@@ -729,7 +729,7 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 		return nil, err
 	}
 
-	anp, err := w.guiWallet.AddAddress(name, address.String(), 2)
+	anp, err := w.guiWallet.AddSeededAddress(name, address.String(), 2)
 	if err != nil {
 		return nil, err
 	}

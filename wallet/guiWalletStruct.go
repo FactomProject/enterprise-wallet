@@ -62,11 +62,11 @@ func (w *WalletStruct) AddSeededAddress(name string, address string, list int) (
 
 	switch list {
 	case 1:
-		return w.FactoidAddresses.Add(name, address)
+		return w.FactoidAddresses.AddSeeded(name, address)
 	case 2:
-		return w.EntryCreditAddresses.Add(name, address)
+		return w.EntryCreditAddresses.AddSeeded(name, address)
 	case 3:
-		return w.ExternalAddresses.Add(name, address)
+		return w.ExternalAddresses.Add(name, address) // You can't do this, but will not hurt
 	}
 
 	return nil, fmt.Errorf("Encountered an error, this should not be able to happen")
