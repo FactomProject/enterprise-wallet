@@ -711,7 +711,7 @@ th {
   padding: 0; }
 
 .foundation-mq {
-  font-family: "small=0em&medium=40em&large=64em&xlarge=100em&xxlarge=125em"; }
+  font-family: "small=0em&medium=40em&large=75em&xlarge=100em&xxlarge=125em"; }
 
 html,
 body {
@@ -882,7 +882,7 @@ button {
   .medium-12 {
     flex: 0 0 100%;
     max-width: 100%; } }
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 75em) {
   .large-1 {
     flex: 0 0 8.33333%;
     max-width: 8.33333%; }
@@ -933,7 +933,7 @@ button {
 @media screen and (min-width: 40em) {
   .medium-expand {
     flex: 1 1 0px; } }
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 75em) {
   .large-expand {
     flex: 1 1 0px; } }
 .shrink {
@@ -947,7 +947,7 @@ button {
 
 .row.large-unstack .column {
   flex: 0 0 100%; }
-  @media screen and (min-width: 64em) {
+  @media screen and (min-width: 75em) {
     .row.large-unstack .column {
       flex: 1 1 0px; } }
 
@@ -987,7 +987,7 @@ button {
 
   .medium-order-6 {
     order: 6; } }
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 75em) {
   .large-order-1 {
     order: 1; }
 
@@ -1270,7 +1270,7 @@ kbd {
 
   .medium-text-justify {
     text-align: justify; } }
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 75em) {
   .large-text-left {
     text-align: left; }
 
@@ -1689,27 +1689,27 @@ select {
   .show-for-medium {
     display: none !important; } }
 
-@media screen and (min-width: 40em) and (max-width: 63.9375em) {
+@media screen and (min-width: 40em) and (max-width: 74.9375em) {
   .hide-for-medium-only {
     display: none !important; } }
 
-@media screen and (max-width: 39.9375em), screen and (min-width: 64em) {
+@media screen and (max-width: 39.9375em), screen and (min-width: 75em) {
   .show-for-medium-only {
     display: none !important; } }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 75em) {
   .hide-for-large {
     display: none !important; } }
 
-@media screen and (max-width: 63.9375em) {
+@media screen and (max-width: 74.9375em) {
   .show-for-large {
     display: none !important; } }
 
-@media screen and (min-width: 64em) and (max-width: 99.9375em) {
+@media screen and (min-width: 75em) and (max-width: 99.9375em) {
   .hide-for-large-only {
     display: none !important; } }
 
-@media screen and (max-width: 63.9375em), screen and (min-width: 100em) {
+@media screen and (max-width: 74.9375em), screen and (min-width: 100em) {
   .show-for-large-only {
     display: none !important; } }
 
@@ -2243,7 +2243,7 @@ select {
       display: table-cell; }
     .menu.medium-vertical > li {
       display: block; } }
-  @media screen and (min-width: 64em) {
+  @media screen and (min-width: 75em) {
     .menu.large-horizontal > li {
       display: table-cell; }
     .menu.large-vertical > li {
@@ -2367,7 +2367,7 @@ body {
     position: fixed; }
     .position-right.reveal-for-medium ~ .off-canvas-content {
       margin-right: 250px; } }
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 75em) {
   .position-left.reveal-for-large {
     left: 0;
     z-index: auto;
@@ -2822,7 +2822,7 @@ table {
   tbody td {
     padding: 0.5rem 0.625rem 0.625rem; }
 
-@media screen and (max-width: 63.9375em) {
+@media screen and (max-width: 74.9375em) {
   table.stack thead {
     display: none; }
   table.stack tfoot {
@@ -3043,7 +3043,7 @@ table.hover tr:nth-of-type(even):hover {
 .stacked-for-small .top-bar-left {
   width: 100%; }
 
-@media screen and (max-width: 63.9375em) {
+@media screen and (max-width: 74.9375em) {
   .stacked-for-medium .top-bar-right {
     width: 100%; }
   .stacked-for-medium .top-bar-left {
@@ -3493,10 +3493,10 @@ svg {
     margin-right: 8px;
     font-size: 18px;
     line-height: 12px; }
-  .button.newPlus, button.newPlus {
+  .button.newPlus, .button.newMinus, button.newPlus, button.newMinus {
     position: relative;
     overflow: hidden; }
-    .button.newPlus:before, button.newPlus:before {
+    .button.newPlus:before, .button.newMinus:before, button.newPlus:before, button.newMinus:before {
       content: '+';
       display: inline-block;
       position: absolute;
@@ -3506,19 +3506,8 @@ svg {
       margin: 0 auto;
       font-size: 26px;
       line-height: 39px; }
-  .button.newMinus, button.newPlus {
-    position: relative;
-    overflow: hidden; }
-    .button.newMinus:before, button.newPlus:before {
-      content: '-';
-      display: inline-block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
-      font-size: 26px;
-      line-height: 39px; }
+  .button.newMinus:before, button.newMinus:before {
+    content: '-'; }
   .button.alert:hover, button.alert:hover {
     background: #EA6752; }
   .button.close-button, button.close-button {
@@ -3576,7 +3565,7 @@ header {
   header .svg, header svg {
     max-width: 209px;
     margin-bottom: 3px; }
-    @media screen and (max-width: 63.9375em) {
+    @media screen and (max-width: 74.9375em) {
       header .svg, header svg {
         max-width: 140px; } }
   header h1 {
@@ -3584,7 +3573,7 @@ header {
     color: #7faccc;
     font-size: 21px;
     text-transform: uppercase; }
-    @media screen and (max-width: 63.9375em) {
+    @media screen and (max-width: 74.9375em) {
       header h1 {
         font-size: 15px; } }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
@@ -3621,7 +3610,7 @@ header {
           color: #417ba4;
           font-size: 18px;
           line-height: 35px; }
-          @media screen and (min-width: 40em) and (max-width: 63.9375em) {
+          @media screen and (min-width: 40em) and (max-width: 74.9375em) {
             #frame section.leftCol nav ul li a {
               padding-left: 8em;
               font-size: 14px; } }
@@ -3646,7 +3635,7 @@ header {
             top: 1.5rem;
             left: 3rem;
             width: 54px; }
-          @media screen and (min-width: 40em) and (max-width: 63.9375em) {
+          @media screen and (min-width: 40em) and (max-width: 74.9375em) {
             #frame section.leftCol nav ul li a {
               padding-left: 6rem; }
               #frame section.leftCol nav ul li a i {
@@ -3722,7 +3711,7 @@ header {
       padding: 40px 0 0;
       background: #fbfbfb;
       text-align: center; }
-      @media screen and (min-width: 40em) and (max-width: 63.9375em) {
+      @media screen and (min-width: 40em) and (max-width: 74.9375em) {
         #frame section.rightCol .balances {
           padding-top: 40px; } }
       #frame section.rightCol .balances > .row {
@@ -3732,6 +3721,9 @@ header {
         position: relative;
         padding-left: 92px;
         text-align: left; }
+        @media screen and (min-width: 40em) and (max-width: 74.9375em) {
+          #frame section.rightCol .balances .balance {
+            padding-left: 48px; } }
         #frame section.rightCol .balances .balance span {
           position: relative;
           top: 0.5rem;
@@ -3741,7 +3733,7 @@ header {
           line-height: 60px; }
           #frame section.rightCol .balances .balance span small {
             font-size: 24px; }
-          @media screen and (min-width: 40em) and (max-width: 63.9375em) {
+          @media screen and (min-width: 40em) and (max-width: 74.9375em) {
             #frame section.rightCol .balances .balance span {
               font-size: 40px;
               line-height: 40px; } }
@@ -3751,7 +3743,7 @@ header {
           left: 0;
           width: 64px;
           height: 64px; }
-          @media screen and (min-width: 40em) and (max-width: 63.9375em) {
+          @media screen and (min-width: 40em) and (max-width: 74.9375em) {
             #frame section.rightCol .balances .balance i {
               width: 40px;
               height: 40px; } }
@@ -3836,7 +3828,7 @@ header {
           #frame section.rightCol main form label small a {
             color: #7faccc; }
             #frame section.rightCol main form label small a:hover {
-              color: #fff; }
+              color: #417ba4; }
       #frame section.rightCol main form .input-group-label {
         background: #d37d41;
         border-color: transparent;
@@ -3846,7 +3838,7 @@ header {
         background: #e6e6e6;
         border: solid 1px transparent;
         color: #656666; }
-        #frame section.rightCol main form input[type='text'][disabled='true'], #frame section.rightCol main form input[type='text'][readonly='true'], #frame section.rightCol main form select[disabled='true'], #frame section.rightCol main form select[readonly='true'] {
+        #frame section.rightCol main form input[type='text'][disabled='true'], #frame section.rightCol main form select[disabled='true'] {
           background: #f9ebc3;
           border-color: transparent;
           color: #d37d41; }
@@ -3887,14 +3879,14 @@ header {
           border: solid #7faccc;
           border-width: 0 4px 4px 0;
           transform: rotate(45deg); }
-      #frame section.rightCol main table {
+      #frame section.rightCol main table, #frame section.rightCol main .abTable {
         display: block;
         max-height: 100%;
         width: 100%;
         margin: 0;
         background: transparent;
         border: none; }
-        #frame section.rightCol main table tbody {
+        #frame section.rightCol main table tbody, #frame section.rightCol main .abTable tbody {
           display: table;
           width: 100%;
           margin: 0;
@@ -3902,53 +3894,53 @@ header {
           border: none;
           border-right: solid 8px transparent; }
           @media screen and (min-width: 0em) and (max-width: 39.9375em) {
-            #frame section.rightCol main table tbody {
+            #frame section.rightCol main table tbody, #frame section.rightCol main .abTable tbody {
               border-right: none; } }
-          #frame section.rightCol main table tbody tr {
+          #frame section.rightCol main table tbody tr, #frame section.rightCol main .abTable tbody tr {
             background: transparent;
             transition: ease 0.15s background-color; }
-            #frame section.rightCol main table tbody tr:nth-child(even) {
+            #frame section.rightCol main table tbody tr:nth-child(even), #frame section.rightCol main .abTable tbody tr:nth-child(even) {
               background: #f8f8f8; }
-            #frame section.rightCol main table tbody tr td {
+            #frame section.rightCol main table tbody tr td, #frame section.rightCol main .abTable tbody tr td {
               padding: 1.25rem 1rem;
               transition: ease 0.15s color;
               font-size: 16px; }
               @media screen and (min-width: 0em) and (max-width: 39.9375em) {
-                #frame section.rightCol main table tbody tr td {
+                #frame section.rightCol main table tbody tr td, #frame section.rightCol main .abTable tbody tr td {
                   padding: 0.75rem 1rem;
                   font-size: 12px; } }
-              #frame section.rightCol main table tbody tr td a {
+              #frame section.rightCol main table tbody tr td a, #frame section.rightCol main .abTable tbody tr td a {
                 transition: ease 0.15s color; }
-                #frame section.rightCol main table tbody tr td a i svg path, #frame section.rightCol main table tbody tr td a i svg rect, #frame section.rightCol main table tbody tr td a i svg poly, #frame section.rightCol main table tbody tr td a i .svg path, #frame section.rightCol main table tbody tr td a i .svg rect, #frame section.rightCol main table tbody tr td a i .svg poly {
+                #frame section.rightCol main table tbody tr td a i svg path, #frame section.rightCol main table tbody tr td a i svg rect, #frame section.rightCol main table tbody tr td a i svg poly, #frame section.rightCol main table tbody tr td a i .svg path, #frame section.rightCol main table tbody tr td a i .svg rect, #frame section.rightCol main table tbody tr td a i .svg poly, #frame section.rightCol main .abTable tbody tr td a i svg path, #frame section.rightCol main .abTable tbody tr td a i svg rect, #frame section.rightCol main .abTable tbody tr td a i svg poly, #frame section.rightCol main .abTable tbody tr td a i .svg path, #frame section.rightCol main .abTable tbody tr td a i .svg rect, #frame section.rightCol main .abTable tbody tr td a i .svg poly {
                   fill: #e8b521 !important; }
-                #frame section.rightCol main table tbody tr td a:hover {
+                #frame section.rightCol main table tbody tr td a:hover, #frame section.rightCol main .abTable tbody tr td a:hover {
                   text-decoration: underline; }
-                  #frame section.rightCol main table tbody tr td a:hover i svg path, #frame section.rightCol main table tbody tr td a:hover i svg rect, #frame section.rightCol main table tbody tr td a:hover i svg poly, #frame section.rightCol main table tbody tr td a:hover i .svg path, #frame section.rightCol main table tbody tr td a:hover i .svg rect, #frame section.rightCol main table tbody tr td a:hover i .svg poly {
+                  #frame section.rightCol main table tbody tr td a:hover i svg path, #frame section.rightCol main table tbody tr td a:hover i svg rect, #frame section.rightCol main table tbody tr td a:hover i svg poly, #frame section.rightCol main table tbody tr td a:hover i .svg path, #frame section.rightCol main table tbody tr td a:hover i .svg rect, #frame section.rightCol main table tbody tr td a:hover i .svg poly, #frame section.rightCol main .abTable tbody tr td a:hover i svg path, #frame section.rightCol main .abTable tbody tr td a:hover i svg rect, #frame section.rightCol main .abTable tbody tr td a:hover i svg poly, #frame section.rightCol main .abTable tbody tr td a:hover i .svg path, #frame section.rightCol main .abTable tbody tr td a:hover i .svg rect, #frame section.rightCol main .abTable tbody tr td a:hover i .svg poly {
                     fill: #417ba4 !important; }
-              #frame section.rightCol main table tbody tr td i {
+              #frame section.rightCol main table tbody tr td i, #frame section.rightCol main .abTable tbody tr td i {
                 display: block;
                 width: 64px;
                 height: 40px;
                 margin: 0 auto; }
-                #frame section.rightCol main table tbody tr td i.received {
+                #frame section.rightCol main table tbody tr td i.received, #frame section.rightCol main .abTable tbody tr td i.received {
                   width: 48px;
                   height: 52px; }
-                #frame section.rightCol main table tbody tr td i.converted {
+                #frame section.rightCol main table tbody tr td i.converted, #frame section.rightCol main .abTable tbody tr td i.converted {
                   width: 81px;
                   height: 60px; }
-                #frame section.rightCol main table tbody tr td i svg path, #frame section.rightCol main table tbody tr td i svg rect, #frame section.rightCol main table tbody tr td i svg poly, #frame section.rightCol main table tbody tr td i .svg path, #frame section.rightCol main table tbody tr td i .svg rect, #frame section.rightCol main table tbody tr td i .svg poly {
+                #frame section.rightCol main table tbody tr td i svg path, #frame section.rightCol main table tbody tr td i svg rect, #frame section.rightCol main table tbody tr td i svg poly, #frame section.rightCol main table tbody tr td i .svg path, #frame section.rightCol main table tbody tr td i .svg rect, #frame section.rightCol main table tbody tr td i .svg poly, #frame section.rightCol main .abTable tbody tr td i svg path, #frame section.rightCol main .abTable tbody tr td i svg rect, #frame section.rightCol main .abTable tbody tr td i svg poly, #frame section.rightCol main .abTable tbody tr td i .svg path, #frame section.rightCol main .abTable tbody tr td i .svg rect, #frame section.rightCol main .abTable tbody tr td i .svg poly {
                   transition: ease 0.15s fill; }
                 @media screen and (min-width: 0em) and (max-width: 39.9375em) {
-                  #frame section.rightCol main table tbody tr td i {
+                  #frame section.rightCol main table tbody tr td i, #frame section.rightCol main .abTable tbody tr td i {
                     width: 36px;
                     height: 25px; }
-                    #frame section.rightCol main table tbody tr td i.received {
+                    #frame section.rightCol main table tbody tr td i.received, #frame section.rightCol main .abTable tbody tr td i.received {
                       width: 28px;
                       height: 28px; }
-                    #frame section.rightCol main table tbody tr td i.converted {
+                    #frame section.rightCol main table tbody tr td i.converted, #frame section.rightCol main .abTable tbody tr td i.converted {
                       width: 40px;
                       height: 36px; } }
-            #frame section.rightCol main table tbody tr:hover {
+            #frame section.rightCol main table tbody tr:hover, #frame section.rightCol main .abTable tbody tr:hover {
               background: #fbf3da; }
       #frame section.rightCol main.transactions table tbody tr td a i svg path, #frame section.rightCol main.transactions table tbody tr td a i svg rect, #frame section.rightCol main.transactions table tbody tr td a i svg poly, #frame section.rightCol main.transactions table tbody tr td a i .svg path, #frame section.rightCol main.transactions table tbody tr td a i .svg rect, #frame section.rightCol main.transactions table tbody tr td a i .svg poly {
         fill: #656666 !important; }
@@ -4106,12 +4098,35 @@ header {
               border-bottom-right-radius: 24px; }
         #frame section.rightCol main .newCTA.active ul {
           display: inline-block; }
-      #frame section.rightCol main .reveal {
-        padding: 3em;
-        background: #fff; }
-        #frame section.rightCol main .reveal h1 {
-          font-size: 32px;
-          text-transform: uppercase; }
+    #frame section.rightCol .reveal {
+      padding: 3em;
+      background: #fff; }
+      #frame section.rightCol .reveal h1 {
+        font-size: 32px;
+        text-transform: uppercase; }
+      #frame section.rightCol .reveal#transDetails {
+        width: 800px; }
+        #frame section.rightCol .reveal#transDetails table {
+          width: 100%;
+          background: #fafafa; }
+          #frame section.rightCol .reveal#transDetails table thead {
+            background: #417ba4;
+            border: none;
+            color: #fff; }
+          #frame section.rightCol .reveal#transDetails table tbody {
+            background: none;
+            border: none; }
+          #frame section.rightCol .reveal#transDetails table table {
+            background: #fff; }
+            #frame section.rightCol .reveal#transDetails table table tr:nth-child(even) {
+              background: #fafafa; }
+            #frame section.rightCol .reveal#transDetails table table tr.total {
+              border-top: solid 1px #939598; }
+            #frame section.rightCol .reveal#transDetails table table td {
+              padding-top: 3px;
+              padding-bottom: 3px;
+              font-family: monospace;
+              font-size: 14px; }
 
 .coin-control {
   display: none; }
@@ -4184,9 +4199,6 @@ body.darkTheme {
         background: #4f2b12; }
     body.darkTheme #frame section.rightCol main form input[type='checkbox'] + label:before {
       background-color: #323333; }
-    body.darkTheme #frame section.rightCol main .reveal {
-      background: #111;
-      border-color: #417ba4; }
     body.darkTheme #frame section.rightCol main .newCTA.active ul {
       background: #000;
       box-shadow: 0 0 90px 0 rgba(255, 255, 255, 0.3); }
@@ -4196,5 +4208,11 @@ body.darkTheme {
         body.darkTheme #frame section.rightCol main .newCTA.active ul li a:hover {
           background: #e8b521;
           color: #fff; }
+    body.darkTheme #frame section.rightCol .reveal {
+      background: #111;
+      border-color: #417ba4; }
+      body.darkTheme #frame section.rightCol .reveal thead, body.darkTheme #frame section.rightCol .reveal tfoot {
+        background: #222;
+        border-color: #333; }
 
 /*# sourceMappingURL=app.css.map */
