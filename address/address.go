@@ -185,7 +185,7 @@ func (addList *AddressList) AddSeeded(name string, address string) (*AddressName
 }
 
 func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
-	anp, err := NewSeededAddress(name, address)
+	anp, err := NewAddress(name, address)
 	if err != nil {
 		return nil, err
 	}

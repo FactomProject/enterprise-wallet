@@ -363,7 +363,8 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if recover() != nil {
-			err = fmt.Errorf("Failed updating database, try again in a few seconds")
+			err = fmt.Errorf("There was an issue trying to load the database. Please try again in a few seconds. If you keep encountering this error," +
+				"factomd might be having issues syncing with the network.")
 		}
 	}()
 

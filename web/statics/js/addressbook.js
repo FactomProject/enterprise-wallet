@@ -28,15 +28,21 @@ function LoadAddresses(){
 }
 
 function addressTableRow(address, type) {
+	console.log(address)
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
 	} else {
 		token = " EC"
 	}
+
+	star = '<small><span class="fa fa-star-o" aria-hidden="true"></span></small>'
+	if(address.Seeded) {
+		star = '<small><span class="fa fa-star" aria-hidden="true"></span></small>'
+	}
 	return		'<tr>' +
 				'<td><a href="receive-factoids?address=' + address.Address + '&name=' + address.Name + '"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
 				'<td>' + address.Name + ' <a href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
-				'<td><pre>' + address.Address + '</pre></td>' +
+				'<td><pre>' + star + " " + address.Address + '</pre></td>' +
 				'<td>' + address.Balance + token + '</td>' +
 				'</tr>'
 }
