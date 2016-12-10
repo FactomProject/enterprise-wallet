@@ -394,7 +394,6 @@ header {
             }
             &::-webkit-scrollbar-button { display: none; }
             &.transactions, &.address-book { 
-				overflow: visible;
                 padding: 0;
                 border: solid 8px transparent;
                 border-top: none;
