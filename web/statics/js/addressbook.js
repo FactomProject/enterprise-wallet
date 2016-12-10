@@ -9,17 +9,21 @@ function LoadAddresses(){
 		obj = JSON.parse(resp)
 		//console.log(resp)
 		
-		obj.FactoidAddresses.List.forEach(function(address){
-			$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid"));
-		})
-
-		obj.EntryCreditAddresses.List.forEach(function(address){
-			$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits"));
-		})
-
-		obj.ExternalAddresses.List.forEach(function(address){
-			$('#external-addresses-table tbody').append(addressTableRow(address, "external"));
-		})
+		if(obj.FactoidAddresses.List != null) {
+			obj.FactoidAddresses.List.forEach(function(address){
+				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid"));
+			})
+		}
+		if(obj.EntryCreditAddresses.List != null) {
+			obj.EntryCreditAddresses.List.forEach(function(address){
+				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits"));
+			})
+		}
+		if(obj.ExternalAddresses.List != null) {
+			obj.ExternalAddresses.List.forEach(function(address){
+				$('#external-addresses-table tbody').append(addressTableRow(address, "external"));
+			})
+		}
  	})
 }
 

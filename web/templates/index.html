@@ -33,8 +33,8 @@
     <table class="itemized">
     	<thead>
     		<tr>
-    			<td>
-    				7f5b59e2692812e5ebf0a1fdadbb1b3029f70086f326ff229f638fcbb6bf69db
+    			<td id="trans-detail-txid">
+    				0000000000000000000000000000000000000000000000000000000000000000
     			</td>
     		</tr>
     	</thead>
@@ -42,10 +42,10 @@
     		<tr>
 				<td class="inputs">
 					<strong>Inputs:</strong><br>
-   					<table>
+   					<table id="trans-details-inputs">
    						<tr>
-							<td>FA2nmHSnesq3KQSDGXS2qMT9Jk4U4cJzWGxQ55urbJdcSRMmtXvG</td>
-							<td>500000 FCT</td>
+   							<td>FA00000000000000000000000000000000000000000000000000</td>
+							<td>10000 FCT</td>
 						</tr>
 					</table>
 				</td>
@@ -53,92 +53,31 @@
 			<tr>
     			<td class="outputs">
 					<strong>Factoid Outputs:</strong><br>
-   					<table>
-   						<tr>
-							<td>FA2Ucjw1pBzrCxDJP82yCbhzk9BFU2aWdb1VqitBot3mFAseW6Uo</td>
-							<td>20000 FCT</td>
-						</tr>
+   					<table id="trans-details-outputs">
 						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
-						</tr>
-						<tr>
-							<td>FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf</td>
-							<td>20000 FCT</td>
+							<td>FA00000000000000000000000000000000000000000000000000</td>
+							<td>10000 FCT</td>
 						</tr>
 						<tr class="total">
 							<td>Total</td>
-							<td>500000 FCT</td>
+							<td>10000 FCT</td>
 						</tr>
    					</table>
    				</td>
     		</tr>
 			<tr>
     			<td class="total">
-					<strong>Total Transacted:</strong> 500000 FCT
+					<strong>Total Transacted:</strong> <span id="total-transacted">0</span> FCT
 				</td>
 			</tr>
     		<tr>
-    			<td><strong>Date Sent:</strong> 09/01/2015 at 07:00:00</td>
+    			<td><strong>Date Sent:</strong> <span id="trans-date">09/01/2015 at 07:00:00</span></td>
     		</tr>
-    		<tr>
-    			<td><strong>Block Height:</strong> 11283</td>
-    		</tr>
+    		<!-- <tr>
+    			<td><strong>Block Height:</strong id="trans-block-height"> 0</td>
+    		</tr> -->
     	</tbody>
     </table>
-    <p id="details">[transaction details here]</p>
     <p><a id="link" href="" class="button" target="_blank">View in Explorer</a><a id="local-link" href="" class="button" target="_blank">View in Local Explorer</a></p>
     <button class="close-button" data-close aria-label="Close reveal" type="button">
         <span aria-hidden="true">&times;</span>

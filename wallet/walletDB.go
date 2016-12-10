@@ -252,7 +252,7 @@ func (slice DisplayTransactions) Len() int {
 }
 
 func (slice DisplayTransactions) Less(i, j int) bool {
-	return slice[i].ExactTime.Before(slice[j].ExactTime)
+	return !slice[i].ExactTime.Before(slice[j].ExactTime)
 }
 
 func (slice DisplayTransactions) Swap(i, j int) {
@@ -447,12 +447,13 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 
 	// Sort the new ones
 	sort.Sort(DisplayTransactions(newTransactions))
+
 	// Prepend them to the old cache
 	w.cachedTransactions = append(newTransactions, w.cachedTransactions...)
 
 	// Find all new addresses, need to do additional handling and inserting
 	var moreTransactions []DisplayTransaction
-	anps := w.GetAllGUIAddresses()
+	anps := w.GetAllMyGUIAddresses()
 	var newAddrs []string
 	for _, a := range anps {
 		addr, ok := w.addrMap[a.Address]
@@ -514,9 +515,11 @@ func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
 			return mid
 		}
 		if !w.cachedTransactions[mid].ExactTime.Before(t.ExactTime) {
-			high = mid - 1
-		} else {
+			//high = mid - 1
 			low = mid + 1
+		} else {
+			//low = mid + 1
+			high = mid - 1
 		}
 	}
 
@@ -529,7 +532,7 @@ func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, erro
 	// ## No cache solution ##
 	transMap := make(map[string]interfaces.ITransaction)
 	var transList []DisplayTransaction
-	adds := w.GetAllGUIAddresses()
+	adds := w.GetAllMyGUIAddresses()
 	for _, a := range adds {
 		transactions, err := w.TransactionDB.GetTXAddress(a.Address)
 		if err != nil {
@@ -576,7 +579,7 @@ func (w *WalletDB) UpdateGUIDB() error {
 	var names []string
 	var addresses []string
 
-	guiAdds := w.GetAllGUIAddresses()
+	guiAdds := w.GetAllMyGUIAddresses()
 
 	// Add addresses to GUI from cli
 	for _, fa := range faAdds {
@@ -754,6 +757,19 @@ func (w *WalletDB) RemoveAddress(address string) (*address.AddressNamePair, erro
 	return anp, nil
 }
 
+func (w *WalletDB) AddExternalAddress(name string, public string) (*address.AddressNamePair, error) {
+	if !factom.IsValidAddress(public) {
+		return nil, fmt.Errorf("Not a valid private key")
+	}
+
+	anp, err := w.addGUIAddress(name, public, 3)
+	if err != nil {
+		return nil, err
+	}
+
+	return anp, nil
+}
+
 func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNamePair, error) {
 	if !factom.IsValidAddress(secret) {
 		return nil, fmt.Errorf("Not a valid private key")
@@ -768,7 +784,7 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 			return nil, err
 		}
 
-		anp, err := w.addGUIAddress(name, add.String())
+		anp, err := w.addGUIAddress(name, add.String(), 1)
 		if err != nil {
 			return nil, err
 		}
@@ -790,7 +806,7 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 			return nil, err
 		}
 
-		anp, err := w.addGUIAddress(name, add.String())
+		anp, err := w.addGUIAddress(name, add.String(), 2)
 		if err != nil {
 			return nil, err
 		}
@@ -812,15 +828,35 @@ func (w *WalletDB) addBatchGUIAddresses(names []string, addresses []string) erro
 	}
 
 	for i := 0; i < len(names); i++ {
-		w.addGUIAddress(names[i], addresses[i])
+		if addresses[i][:2] == "FA" {
+			w.addGUIAddress(names[i], addresses[i], 1)
+		} else {
+			w.addGUIAddress(names[i], addresses[i], 2)
+		}
 	}
 
 	return w.Save()
 }
 
 // Only adds to GUI database
-func (w *WalletDB) addGUIAddress(name string, address string) (*address.AddressNamePair, error) {
-	anp, err := w.guiWallet.AddAddress(name, address, 3)
+func (w *WalletDB) addGUIAddress(name string, addressStr string, list int) (*address.AddressNamePair, error) {
+	var anp *address.AddressNamePair
+	var err error
+	if list <= 0 || list > 3 {
+		return nil, fmt.Errorf("Invalid list")
+	}
+	if addressStr[:2] == "FA" {
+		if list == 2 {
+			return nil, fmt.Errorf("Factoid address cannot go in Entry credit list")
+		}
+		anp, err = w.guiWallet.AddAddress(name, addressStr, list)
+	} else {
+		if list == 1 {
+			return nil, fmt.Errorf("Entry credit address cannot go in Factoid list")
+		}
+		anp, err = w.guiWallet.AddAddress(name, addressStr, list)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -853,6 +889,10 @@ func (w *WalletDB) GetTotalGUIAddresses() uint32 {
 
 func (w *WalletDB) GetAllGUIAddresses() []address.AddressNamePair {
 	return w.guiWallet.GetAllAddresses()
+}
+
+func (w *WalletDB) GetAllMyGUIAddresses() []address.AddressNamePair {
+	return w.guiWallet.GetAllMyGUIAddresses()
 }
 
 func (w *WalletDB) IsValidAddress(address string) bool {

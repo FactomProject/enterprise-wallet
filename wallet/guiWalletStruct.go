@@ -152,6 +152,16 @@ func (w *WalletStruct) GetAllAddresses() []address.AddressNamePair {
 	return anpList
 }
 
+func (w *WalletStruct) GetAllMyGUIAddresses() []address.AddressNamePair {
+	w.RLock()
+	defer w.RUnlock()
+	var anpList []address.AddressNamePair
+	anpList = append(anpList, w.FactoidAddresses.List...)
+	anpList = append(anpList, w.EntryCreditAddresses.List...)
+
+	return anpList
+}
+
 func (w *WalletStruct) GetAllAddressesFromList(list int) []address.AddressNamePair {
 	w.RLock()
 	defer w.RUnlock()
@@ -318,7 +328,8 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 			}
 		}
 
-		for i, a := range w.ExternalAddresses.List {
+		// We do not include these
+		/*for i, a := range w.ExternalAddresses.List {
 			if a.Address[:2] == "FA" {
 				bal, err := factom.GetFactoidBalance(a.Address)
 				if err != nil {
@@ -336,6 +347,6 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 					w.ECTotal += bal
 				}
 			}
-		}
+		}*/
 	}
 }

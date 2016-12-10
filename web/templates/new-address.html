@@ -18,13 +18,14 @@
                     <select id="generate-source" name="generate-source">
                         <option value="random-factoid">Random new factoid address</option>
                         <option value="random-ec">Random new entry credit address</option>
-                        <option value="import-address">Import from private key (External Address)</option>
+                        <option value="import-address">Import from private key</option>
+                        <option value="new-external-address">New external address</option>
                     </select>
                 </div>
             </div>
             <div class="row">
                 <div class="small-12 medium-7 large-8 columns">
-                    <label>Private key:</label>
+                    <label><span id="sec-pub">Private</span> key:</label>
                     <div class="input-group" id="private-key-input-container">
                       <pre><input id="private-key-input" type="text" name="private-key" class="input-group-field percent95 disabled-input" placeholder="Type factoid address" disabled></pre>
                     </div>

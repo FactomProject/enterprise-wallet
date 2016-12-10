@@ -232,25 +232,32 @@ function LoadAddresses(){
   resp = getRequest("addresses",function(resp){
     obj = JSON.parse(resp)
     if(PageTokenABR == "FCT") {
-      obj.FactoidAddresses.List.forEach(function(address){
-        $('#addresses-reveal').append(factoidAddressRadio(address, "factoid"));
-      })
+      if(obj.FactoidAddresses.List  != null) {
+        obj.FactoidAddresses.List.forEach(function(address){
+          $('#addresses-reveal').append(factoidAddressRadio(address, "factoid"));
+        })
+      }
 
-      obj.ExternalAddresses.List.forEach(function(address){
-        if(address.Address.startsWith("FA")){
-          $('#addresses-reveal').append(factoidAddressRadio(address, "external"));
-        }
-      })
+      if(obj.ExternalAddresses.List  != null) {
+        obj.ExternalAddresses.List.forEach(function(address){
+          if(address.Address.startsWith("FA")){
+            $('#addresses-reveal').append(factoidAddressRadio(address, "external"));
+          }
+        })          
+      }
     } else {
-      obj.EntryCreditAddresses.List.forEach(function(address){
-        $('#addresses-reveal').append(factoidECRadio(address, "entry-credits"));
-      })
-
-      obj.ExternalAddresses.List.forEach(function(address){
-        if(address.Address.startsWith("EC")){
-          $('#addresses-reveal').append(factoidECRadio(address, "external"));
-        }
-      })
+      if(obj.EntryCreditAddresses.List  != null) {
+        obj.EntryCreditAddresses.List.forEach(function(address){
+          $('#addresses-reveal').append(factoidECRadio(address, "entry-credits"));
+        })
+      }
+      if(obj.ExternalAddresses.List  != null) {
+        obj.ExternalAddresses.List.forEach(function(address){
+          if(address.Address.startsWith("EC")){
+            $('#addresses-reveal').append(factoidECRadio(address, "external"));
+          }
+        })
+      }
     }
   })
 }
@@ -350,6 +357,10 @@ function disableInput() {
   $("#make-entire-transaction").addClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", true)
 }
+
+$("#addressbook-button").on('click', function(){
+  $("input[type=radio]").attr('checked', false)
+})
 
 function enableInput() {
   Input = true
