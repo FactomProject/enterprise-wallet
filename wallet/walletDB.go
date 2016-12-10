@@ -611,7 +611,7 @@ func (w *WalletDB) UpdateGUIDB() error {
 	// Missing from CLI? We need to remove them here
 	for _, guiAdd := range guiAdds {
 		if _, ok := addMap[guiAdd.Address]; !ok {
-			w.RemoveAddress(guiAdd.Address)
+			w.RemoveAddressFromAnyList(guiAdd.Address)
 		}
 	}
 
@@ -743,8 +743,22 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 }
 
 // TODO: Fix, make wallet take the remove
-func (w *WalletDB) RemoveAddress(address string) (*address.AddressNamePair, error) {
-	anp, err := w.guiWallet.RemoveAddress(address)
+func (w *WalletDB) RemoveAddress(address string, list int) (*address.AddressNamePair, error) {
+	anp, err := w.guiWallet.RemoveAddress(address, list)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	return anp, nil
+}
+
+func (w *WalletDB) RemoveAddressFromAnyList(address string) (*address.AddressNamePair, error) {
+	anp, err := w.guiWallet.RemoveAddressFromAnyList(address)
 	if err != nil {
 		return nil, err
 	}

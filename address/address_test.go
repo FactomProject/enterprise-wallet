@@ -16,7 +16,7 @@ var _ = strings.Compare("", "")
 var _ = fmt.Sprintf("")
 
 func TestAddressNamePairMarshal(t *testing.T) {
-	a, err := NewAddress("Factoid1ss", "FA27kaVcH76hDsLmZuSq2yad6zrmUDUm6KCHq6nibEZiKbBSLQ8C")
+	a, err := NewSeededAddress("Factoid1ss", "FA27kaVcH76hDsLmZuSq2yad6zrmUDUm6KCHq6nibEZiKbBSLQ8C")
 	if err != nil {
 		t.Fatalf("Error Creating")
 	}

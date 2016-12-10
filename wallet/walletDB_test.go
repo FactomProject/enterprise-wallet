@@ -311,7 +311,7 @@ func CheckRemoveAddressTest(wal *WalletDB) error {
 		return fmt.Errorf("Address not found")
 	}
 
-	_, err = wal.RemoveAddress(anp.Address)
+	_, err = wal.RemoveAddressFromAnyList(anp.Address)
 	if err != nil {
 		return err
 	}

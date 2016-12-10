@@ -43,6 +43,19 @@ $("#save-name-change").click(function(){
 	}
 })
 
+$("#delete-address").on('click', function(){
+	name = $("#address-name").val()
+	jsonOBJ = '{"Address":"' + Address + '", "Name":"' + name + '"}'
+	postRequest("delete-address", jsonOBJ, function(resp){
+		obj = JSON.parse(resp)
+		if (obj.Error != "none") {
+			SetGeneralError("Error: " + obj.Error)
+		} else {
+			SetGeneralSuccess(obj.Content + ": The name has been changed")
+		}
+	})
+})
+
 $("#copy-to-clipboard").on('click', function(){
 	var aux = document.createElement("input");
 	//console.log($('#selected-address-info').val())

@@ -239,6 +239,32 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write(jsonResp("Success"))
 		}
+	case "delete-address":
+		type ANC struct {
+			Address string `json:"Address"`
+			Name    string `json:"Name"`
+		}
+		j := r.FormValue("json")
+		anc := new(ANC)
+		err := json.Unmarshal([]byte(j), anc)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		_, list := MasterWallet.GetGUIAddress(anc.Address)
+		if list != 3 {
+			w.Write(jsonError("You can only delete External Addresses."))
+			return
+		}
+
+		_, err = MasterWallet.RemoveAddress(anc.Address, list)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		} else {
+			w.Write(jsonResp("Success"))
+		}
 	case "display-private-key":
 		type Add struct {
 			Address string `json:"Address"`

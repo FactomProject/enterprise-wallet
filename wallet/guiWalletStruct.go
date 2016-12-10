@@ -33,28 +33,8 @@ func NewWallet() *WalletStruct {
 }
 
 func (w *WalletStruct) AddAddress(name string, address string, list int) (*address.AddressNamePair, error) {
-	if list > 3 || list <= 0 {
-		return nil, fmt.Errorf("Invalid list")
-	}
-
-	switch list {
-	case 1: // Factoid
-		if address[:2] != "FA" {
-			return nil, fmt.Errorf("Not a valid factoid address")
-		}
-	case 2: // EC
-		if address[:2] != "EC" {
-			return nil, fmt.Errorf("Not a valid entry credit address")
-		}
-	case 3: // Either
-		if !(address[:2] == "EC" || address[:2] == "FA") {
-			return nil, fmt.Errorf("Not a valid address")
-		}
-	}
-
-	valid := factom.IsValidAddress(address)
-	if !valid {
-		return nil, fmt.Errorf("Not a valid address")
+	if err := w.addAddress(name, address, list); err != nil {
+		return nil, err
 	}
 
 	w.Lock()
@@ -70,6 +50,62 @@ func (w *WalletStruct) AddAddress(name string, address string, list int) (*addre
 	}
 
 	return nil, fmt.Errorf("Encountered an error, this should not be able to happen")
+}
+
+func (w *WalletStruct) AddSeededAddress(name string, address string, list int) (*address.AddressNamePair, error) {
+	if err := w.addAddress(name, address, list); err != nil {
+		return nil, err
+	}
+
+	w.Lock()
+	defer w.Unlock()
+
+	switch list {
+	case 1:
+		return w.FactoidAddresses.Add(name, address)
+	case 2:
+		return w.EntryCreditAddresses.Add(name, address)
+	case 3:
+		return w.ExternalAddresses.Add(name, address)
+	}
+
+	return nil, fmt.Errorf("Encountered an error, this should not be able to happen")
+}
+
+func (w *WalletStruct) addAddress(name string, address string, list int) error {
+	if list > 3 || list <= 0 {
+		return fmt.Errorf("Invalid list")
+	}
+
+	if list == 3 {
+		anp, getList, _ := w.GetAddress(address)
+		if getList != -1 {
+			return fmt.Errorf("You cannot add this address as it is located in your Addressbook. " +
+				"It's nickname is: " + anp.Name)
+		}
+	}
+
+	switch list {
+	case 1: // Factoid
+		if address[:2] != "FA" {
+			return fmt.Errorf("Not a valid factoid address")
+		}
+	case 2: // EC
+		if address[:2] != "EC" {
+			return fmt.Errorf("Not a valid entry credit address")
+		}
+	case 3: // Either
+		if !(address[:2] == "EC" || address[:2] == "FA") {
+			return fmt.Errorf("Not a valid address")
+		}
+	}
+
+	valid := factom.IsValidAddress(address)
+	if !valid {
+		return fmt.Errorf("Not a valid address")
+	}
+
+	return nil
 }
 
 func (w *WalletStruct) GetTotalAddressCount() uint32 {
@@ -258,14 +294,20 @@ func (w *WalletStruct) UnmarshalBinary(data []byte) error {
 	return err
 }
 
-func (w *WalletStruct) RemoveAddress(address string) (*address.AddressNamePair, error) {
-	anp, list, _ := w.GetAddress(address)
+func (w *WalletStruct) RemoveAddressFromAnyList(address string) (*address.AddressNamePair, error) {
+	_, list, _ := w.GetAddress(address)
 	if list > 3 {
 		return nil, fmt.Errorf("This should never happen")
 	}
 
+	return w.RemoveAddressFromAnyList(address)
+}
+
+func (w *WalletStruct) RemoveAddress(address string, list int) (*address.AddressNamePair, error) {
 	w.Lock()
 	defer w.Unlock()
+
+	anp, _, _ := w.GetAddress(address)
 
 	switch list {
 	case 0:
@@ -328,15 +370,14 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 			}
 		}
 
-		// We do not include these
-		/*for i, a := range w.ExternalAddresses.List {
+		for i, a := range w.ExternalAddresses.List {
 			if a.Address[:2] == "FA" {
 				bal, err := factom.GetFactoidBalance(a.Address)
 				if err != nil {
 					w.ExternalAddresses.List[i].Balance = -1
 				} else {
 					w.ExternalAddresses.List[i].Balance = float64(bal) / 1e8
-					w.FactoidTotal += bal
+					//w.FactoidTotal += bal
 				}
 			} else if a.Address[:2] == "EC" {
 				bal, err := factom.GetECBalance(a.Address)
@@ -344,9 +385,9 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 					w.ExternalAddresses.List[i].Balance = -1
 				} else {
 					w.ExternalAddresses.List[i].Balance = float64(bal)
-					w.ECTotal += bal
+					//w.ECTotal += bal
 				}
 			}
-		}*/
+		}
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/FactomProject/btcutil/base58"
@@ -19,6 +20,7 @@ const maxNameLength int = 20
 type AddressNamePair struct {
 	Name    string // Length maxNameLength Characters
 	Address string
+	Seeded  bool // Derived from seeed
 
 	// Not Marshaled
 	Balance float64 // Unused except for JSON return
@@ -40,7 +42,19 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 
 	add.Name = name
 	add.Address = address
+	add.Seeded = false
 
+	return add, nil
+}
+
+// If addresses derives from the seed
+func NewSeededAddress(name string, address string) (*AddressNamePair, error) {
+	add, err := NewAddress(name, address)
+	if err != nil {
+		return nil, err
+	}
+
+	add.Seeded = true
 	return add, nil
 }
 
@@ -72,8 +86,14 @@ func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 	add := base58.Decode(anp.Address)
 	var a [38]byte
 	copy(a[:38], add[:])
-
 	buf.Write(a[:38])
+
+	var b []byte
+	b = strconv.AppendBool(b, anp.Seeded)
+	if anp.Seeded {
+		b = append(b, 0x00)
+	}
+	buf.Write(b)
 
 	return buf.Next(buf.Len()), nil
 }
@@ -92,6 +112,17 @@ func (anp *AddressNamePair) UnmarshalBinaryData(data []byte) (newData []byte, er
 	} else {
 		newData = nil
 	}
+
+	booldata := newData[:5]
+	if booldata[4] == 0x00 {
+		booldata = booldata[:4]
+	}
+	b, err := strconv.ParseBool(string(booldata))
+	if err != nil {
+		return data, err
+	}
+	anp.Seeded = b
+	newData = newData[5:]
 
 	return
 }
@@ -145,15 +176,26 @@ func (addList *AddressList) AddANP(anp *AddressNamePair) error {
 
 }
 
-func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
-	// We check for valid factom address higher up, this is just a basic check
-	if len(name) == 0 {
-		return nil, errors.New("Nil AddressNamePair")
-	}
-
-	anp, err := NewAddress(name, address)
+func (addList *AddressList) AddSeeded(name string, address string) (*AddressNamePair, error) {
+	anp, err := NewSeededAddress(name, address)
 	if err != nil {
 		return nil, err
+	}
+	return addList.add(anp)
+}
+
+func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
+	anp, err := NewSeededAddress(name, address)
+	if err != nil {
+		return nil, err
+	}
+	return addList.add(anp)
+}
+
+func (addList *AddressList) add(anp *AddressNamePair) (*AddressNamePair, error) {
+	// We check for valid factom address higher up, this is just a basic check
+	if len(anp.Name) == 0 {
+		return nil, errors.New("Nil AddressNamePair")
 	}
 
 	_, i := addList.Get(anp.Address)
