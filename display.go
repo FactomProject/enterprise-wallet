@@ -38,7 +38,7 @@ func ServeWallet(port int) {
 	go doEvery(10*time.Second, updateBalances)
 
 	// Load the initial transaction DB. This takes some time, should start before user hits first page
-	go MasterWallet.TransactionDB.GetAllTXs()
+	go MasterWallet.GetRelatedTransactions()
 
 	// Mux for static files
 	mux = http.NewServeMux()

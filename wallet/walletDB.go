@@ -358,12 +358,19 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 // This function grabs all transactions related to any address in the address book
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.
-func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
+func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error) {
+	// Temporary
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if recover() != nil {
+			err = fmt.Errorf("Failed updating database, try again in a few seconds")
+		}
+	}()
+
 	w.relatedTransactionLock.Lock()
 	defer w.relatedTransactionLock.Unlock()
 
 	// Get current Fblock height
-	var err error
 	var i int
 	var block interfaces.IFBlock
 	for i = 0; i < 2; i++ { // 2 tries, if fails first, updates transactions and trys again
@@ -373,6 +380,7 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 		}
 		if block == nil {
 			if i == 0 {
+
 				w.TransactionDB.GetAllTXs()
 			} else {
 				return nil, fmt.Errorf("Error with loading transaction database.")
@@ -380,6 +388,10 @@ func (w *WalletDB) GetRelatedTransactions() ([]DisplayTransaction, error) {
 		} else {
 			break
 		}
+	}
+
+	if block.GetDatabaseHeight() == 0 {
+		return nil, fmt.Errorf("Must wait 1 block and try again.")
 	}
 
 	var oldHeight uint32
