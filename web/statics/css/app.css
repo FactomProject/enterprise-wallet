@@ -3790,7 +3790,6 @@ header {
       #frame section.rightCol main::-webkit-scrollbar-button {
         display: none; }
       #frame section.rightCol main.transactions, #frame section.rightCol main.address-book {
-        overflow: visible;
         padding: 0;
         border: solid 8px transparent;
         border-top: none; }
