@@ -25,8 +25,9 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 // This is used on every page
 type SettingsStruct struct {
 	// Marshaled
-	DarkTheme bool
-	KeyExport bool // Allow export of private key
+	DarkTheme   bool
+	KeyExport   bool // Allow export of private key
+	CoinControl bool
 
 	// Not marshaled
 	Theme string // darkTheme or ""
@@ -45,6 +46,10 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	if s.KeyExport {
 		b = append(b, 0x00)
 	}
+	b = strconv.AppendBool(b, s.CoinControl)
+	if s.CoinControl {
+		b = append(b, 0x00)
+	}
 
 	buf.Write(b)
 
@@ -56,33 +61,43 @@ func (s *SettingsStruct) UnmarshalBinary(data []byte) error {
 	return err
 }
 
-func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
-	newData = data
-
-	booldata := newData[:5]
+func unmarshalBool(booldata []byte) (bool, error) {
 	if booldata[4] == 0x00 {
 		booldata = booldata[:4]
 	}
 	b, err := strconv.ParseBool(string(booldata))
 	if err != nil {
-		return data, err
-	}
-	s.DarkTheme = b
-	newData = newData[5:]
-
-	if b {
-		s.Theme = "darkTheme"
+		return false, err
 	}
 
-	booldata = newData[:5]
-	if booldata[4] == 0x00 {
-		booldata = booldata[:4]
-	}
-	b, err = strconv.ParseBool(string(booldata))
+	return b, nil
+}
+
+func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
+	newData = data
+
+	s.DarkTheme, err = unmarshalBool(newData[:5])
 	if err != nil {
 		return data, err
 	}
-	s.KeyExport = b
+	newData = newData[5:]
+
+	if s.DarkTheme {
+		s.Theme = "darkTheme"
+	} else {
+		s.Theme = ""
+	}
+
+	s.KeyExport, err = unmarshalBool(newData[:5])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[5:]
+
+	s.CoinControl, err = unmarshalBool(newData[:5])
+	if err != nil {
+		return data, err
+	}
 	newData = newData[5:]
 	return
 }

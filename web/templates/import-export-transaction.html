@@ -4,15 +4,36 @@
 {{$mainClass := "send-factoids"}}
 {{$theme := .Settings.Theme}}
 {{$activeNav := 1}}
-{{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
 
 <div class="row">
     <div class="columns">
         <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
         <h1>Import/Export Transactions</h1>
-        <p><a href="#" class="button">Import from file</a></p>
-        <form>
+        <div class="row columns">
+            <input id="uploaded-file" type='file' name='userFile' class="input-group-field">
+            <!-- <input type='submit' name='upload_btn' value='upload' class="input-group-field"> -->
+            <a id="import-file" class="button">Import from file</a>
+        </div>
+        {{$divBottom := print "<hr>"}}
+        {{$divBottom := print $divBottom "<div class='row'>"}}
+        {{$divBottom := print $divBottom " <div class='columns'>"}}
+        {{$divBottom := print $divBottom "  <input type='checkbox' id='sign-transaction' name='sign-transaction' value='true'>"}}
+        {{$divBottom := print $divBottom "  <label for='sign-transaction'>Sign transaction</label>"}}
+        {{$divBottom := print $divBottom " </div>"}}
+        {{$divBottom := print $divBottom "</div>"}}
+        {{$divBottom := print $divBottom "<div class='row'>"}}
+        {{$divBottom := print $divBottom " <div class='columns'>"}}
+        {{$divBottom := print $divBottom "  <a id='make-entire-transaction' class='button'>View Transaction</a>"}}
+        {{$divBottom := print $divBottom "  <a class='button'>Export to file</a>"}}
+        {{$divBottom := print $divBottom "  <a class='button'>Broadcast Transaction</a>"}}
+        {{$divBottom := print $divBottom " </div>"}}
+        {{$divBottom := print $divBottom "</div>"}}
+
+        {{$tokenInfo := mkArray "FCT" "factoid" $divBottom true}}
+        {{template "transaction-template" $tokenInfo}}
+        <!-- <form>
             <div class="coin-control">
                 <div class="row">
                     <div class="columns">
@@ -97,23 +118,31 @@
                     <a href="#" class="button">Broadcast Transaction</a>
                 </div>
             </div>
-        </form>
+        </form> -->
     </div>
 </div>
 <div class="reveal" id="addressbook" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
-	<h1>Select Address</h1>
-	<form>
-		<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid1<br>
-		<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid2<br>
-		<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid3<br>
-		<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid4<br>
-		<input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> factoid5<br>
-		<a href="#" class="button" target="_blank">Continue</a>
-	</form>
-	<button class="close-button" data-close aria-label="Close reveal" type="button">
-		<span aria-hidden="true">&times;</span>
-	</button>
+    <h1>Select Address</h1>
+    <form>
+        <div id="addresses-reveal">
+        </div>
+        <div data-toggle="addressbook" class="button send-factoid-reveal-button" id="addresses-reveal-button">Add Address</div>
+    </form>
+    <button class="close-button" data-close aria-label="Close reveal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="reveal" id="fee-addressbook" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
+    <h1>Select Factoid</h1>
+    <form>
+        <div id="fee-addresses-reveal">
+        </div>
+        <div data-toggle="fee-addressbook" class="button send-factoid-reveal-button" id="fee-addresses-reveal-button">Choose Address</div>
+    </form>
+    <button class="close-button" data-close aria-label="Close reveal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 
-{{template "templateBottom"}}
+{{template "templateBottom" "send-convert"}}
 {{end}}

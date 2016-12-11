@@ -4,14 +4,16 @@
 {{$mainClass := "create-entry-credits"}}
 {{$theme := .Settings.Theme}}
 {{$activeNav := 1}}
-{{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
 
 <div class="row">
     <div class="columns">
         <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
         <h1 id="token-header" value="1">Buy Entry Credits</h1>
-        <form>
+        {{$tokenInfo := mkArray "EC" "entry credit" nil .Settings.CoinControl}}
+        {{template "transaction-template" $tokenInfo}}
+        <!-- <form>
             <div class="coin-control">
                 <div class="row">
                     <div class="columns">
@@ -40,9 +42,9 @@
                 <div class="columns">
                     <label>Send to:</label>
                 </div>
-            </div>
+            </div> -->
             <!-- Address + AMT -->
-            <div class="row" id="all-outputs">
+            <!-- <div class="row" id="all-outputs">
                 <div class="row" id="single-output">
                     <div class="small-12 medium-7 large-8 columns">
                         <div class="input-group" id="output-factoid-address-container">
@@ -60,9 +62,9 @@
                             <a id="append-new-output" class="button expanded newPlus">&nbsp;</a>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <!-- Fee -->
-            <div class="row">
+            <!-- <div class="row">
                 <div class="small-12 medium-7 large-8 columns">
 
                 </div>
@@ -74,13 +76,16 @@
                     </div>
                 </div>
             </div>
-            <hr>
+            <hr> -->
             <!-- Subtotal -->
-            <div class="row">
+            <!-- <div class="row">
                 <div class="small-12 medium-7 large-8 columns">
-                    <div>
-                        <a id="send-entire-transaction" class="button " style="display:none">Send Transaction</a>
-                        <a id="edit-transaction" class="button " style="display:none">Edit Transaction</a>
+                    <div id="first-stage-buttons">
+                        
+                    </div>
+                    <div id="second-stage-buttons" style="display:none">
+                        <a id="send-entire-transaction" class="button">Send Transaction</a>
+                        <a id="edit-transaction" class="button">Edit Transaction</a>
                     </div>
                     <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
                     <div id="success-zone" class="callout success text-center" style="display:none"></div>
@@ -107,21 +112,26 @@
                     
                 </div>
             </div>
-        </form>
+        </form> -->
     </div>
 </div>
 <div class="reveal" id="addressbook" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
     <h1>Select Address</h1>
     <form>
         <div id="addresses-reveal">
-        <!-- 
-        <span>
-            <input type="radio" name="address" id="address" value="FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1"> <span id="address-name" name="factoid1"> factoid1</span>
-        </span>
-        <br> 
-        -->
         </div>
         <div data-toggle="addressbook" class="button send-factoid-reveal-button" id="addresses-reveal-button">Add Address</div>
+    </form>
+    <button class="close-button" data-close aria-label="Close reveal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="reveal" id="fee-addressbook" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
+    <h1>Choose Factoid Address</h1>
+    <form>
+        <div id="fee-addresses-reveal">
+        </div>
+        <div data-toggle="fee-addressbook" class="button send-factoid-reveal-button" id="fee-addresses-reveal-button">Choose Address</div>
     </form>
     <button class="close-button" data-close aria-label="Close reveal" type="button">
         <span aria-hidden="true">&times;</span>

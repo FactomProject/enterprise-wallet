@@ -11,7 +11,7 @@ if($("#token-header").attr("value") == "1") {
   PageTransType = "ec"
 }
 
-counter = 1
+counter = 2
 function addNewOutputAddress(defaultVal, error) {
   eClass = ""
   if(error){
@@ -24,11 +24,11 @@ function addNewOutputAddress(defaultVal, error) {
   }
 
   $("#all-outputs").append(
-  '<div class="row" id="single-output">' +
+  '<div class="row single-output-' + counter + '" id="single-output">' +
   '    <div class="small-12 medium-7 large-8 columns">' +
   '        <div class="input-group ' + eClass + '" id="output-factoid-address-container">' +
-  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type ' + str + ' address" value="' + defaultVal + '"></pre>' +
-  '            <!-- <a data-toggle="addressbook" class="input-group-button button" id="addressbook-' + counter + '"><i class="fa fa-book"></i></a> -->' +
+  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type ' + str + ' address"></pre>' +
+    '        <a id="addressbook-button" data-toggle="addressbook" class="input-group-button button input-group-field" id="addressbook" value="' + counter + '"><i class="fa fa-book"></i></a>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-10 medium-4 large-3 columns">' +
@@ -41,16 +41,59 @@ function addNewOutputAddress(defaultVal, error) {
   '            <a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>' +
   '    </div>' +
   '</div>')
+
+  counter = counter + 1
 }
 
 // Add new output address
 $("#append-new-output").click(function(){
+  if($(this).hasClass("disabled-input")) {
+    return
+  }
   addNewOutputAddress("", true)
+})
+
+function addNewInputAddress(defaultVal, error) {
+  eClass = ""
+  if(error){
+    eClass = "input-group-error"
+  }
+
+  $("#all-inputs").append(
+  '<div class="row single-input-' + counter + '" id="single-input">' +
+  '    <div class="small-12 medium-7 large-8 columns">' +
+  '        <div class="input-group ' + eClass + '" id="input-factoid-address-container">' +
+  '        <pre><input id="input-factoid-address" type="text" name="input1" class="input-group-field percent95 disabled-input" placeholder="Choose factoid address" disabled></pre>' +
+  '        <a id="addressbook-button" data-toggle="fee-addressbook" class="input-group-button button input-group-field" id="addressbook" value="' + counter + '"><i class="fa fa-book"></i></a>' +
+  '        </div>' +
+  '    </div>' +
+  '    <div class="small-10 medium-4 large-3 columns">' +
+  '        <div class="input-group">' +
+  '            <input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">' +
+  '            <span class="input-group-label">FCT</span>' +
+  '        </div>' +
+  '    </div>' +
+  '    <div class="small-2 medium-1 columns">' +
+  '            <a id="remove-new-input" class="button expanded newMinus">&nbsp;</a>' +
+  '    </div>' +
+  '</div>')
+  counter = counter + 1
+}
+
+$("#append-new-input").click(function(){
+  if($(this).hasClass("disabled-input")) {
+    return
+  }
+  addNewInputAddress("", true)
 })
 
 // Remove output address
 $("#all-outputs").on('click','#remove-new-output', function(){
 	jQuery(this).parent().parent().remove()
+})
+
+$("#all-inputs").on('click','#remove-new-input', function(){
+  jQuery(this).parent().parent().remove()
 })
 
 // Ensure factoids/ec being sent are valid, this is not a security feature, but an ease of use
@@ -69,7 +112,6 @@ $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
     }
   } else {
     var self = $(this);
-    console.log(evt.which)
     self.val(self.val().replace(/[^0-9\.]/g, ''));
     if ((evt.which < 48 || evt.which > 57) && evt.which != 8) {
       evt.preventDefault();
@@ -93,49 +135,17 @@ $("#make-entire-transaction").on('click', function(){
 })
 
 function MakeTransaction() {
-  // var transObject = new Object()
-  var transObject = {
-    TransType:PageTransType,
-    OutputAddresses:[],
-    OutputAmounts:[]
-  }
+  transObject = getTransactionObject(true)
 
-  errMessage = ""
-  faErr = false
-  amtErr = false
-
-
-  $("#all-outputs #single-output").each(function(){
-    err = false
-    add = $(this).find("#output-factoid-address").val()
-    if(!add.startsWith(AddressPrefix)) {
-      $(this).find("#output-factoid-address-container").addClass("input-group-error")
-      faErr = true
-      err = true
-    }
-
-    amt = $(this).find("#output-factoid-amount").val()
-    if(amt == 0 || amt == undefined) {
-      $(this).find("#output-factoid-amount").addClass("input-group-error")
-      amtErr = true
-      err = true
-    }
-
-    transObject.OutputAddresses.push(add)
-    transObject.OutputAmounts.push(amt)
-  })
-
-  if(err){
-    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
-    if(amtErr){errMessage += "Amounts should not be 0. "}
-    SetGeneralError("Error(s): " + errMessage)
+  if(transObject == null) {
     return
   }
 
   j = JSON.stringify(transObject)
   postRequest("make-transaction", j, function(resp){
-    console.log(resp)
+    //console.log(resp)
     obj = JSON.parse(resp)
+    //console.log(obj)
     if(obj.Error == "none") {
       disableInput()
       ShowNewButtons()
@@ -144,6 +154,7 @@ function MakeTransaction() {
       total = totalInput + feeFact 
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
+      $("#export-json").text(obj.Content.Json)
       SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
     } else {
       SetGeneralError("Error: " + obj.Error)
@@ -155,12 +166,15 @@ $("#send-entire-transaction").on('click', function(){
   SendTransaction()
 })
 
-function SendTransaction() {
-  // var transObject = new Object()
+function getTransactionObject(checkInput) {
   var transObject = {
     TransType:PageTransType,
     OutputAddresses:[],
-    OutputAmounts:[]
+    OutputAmounts:[],
+
+    InputAddresses:[],
+    InputAmounts:[],
+    FeeAddress:""
   }
 
   errMessage = ""
@@ -188,16 +202,75 @@ function SendTransaction() {
     transObject.OutputAmounts.push(amt)
   })
 
+  if(checkInput) {
+    // Only FCT for inputs
+    if(!$("#coin-control").hasClass("coin-control")) {
+      $("#all-inputs #single-input").each(function(){
+        err = false
+        add = $(this).find("#input-factoid-address").val()
+        if(!add.startsWith("FA")) {
+          $(this).find("#input-factoid-address-container").addClass("input-group-error")
+          faErr = true
+          err = true
+        }
+
+        amt = $(this).find("#input-factoid-amount").val()
+        if(amt == 0 || amt == undefined) {
+          $(this).find("#input-factoid-amount").addClass("input-group-error")
+          amtErr = true
+          err = true
+        }
+
+        transObject.InputAddresses.push(add)
+        transObject.InputAmounts.push(amt)
+      })
+
+      transObject.FeeAddress = $("#fee-factoid-address").val()
+      transObject.TransType = "custom"
+    }
+  }
+
   if(err){
     if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
     if(amtErr){errMessage += "Amounts should not be 0. "}
     SetGeneralError("Error(s): " + errMessage)
+    return null
+  }
+
+  return transObject
+}
+
+$("#needed-input-button").on('click', GetNeededInput)
+
+function GetNeededInput() {
+  transObject = getTransactionObject(false)
+
+  if(transObject == null) {
+    return
+  }
+
+  j = JSON.stringify(transObject)
+  postRequest("get-needed-input", j, function(resp){
+    obj = JSON.parse(resp)
+    if(obj.Error == "none") {
+      $("#input-needed-amount").val(FCTNormalize(obj.Content))
+      HideMessages()
+    } else {
+      SetGeneralError("Error: " + obj.Error)
+    }
+  })
+}
+
+function SendTransaction() {
+  transObject = getTransactionObject(true)
+
+  if(transObject == null) {
     return
   }
 
   j = JSON.stringify(transObject)
   postRequest("send-transaction", j, function(resp){
-    console.log(resp)
+    //console.log(resp)
     obj = JSON.parse(resp)
     if(obj.Error == "none") {
       disableInput()
@@ -208,8 +281,8 @@ function SendTransaction() {
     } else {
       enableInput()
       HideNewButtons()
-      $("#transaction-fee").attr("value", "???")
-      $("#transaction-total").attr("value", "???")
+      $("#transaction-fee").attr("value", "----")
+      $("#transaction-total").attr("value", "----")
       SetGeneralError("Error: " + obj.Error)
     }
   })
@@ -218,43 +291,53 @@ function SendTransaction() {
 $("#edit-transaction").on('click', function(){
   enableInput()
   HideNewButtons()
-  $("#transaction-fee").attr("value", "???")
-  $("#transaction-total").attr("value", "???")
+  $("#transaction-fee").attr("value", "----")
+  $("#transaction-total").attr("value", "----")
   HideMessages()
 })
 
 // Load the Reveal
 $(window).load(function() {
     LoadAddresses()
+    if($("#coin-control").hasClass("coin-control")) {
+      $("#fee-address-input").css("display", "none")
+    }
 });
 
 function LoadAddresses(){
   resp = getRequest("addresses",function(resp){
     obj = JSON.parse(resp)
+
+    if(obj.FactoidAddresses.List  != null) {
+      obj.FactoidAddresses.List.forEach(function(address){
+        $('#fee-addresses-reveal').append(factoidAddressRadio(address, "fee-address"));
+      })
+    }
+
     if(PageTokenABR == "FCT") {
       if(obj.FactoidAddresses.List  != null) {
         obj.FactoidAddresses.List.forEach(function(address){
-          $('#addresses-reveal').append(factoidAddressRadio(address, "factoid"));
+          $('#addresses-reveal').append(factoidAddressRadio(address, "address"));
         })
       }
 
       if(obj.ExternalAddresses.List  != null) {
         obj.ExternalAddresses.List.forEach(function(address){
           if(address.Address.startsWith("FA")){
-            $('#addresses-reveal').append(factoidAddressRadio(address, "external"));
+            $('#addresses-reveal').append(factoidAddressRadio(address, "address"));
           }
         })          
       }
     } else {
       if(obj.EntryCreditAddresses.List  != null) {
         obj.EntryCreditAddresses.List.forEach(function(address){
-          $('#addresses-reveal').append(factoidECRadio(address, "entry-credits"));
+          $('#addresses-reveal').append(factoidECRadio(address, "address"));
         })
       }
       if(obj.ExternalAddresses.List  != null) {
         obj.ExternalAddresses.List.forEach(function(address){
           if(address.Address.startsWith("EC")){
-            $('#addresses-reveal').append(factoidECRadio(address, "external"));
+            $('#addresses-reveal').append(factoidECRadio(address, "address"));
           }
         })
       }
@@ -262,9 +345,9 @@ function LoadAddresses(){
   })
 }
 
-function factoidAddressRadio(address, type){
+function factoidAddressRadio(address, name){
 return '<pre>' +
-'  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
+'  <input type="radio" name="' + name + '" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
 '</pre><br />'
 }
 
@@ -302,6 +385,15 @@ $("#addresses-reveal-button").on("click", function(){
     return
   }
 
+  console.log($(".single-output-1 #output-factoid-address").html())
+  $(".single-output-" + toChange + " #output-factoid-address").val(newAddress)
+  $(".single-output-" + toChange + " #output-factoid-address-container").removeClass("input-group-error")
+  /* Old Method
+  newAddress = $("input[name='address']:checked").val()
+  if(newAddress == undefined) {
+    return
+  }
+
   done = false
   $("#all-outputs #single-output").each(function(){
     if(!done) {
@@ -317,17 +409,49 @@ $("#addresses-reveal-button").on("click", function(){
   // No empty slot found
   if(!done){
     addNewOutputAddress(newAddress, false)
+  }*/
+})
+
+toChange = "-1"
+
+$("#all-outputs").on('click', "#addressbook-button", function(){
+  toChange = $(this).attr("value")
+  $("input[type=radio]").attr('checked', false)
+})
+
+$("#all-inputs").on('click', "#addressbook-button", function(){
+  toChange = $(this).attr("value")
+  $("input[type=radio]").attr('checked', false)
+})
+
+$("#fee-address-input").on('click', "#addressbook-button", function(){
+  toChange = $(this).attr("value")
+  $("input[type=radio]").attr('checked', false)
+})
+
+$("#fee-addresses-reveal-button").on("click", function(){
+  newAddress = $("input[name='fee-address']:checked").val()
+  if(newAddress == undefined) {
+    return
+  }
+  console.log("H:" + toChange)
+
+  if(toChange == "-1") {
+    $("#fee-factoid-address").val(newAddress)
+  } else {
+    $(".single-input-" + toChange + " #input-factoid-address").val(newAddress)
+    $(".single-input-" + toChange + " #input-factoid-address-container").removeClass("input-group-error")
   }
 })
 
 function HideNewButtons() {
-  $("#edit-transaction").slideUp(100)
-  $("#send-entire-transaction").slideUp(100)
+  $("#second-stage-buttons").slideUp(100)
+  //$("#send-entire-transaction").slideUp(100)
 }
 
 function ShowNewButtons() {
-  $("#edit-transaction").slideDown(100)
-  $("#send-entire-transaction").slideDown(100)
+  $("#second-stage-buttons").slideDown(100)
+  //$("#send-entire-transaction").slideDown(100)
 }
 
 function ShowNewTransaction() {
@@ -356,11 +480,8 @@ function disableInput() {
   $("#addressbook-button").prop("disabled", true)
   $("#make-entire-transaction").addClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", true)
+  $("#first-stage-buttons").slideUp(100)
 }
-
-$("#addressbook-button").on('click', function(){
-  $("input[type=radio]").attr('checked', false)
-})
 
 function enableInput() {
   Input = true
@@ -381,9 +502,96 @@ function enableInput() {
   $("#addressbook-button").prop("disabled", false)
   $("#make-entire-transaction").removeClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", false)
+  $("#first-stage-buttons").slideDown(100)
+
+  keepFeeDisabled()
+}
+
+function keepFeeDisabled() {
+  $("#fee-factoid-address").prop("disabled", true)
+  $("#fee-factoid-address").addClass("disabled-input")
+
+  $("#input-factoid-address").prop("disabled", true)
+  $("#input-factoid-address").addClass("disabled-input")
 }
 
 function HideMessages(){
   $("#error-zone").slideUp(100)
   $("#success-zone").slideUp(100)
 }
+
+$("#copy-to-clipboard").on('click', function(){
+  var aux = document.createElement("input");
+  aux.setAttribute("value", $('#export-json').text());
+  document.body.appendChild(aux);
+  aux.select();
+  document.execCommand("copy");
+  document.body.removeChild(aux);
+})
+
+// Import/Export
+$("#import-file").on('click', function(){
+  input = document.getElementById('uploaded-file');
+  if (!input) {
+    alert("Um, couldn't find the fileinput element.");
+  }
+  else if (!input.files) {
+    alert("This browser doesn't seem to support the `files` property of file inputs.");
+  }
+  else if (!input.files[0]) {
+    alert("Please select a file before clicking 'Load'");               
+  }
+  else {
+    file = input.files[0];
+    fr = new FileReader();
+    fr.onload = receivedText;
+    //fr.readAsText(file);
+    fr.readAsDataURL(file);
+  }
+})
+
+// Do action with imported transaction
+function receivedText() {
+  console.log(fr.result)
+}
+
+/* http://stackoverflow.com/questions/12281775/get-data-from-file-input-in-jquery
+<script>        
+  function handleFileSelect()
+  {               
+    if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+      alert('The File APIs are not fully supported in this browser.');
+      return;
+    }   
+
+    input = document.getElementById('fileinput');
+    if (!input) {
+      alert("Um, couldn't find the fileinput element.");
+    }
+    else if (!input.files) {
+      alert("This browser doesn't seem to support the `files` property of file inputs.");
+    }
+    else if (!input.files[0]) {
+      alert("Please select a file before clicking 'Load'");               
+    }
+    else {
+      file = input.files[0];
+      fr = new FileReader();
+      fr.onload = receivedText;
+      //fr.readAsText(file);
+      fr.readAsDataURL(file);
+    }
+  }
+
+  function receivedText() {
+    document.getElementById('editor').appendChild(document.createTextNode(fr.result));
+  }           
+
+</script>
+
+
+<input type="file" id="fileinput"/>
+<input type='button' id='btnLoad' value='Load' onclick='handleFileSelect();'>
+<div id="editor"></div>
+
+*/

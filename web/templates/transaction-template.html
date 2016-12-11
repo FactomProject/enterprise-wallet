@@ -1,0 +1,143 @@
+{{define "transaction-template"}}
+
+{{$abr := index . 0}}
+{{$whole := index . 1}}
+{{$divBottom := index . 2}}
+{{$coincontrol := index . 3}}
+
+<form>
+
+    <!-- From -->
+    <div id="coin-control" {{if $coincontrol}} {{else}} class="coin-control" {{end}}>
+        <div class="row">
+            <div class="columns small-12 medium-4 large-4">
+                <label>Send from:</label>
+            </div>
+            <div class="small-12 medium-8 large-8">
+                <div class="row text-right">
+                    <div class="small-12 medium-3 large-4 columns">
+                        <a id="needed-input-button" class="button"> Get Needed Input</a>
+                    </div>
+                    <div class="input-group small-10 medium-8 large-8 columns">
+                        <input id="input-needed-amount" type="text" class="input-group-field" readonly="true" name="fee" value="----">
+                        <span class="input-group-label">FCT</span>
+                    </div>
+                    <div class="small-2 medium-1 large-1 columns"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="all-inputs">
+            <div class="row single-input-0" id="single-input">
+                <div class="small-12 medium-7 large-8 columns">
+                    <div class="input-group" id="input-factoid-address-container">
+                        <pre><input id="input-factoid-address" type="text" name="input1" class="input-group-field percent95 disabled-input" placeholder="Choose factoid address" disabled></pre>
+                        <a id="addressbook-button" data-toggle="fee-addressbook" class="input-group-button button input-group-field" id="addressbook" value="0"><i class="fa fa-book"></i></a>
+                    </div>
+                </div>
+                <div class="small-10 medium-4 large-3 columns">
+                    <div class="input-group">
+                        <input id="input-factoid-amount" type="text" class="input-group-field" name="input1-num" placeholder="Amount of factoids">
+                        <span class="input-group-label">FCT</span>
+                    </div>
+                </div>
+                <div class="small-2 medium-1 columns">
+                        <a id="append-new-input" class="button expanded newPlus input-group-field">&nbsp;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- To -->
+    <div class="row">
+        <div class="columns">
+            <label>Send to:</label>
+        </div>
+    </div> 
+    <!-- Address + AMT -->
+    <div class="row" id="all-outputs">
+        <div class="row single-output-1" id="single-output">
+            <div class="small-12 medium-7 large-8 columns">
+                <div class="input-group" id="output-factoid-address-container">
+                    <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type {{$whole}} address"></pre>
+                    <a id="addressbook-button" data-toggle="addressbook" class="input-group-button button input-group-field" id="addressbook" value="1"><i class="fa fa-book"></i></a>
+                </div>
+            </div>
+            <div class="small-10 medium-4 large-3 columns">
+                <div class="input-group">
+                    <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of {{$whole}}s">
+                    <span class="input-group-label">{{$abr}}<!-- FCT/EC --></span>
+                </div>
+            </div>
+            <div class="small-2 medium-1 columns">
+                    <a id="append-new-output" class="button expanded newPlus input-group-field">&nbsp;</a>
+            </div>
+        </div>
+    </div>
+    <!-- Fee -->
+    <div class="row" id="all-outputs">
+        <div class="row" id="single-fee">
+            <div class="small-12 medium-7 large-8 columns">
+                <div id="fee-address-input">
+                    <div class="columns">
+                        <label>Address to Pay Fee:</label>
+                     </div>
+                    <div class="input-group" id="fee-factoid-address-container">
+                        <pre><input disabled id="fee-factoid-address" type="text" name="output1" class="input-group-field percent95 disabled-input" placeholder="Choose factoid address"></pre>
+                        <a id="addressbook-button" data-toggle="fee-addressbook" class="input-group-button button input-group-field" id="fee-addressbook" value="-1"><i class="fa fa-book"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="small-10 medium-4 large-3 columns">
+                <label>Fee:</label>
+                <div class="input-group">
+                    <input id="transaction-fee" type="text" class="input-group-field" disabled="true" name="fee" value="----">
+                    <span class="input-group-label">FCT</span>
+                </div>
+            </div>
+            <div class="small-2 medium-1 columns">
+
+            </div>
+        </div>
+    </div>
+    <hr>
+    <!-- Subtotal -->
+    <div class="row">
+        <div class="small-12 medium-7 large-8 columns">
+            <div id="first-stage-buttons">
+
+            </div>
+            <div id="second-stage-buttons" style="display:none">
+                <a id="send-entire-transaction" class="button">Send Transaction</a>
+                <a id="edit-transaction" class="button">Edit Transaction</a>
+            </div>
+            <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
+            <div id="success-zone" class="callout success text-center" style="display:none"></div>
+            <div>
+                <a id="new-transaction" class="button expanded" style="display:none">New Transaction</a>
+            </div>
+        </div>
+        <div class="small-12 medium-4 large-3 columns end">
+            <label>Total:</label>
+            <div class="input-group">
+                <input id="transaction-total" type="text" class="input-group-field" disabled="true" name="subtotal" id="subtotal" value="----">
+                <span class="input-group-label">{{$abr}}<!-- FCT/EC --></span>
+            </div>
+        </div>
+    </div>
+    {{if $divBottom}}
+        {{$divBottom}}
+    {{else}}
+    <div class="row">
+        <div class="small-12 medium-7 large-8 columns">
+
+        </div>
+        <div class="small-10 medium-4 large-3 columns">
+            <a id="make-entire-transaction" class="button expanded">View Transaction</a>
+        </div>
+        <div class="small-2 medium-1 columns">
+            
+        </div>
+    </div>
+    {{end}}
+</form>
+{{end}}

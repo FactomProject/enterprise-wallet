@@ -211,6 +211,17 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Transaction struct for sending transactions
+type SendTransStruct struct {
+	TransType   string   `json:"TransType"`
+	ToAddresses []string `json:"OutputAddresses"`
+	ToAmounts   []string `json:"OutputAmounts"`
+
+	FromAddresses []string `json:"InputAddresses"`
+	FromAmounts   []string `json:"InputAmounts"`
+	FeeAddress    string   `json:"FeeAddress"`
+}
+
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	// Only handles POST
 	if r.Method != "POST" {
@@ -366,13 +377,24 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write(jsonResp(anp))
 		}
-	case "make-transaction":
-		type SendTransStruct struct {
-			TransType string   `json:"TransType"`
-			Addresses []string `json:"OutputAddresses"`
-			Amounts   []string `json:"OutputAmounts"`
+	case "get-needed-input":
+		trans := new(SendTransStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), trans)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
 		}
 
+		needed, err := MasterWallet.CalculateNeededInput(trans.ToAddresses, trans.ToAmounts)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp(needed))
+	case "make-transaction":
 		trans := new(SendTransStruct)
 
 		jsonElement := r.FormValue("json")
@@ -386,13 +408,14 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			Name  string `json:"Name"`
 			Total uint64 `json:"Total"`
 			Fee   uint64 `json:"Fee"`
+			Json  string `json:"Json"`
 		}
 
 		var r ReturnTransStruct
 
 		name := ""
 		if trans.TransType == "factoid" {
-			newName, rt, err := MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
+			newName, rt, err := MasterWallet.ConstructSendFactoidsStrings(trans.ToAddresses, trans.ToAmounts)
 			if err != nil {
 				MasterWallet.DeleteTransaction(name)
 				w.Write(jsonError(err.Error()))
@@ -403,7 +426,20 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			r.Total = rt.Total
 			r.Fee = rt.Fee
 		} else if trans.TransType == "ec" {
-			newName, rt, err := MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
+			newName, rt, err := MasterWallet.ConstructConvertEntryCreditsStrings(trans.ToAddresses, trans.ToAmounts)
+			if err != nil {
+				MasterWallet.DeleteTransaction(name)
+				w.Write(jsonError(err.Error()))
+				return
+			}
+
+			name = newName
+			r.Total = rt.Total
+			r.Fee = rt.Fee
+		} else if trans.TransType == "custom" {
+			fmt.Println(trans)
+			newName, rt, err := MasterWallet.ConstructTransactionFromValuesStrings(
+				trans.ToAddresses, trans.ToAmounts, trans.FromAddresses, trans.FromAmounts, trans.FeeAddress)
 			if err != nil {
 				MasterWallet.DeleteTransaction(name)
 				w.Write(jsonError(err.Error()))
@@ -418,15 +454,16 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		j, err := MasterWallet.ExportTransaction(name)
+		if err != nil {
+			r.Json = "Error exporting transaction."
+		} else {
+			r.Json = j
+		}
+
 		r.Name = name
 		w.Write(jsonResp(r))
 	case "send-transaction":
-		type SendTransStruct struct {
-			TransType string   `json:"TransType"`
-			Addresses []string `json:"OutputAddresses"`
-			Amounts   []string `json:"OutputAmounts"`
-		}
-
 		trans := new(SendTransStruct)
 
 		jsonElement := r.FormValue("json")
@@ -436,7 +473,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name, err := MasterWallet.CheckTransactionAndGetName(trans.Addresses, trans.Amounts)
+		name, err := MasterWallet.CheckTransactionAndGetName(trans.ToAddresses, trans.ToAmounts)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
@@ -470,6 +507,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			MasterSettings.Theme = ""
 		}
 		MasterSettings.KeyExport = st.Bools[1]
+		MasterSettings.CoinControl = st.Bools[2]
 
 		err = SaveSettings()
 		if err != nil {

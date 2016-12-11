@@ -34,6 +34,7 @@ func TestSettings(t *testing.T) {
 		t.Fatalf("Does not match")
 	} else if n.KeyExport != s.KeyExport {
 		t.Fatalf("Does not match")
+	} else if n.CoinControl != s.CoinControl {
+		t.Fatalf("Does not match")
 	}
-
 }

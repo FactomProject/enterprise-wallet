@@ -1,6 +1,7 @@
 $("#save-changes").on('click', function(){	
 	theme = $("#darkTheme").is(":checked")
 	exportKeys = $("#export-keys").is(":checked")
+	coinControl = $("#coin-control").is(":checked")
 
 	var SettingsStruct = {
     	Values:[]
@@ -8,6 +9,7 @@ $("#save-changes").on('click', function(){
 
 	SettingsStruct.Values.push(theme)
 	SettingsStruct.Values.push(exportKeys)
+	SettingsStruct.Values.push(coinControl)
 
 	j = JSON.stringify(SettingsStruct)
 	postRequest("adjust-settings", j, function(resp){
