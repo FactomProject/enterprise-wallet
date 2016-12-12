@@ -16,7 +16,7 @@ func main() {
 	var (
 		guiDB = flag.String("guiDB", "Bolt", "GUI Database: Bolt, LDB, or Map")
 		walDB = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
-		txDB  = flag.String("txdb", "Bolt", "Transaction Database: Bolt, LDB, or Map")
+		txDB  = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
 		port  = flag.Int("port", 8091, "The port for the GUIWallet")
 	)
 	flag.Parse()
