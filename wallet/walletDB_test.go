@@ -80,7 +80,7 @@ func TestGetRelatedTransaction(t *testing.T) {
 	LoadTestWallet(8071)
 
 	TestWallet.UpdateGUIDB()
-	transactions, err := TestWallet.GetRelatedTransactions()
+	transactions, err := TestWallet.GetRelatedTransactions(false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestGetRelatedTransaction(t *testing.T) {
 	time.Sleep(10 * time.Second)
 
 	correctTrans, _ := TestWallet.GetRelatedTransactionsNoCaching()
-	transactions, err = TestWallet.GetRelatedTransactions()
+	transactions, err = TestWallet.GetRelatedTransactions(false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +114,7 @@ func TestGetRelatedTransaction(t *testing.T) {
 	}
 
 	correctTrans, _ = TestWallet.GetRelatedTransactionsNoCaching()
-	transactions, err = TestWallet.GetRelatedTransactions()
+	transactions, err = TestWallet.GetRelatedTransactions(false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestGetRelatedTransaction(t *testing.T) {
 	}
 
 	correctTrans, _ = TestWallet.GetRelatedTransactionsNoCaching()
-	transactions, err = TestWallet.GetRelatedTransactions()
+	transactions, err = TestWallet.GetRelatedTransactions(false)
 	if err != nil {
 		t.Fatal(err)
 	}

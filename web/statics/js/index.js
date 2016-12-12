@@ -4,15 +4,21 @@ $(window).load(function() {
 
 CurrentCount = 0
 ContentLen = 0
-LoopstopIncrement = 10 // Amount to load on scroll
+LoopstopIncrement = 15 // Amount to load on scroll
 Loopstop = 20
-var Transactions
+var Transactions = new Array()
 Done = false
 
 function LoadTransactions() {
 	getRequest("related-transactions", function(resp){
-		$("#loading-container").remove()
 		obj = JSON.parse(resp)
+		if(obj.Error == "none" && obj.Content == null){
+			setTimeout(function(){
+			  LoadTransactions()
+			}, 5000);
+			return
+		}
+		$("#loading-container").remove()
 
 		if(obj.Error != "none"){
 			SetGeneralError(obj.Error)
@@ -21,7 +27,6 @@ function LoadTransactions() {
 
 		ContentLen = obj.Content.length
 		Transactions = obj.Content
-					console.log(Transactions)
 
 		// Load past x transactions, then stop. Only load more if they scroll
 		if(ContentLen < Loopstop) {
@@ -30,22 +35,45 @@ function LoadTransactions() {
 		for(; CurrentCount < Loopstop; CurrentCount++) {
 			AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
 		}
-
 	})
 }
 
+// Load past x transactions, then stop. Only load more if they scroll
+Empty = false
 function LoadCached() {
-		// Load past x transactions, then stop. Only load more if they scroll
-		if(ContentLen < Loopstop) {
-			Loopstop = ContentLen
+	if (Empty){return}
+	if(ContentLen < Loopstop * 2) {
+		// Request more
+		var requestObject = {
+			Current:ContentLen,
+		    More:Loopstop*5
 		}
-		for(; CurrentCount < Loopstop; CurrentCount++) {
-			AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
-		}
+		j = JSON.stringify(requestObject)
+		postRequest("more-cached-transaction", j, function(resp){
+			obj = JSON.parse(resp)
+			if(obj.Error != "none"){
+				return
+			}
+			if(obj.Content == null){
+				return
+			}
+			if(obj.Content.length == 0) {
+				Empty = true
+				return
+			}
+			ContentLen = ContentLen + obj.Content.length
+			Transactions = Transactions.concat(obj.Content)
+		})
+	}
+	if(ContentLen < Loopstop) {
+		Loopstop = ContentLen
+	}
+	for(; CurrentCount < Loopstop; CurrentCount++) {
+		AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
+	}
 }
 
 function AppendNewTransaction(trans, index){
-
 	// Transactions are split into 3 transactions if sent/recieve/converted is all happening.
 	// function appendTrans(pic, index, amt, token, date, addrs)
 	if(trans.Action[0] == true) { // Sent
@@ -120,7 +148,6 @@ $("main").bind('scroll', function() {
 	//console.log("scroll", $("main").scrollTop(), $("main").innerHeight(), $("main").prop('scrollHeight'))
 	//console.log("scroll", $("body").scrollTop(), $("body").innerHeight(), $("body").prop('scrollHeight'))
 	if($("main").scrollTop() + $("main").innerHeight() >= .8 * $("main").prop('scrollHeight')) {
-		console.log("more")
 		Loopstop += LoopstopIncrement
 		LoadCached()
 	}
@@ -138,7 +165,6 @@ function setTransDetails(index) {
 	trans = Transactions[index]
 	$("#trans-detail-txid").text(trans.TxID)
 
-	console.log(trans)
 	$("#trans-details-inputs").html("")
 	for(var i = 0; i < trans.Inputs.length; i++) {
 		$("#trans-details-inputs").append('<tr>' +

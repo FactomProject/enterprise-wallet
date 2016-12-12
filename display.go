@@ -200,8 +200,14 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		trans, err := MasterWallet.GetRelatedTransactions()
 		if err != nil {
 			w.Write(jsonError(err.Error()))
+			return
 		} else {
-			w.Write(jsonResp(trans))
+			MasterWallet.ActiveCachedTransactions = trans
+			if len(trans) > 100 {
+				w.Write(jsonResp(trans[:100]))
+			} else {
+				w.Write(jsonResp(trans))
+			}
 		}
 	// TODO: Remove
 	case "test-error":
@@ -555,6 +561,29 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Write(jsonResp(seed))
+	case "more-cached-transaction":
+		type MoreRelatedTransactionReq struct {
+			Current int `json:"Current"` // Current index in list
+			More    int `json:"More"`    // How many more
+		}
+
+		rt := new(MoreRelatedTransactionReq)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), rt)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		total := len(MasterWallet.ActiveCachedTransactions)
+		max := rt.Current + rt.More
+		if max > total {
+			w.Write(jsonResp(MasterWallet.ActiveCachedTransactions[rt.Current:]))
+		} else {
+			w.Write(jsonResp(MasterWallet.ActiveCachedTransactions[rt.Current:max]))
+		}
+
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

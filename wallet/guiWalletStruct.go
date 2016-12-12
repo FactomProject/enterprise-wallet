@@ -108,7 +108,7 @@ func (w *WalletStruct) addAddress(name string, address string, list int) error {
 	return nil
 }
 
-func (w *WalletStruct) GetTotalAddressCount() uint32 {
+func (w *WalletStruct) GetTotalAddressCount() uint64 {
 	w.RLock()
 	defer w.RUnlock()
 	return w.FactoidAddresses.Length + w.EntryCreditAddresses.Length + w.ExternalAddresses.Length

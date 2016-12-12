@@ -30,6 +30,19 @@ $("#nickname-input").on('click', function(){
 	$(this).removeClass("input-group-error")
 })
 
+$("#generate-source").on('change', function(){
+	selected = $("#generate-source option:selected").val()
+	if(selected == "import-address"){
+		$("#private-key-input").attr("placeholder","Type address private key")
+	} else if(selected == "random-ec"){
+		$("#private-key-input").attr("placeholder","A new entry credit address will be created")
+	} else if(selected == "random-factoid"){
+		$("#private-key-input").attr("placeholder","A new factoid address will be created")
+	} else if(selected == "new-external-address"){
+		$("#private-key-input").attr("placeholder","Type a public address to add to your contacts")
+	}
+})
+
 $("#add-to-addressbook").on("click", function(){
 	$("#error-zone").slideUp(100)
 	Name = $("#nickname-input").val()

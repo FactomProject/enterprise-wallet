@@ -12,7 +12,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/FactomProject/M2GUIWallet/address"
 	"github.com/FactomProject/M2GUIWallet/wallet/database"
@@ -37,6 +36,10 @@ var (
 	TX_DB     = MAP
 )
 
+var (
+	STEPS_TO_PRINT int = 10000 // How many steps needed to alert user of progress
+)
+
 // Wallet interacting with LDB and factom/wallet
 //   The LDB doesn't need to be updated often, so we save after every add and only
 //   deal with cached version
@@ -48,11 +51,12 @@ type WalletDB struct {
 
 	// Used to cache related transactions
 	// This is rebuilt upon every launch
-	relatedTransactionLock sync.RWMutex                  // For all variables associated with related transaction caching
-	cachedTransactions     []DisplayTransaction          // All sorted transactions already found
-	cachedHeight           uint32                        // Last FBlock height used
-	transMap               map[string]DisplayTransaction // Prevent duplicate transactions
-	addrMap                map[string]string             // Find addresses quick, All addresses already searched for up to last FBlock
+	relatedTransactionLock   sync.RWMutex                       // For all variables associated with related transaction caching
+	cachedTransactions       []DisplayTransaction               // All sorted transactions already found
+	ActiveCachedTransactions []DisplayTransaction               // Active cache being used.
+	cachedHeight             uint32                             // Last FBlock height used
+	transMap                 map[string]DisplayTransaction      // Prevent duplicate transactions
+	addrMap                  map[string]address.AddressNamePair // Find addresses quick, All addresses already searched for up to last FBlock
 }
 
 // For now is same as New
@@ -134,114 +138,11 @@ func NewWalletDB() (*WalletDB, error) {
 	}
 
 	w.transMap = make(map[string]DisplayTransaction)
-	w.addrMap = make(map[string]string)
+	w.addrMap = make(map[string]address.AddressNamePair)
 	w.cachedHeight = 0
+	w.ActiveCachedTransactions = w.cachedTransactions
 
 	return w, nil
-}
-
-type TransactionAddressInfo struct {
-	Name    string
-	Address string
-	Amount  uint64
-	Type    string // FCT or EC
-}
-
-func NewTransactionAddressInfo(name string, address string, amount uint64, tokenType string) *TransactionAddressInfo {
-	t := new(TransactionAddressInfo)
-	t.Name = name
-	t.Address = address
-	t.Amount = amount
-	t.Type = tokenType
-
-	return t
-}
-
-func (a *TransactionAddressInfo) IsSameAs(b TransactionAddressInfo) bool {
-	if a.Name != b.Name {
-		return false
-	}
-	if a.Address != b.Address {
-		return false
-	}
-	if a.Amount != b.Amount {
-		return false
-	}
-	if a.Type != b.Type {
-		return false
-	}
-	return true
-}
-
-// Names are "" if not in wallet
-type DisplayTransaction struct {
-	Inputs     []TransactionAddressInfo
-	TotalInput uint64
-
-	Outputs        []TransactionAddressInfo
-	TotalFCTOutput uint64
-	TotalECOutput  uint64
-
-	TxID      string
-	Height    uint32
-	Action    [3]bool // Sent, recieved, converted
-	Date      string
-	Time      string
-	ExactTime time.Time
-
-	//ITrans interfaces.ITransaction
-}
-
-func (a *DisplayTransaction) IsSameAs(b DisplayTransaction) bool {
-	if !a.IsSimilarTo(b) {
-		return false
-	}
-
-	for i := 0; i < 3; i++ {
-		if a.Action[i] != b.Action[i] {
-			return false
-		}
-	}
-
-	return true
-}
-
-// Does not count actions
-func (a *DisplayTransaction) IsSimilarTo(b DisplayTransaction) bool {
-	if len(a.Inputs) != len(b.Inputs) {
-		return false
-	}
-	if len(a.Outputs) != len(b.Outputs) {
-		return false
-	}
-
-	for i := 0; i < len(a.Inputs); i++ {
-		if !a.Inputs[i].IsSameAs(b.Inputs[i]) {
-			return false
-		}
-	}
-	if a.TotalInput != b.TotalInput {
-		return false
-	}
-	for i := 0; i < len(a.Outputs); i++ {
-		if !a.Outputs[i].IsSameAs(b.Outputs[i]) {
-			return false
-		}
-	}
-	if a.TotalFCTOutput != b.TotalFCTOutput {
-		return false
-	}
-	if a.TotalECOutput != b.TotalECOutput {
-		return false
-	}
-	if a.TxID != b.TxID {
-		return false
-	}
-	if a.Height != b.Height {
-		return false
-	}
-
-	return true
 }
 
 // for sorting
@@ -282,11 +183,6 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 		return nil, fmt.Errorf("Transaction is nil")
 	}
 
-	_, err := w.TransactionDB.GetAllTXs()
-	if err != nil {
-		return nil, err
-	}
-
 	dt := new(DisplayTransaction)
 	//dt.ITrans = t
 	dt.TotalInput = 0
@@ -297,17 +193,17 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	dt.Inputs = make([]TransactionAddressInfo, 0)
 	dt.Outputs = make([]TransactionAddressInfo, 0)
 	dt.Action = [3]bool{false, false, false}
-	dt.Date = t.GetTimestamp().GetTime().Format(("01/02/2006"))
-	dt.Time = t.GetTimestamp().GetTime().Format(("15:04:05"))
 	dt.ExactTime = t.GetTimestamp().GetTime()
-
+	dt.Date = dt.ExactTime.Format(("01/02/2006"))
+	dt.Time = dt.ExactTime.Format(("15:04:05"))
 	ins := t.GetInputs()
 	// Inputs
 	for _, in := range ins {
 		add := primitives.ConvertFctAddressToUserStr(in.GetAddress())
-		anp, _ := w.GetGUIAddress(add)
+		//anp, _ := w.GetGUIAddress(add)
+		anp, ok := w.addrMap[add]
 		name := ""
-		if anp != nil {
+		if ok {
 			name = anp.Name
 			dt.Action[0] = true
 		}
@@ -322,9 +218,10 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	// FCT Outputs
 	for _, out := range outs {
 		add := primitives.ConvertFctAddressToUserStr(out.GetAddress())
-		anp, _ := w.GetGUIAddress(add)
+		//anp, _ := w.GetGUIAddress(add)
+		anp, ok := w.addrMap[add]
 		name := ""
-		if anp != nil {
+		if ok {
 			name = anp.Name
 			dt.Action[1] = true
 		}
@@ -339,9 +236,10 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	// EC Outputs
 	for _, ecOut := range ecOuts {
 		add := primitives.ConvertECAddressToUserStr(ecOut.GetAddress())
-		anp, _ := w.GetGUIAddress(add)
+		//anp, _ := w.GetGUIAddress(add)
+		anp, ok := w.addrMap[add]
 		name := ""
-		if anp != nil {
+		if ok {
 			name = anp.Name
 			dt.Action[2] = true
 		}
@@ -351,7 +249,6 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 
 		dt.Outputs = append(dt.Outputs, *NewTransactionAddressInfo(name, add, amt, "EC"))
 	}
-
 	return dt, nil
 }
 
@@ -359,10 +256,27 @@ func (w *WalletDB) ExportSeed() (string, error) {
 	return w.Wallet.GetSeed()
 }
 
+var PROCESSING_RELATED_TRANSACTIONS = false
+
+func prtOff() {
+	PROCESSING_RELATED_TRANSACTIONS = false
+}
+
 // This function grabs all transactions related to any address in the address book
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.
 func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error) {
+	if PROCESSING_RELATED_TRANSACTIONS {
+		return
+	}
+
+	// If we print 1 step, we should print all so user knows it is done
+	// Some steps may be very quick
+	printSteps := false
+
+	PROCESSING_RELATED_TRANSACTIONS = true
+	defer prtOff()
+
 	// Temporary
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -371,7 +285,6 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 				"factomd might be having issues syncing with the network.")
 		}
 	}()
-
 	w.relatedTransactionLock.Lock()
 	defer w.relatedTransactionLock.Unlock()
 
@@ -413,10 +326,13 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	if err != nil {
 		return nil, err
 	}
-
+	totalTransactions := len(transactions)
 	var newTransactions []DisplayTransaction
 	// Sort throught new transactions for any related
-	for _, trans := range transactions {
+	for i, trans := range transactions {
+		if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
+			fmt.Printf("Step 1/3 for Transactions %d / %d\n", i, totalTransactions)
+		}
 		added := false
 		for i = 0; i < 3; i++ {
 			var addresses []string
@@ -462,27 +378,36 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		}
 	}
 
+	if totalTransactions > 10000 || printSteps {
+		printSteps = true
+		fmt.Printf("Step 1/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
+	}
+
 	// Sort the new ones
 	sort.Sort(DisplayTransactions(newTransactions))
 
 	// Prepend them to the old cache
 	w.cachedTransactions = append(newTransactions, w.cachedTransactions...)
-
 	// Find all new addresses, need to do additional handling and inserting
 	var moreTransactions []DisplayTransaction
 	anps := w.GetAllMyGUIAddresses()
 	var newAddrs []string
 	for _, a := range anps {
-		addr, ok := w.addrMap[a.Address]
-		if ok || len(addr) > 1 { // Found
+		_, ok := w.addrMap[a.Address]
+		if ok { // Found
 
 		} else { // New addr
-			w.addrMap[a.Address] = a.Address
+			w.addrMap[a.Address] = a
 			newAddrs = append(newAddrs, a.Address)
 			trans, err := w.TransactionDB.GetTXAddress(a.Address)
 			if err == nil {
+				totalTransactions = len(trans)
 				if len(trans) > 0 {
-					for _, t := range trans {
+					// This takes some real time for huge amounts
+					for i, t := range trans {
+						if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
+							fmt.Printf("Step 2/3 for Transactions %d / %d\n", i, totalTransactions)
+						}
 						dt, _ := w.NewDisplayTransaction(t)
 						moreTransactions = append(moreTransactions, *dt)
 					}
@@ -491,10 +416,18 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 			}
 		}
 	}
+	if totalTransactions > 1000 || printSteps {
+		printSteps = true
+		fmt.Printf("Step 2/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
+	}
 
+	totalTransactions = len(moreTransactions)
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
-	for _, t := range moreTransactions {
+	for i, t := range moreTransactions {
+		if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
+			fmt.Printf("Step 3/3 for Transactions %d / %d\n", i, totalTransactions)
+		}
 		if _, ok := w.transMap[t.TxID]; ok {
 			continue
 		}
@@ -517,7 +450,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 			w.cachedTransactions = append(w.cachedTransactions[:i], append([]DisplayTransaction{t}, w.cachedTransactions[i:]...)...)
 		}
 	}
-
+	if totalTransactions > 10000 || printSteps {
+		printSteps = true
+		fmt.Printf("Step 3/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
+	}
 	return w.cachedTransactions, nil
 }
 
@@ -916,7 +852,7 @@ func (w *WalletDB) ChangeAddressName(address string, toName string) error {
 	return w.Save()
 }
 
-func (w *WalletDB) GetTotalGUIAddresses() uint32 {
+func (w *WalletDB) GetTotalGUIAddresses() uint64 {
 	return w.guiWallet.GetTotalAddressCount()
 }
 

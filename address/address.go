@@ -14,7 +14,7 @@ import (
 
 var _ = fmt.Sprintf("")
 
-const maxNameLength int = 20
+const MaxNameLength int = 20
 
 // Name/Address pair
 type AddressNamePair struct {
@@ -27,8 +27,8 @@ type AddressNamePair struct {
 }
 
 func NewAddress(name string, address string) (*AddressNamePair, error) {
-	if len(name) > maxNameLength {
-		return nil, fmt.Errorf("Name must be max %d characters", maxNameLength)
+	if len(name) > MaxNameLength {
+		return nil, fmt.Errorf("Name must be max %d characters", MaxNameLength)
 	}
 
 	if !factom.IsValidAddress(address) {
@@ -59,8 +59,8 @@ func NewSeededAddress(name string, address string) (*AddressNamePair, error) {
 }
 
 func (anp *AddressNamePair) ChangeName(name string) error {
-	if len(name) > maxNameLength {
-		return fmt.Errorf("Name too long, must be less than %d characters", maxNameLength)
+	if len(name) > MaxNameLength {
+		return fmt.Errorf("Name too long, must be less than %d characters", MaxNameLength)
 	}
 	anp.Name = name
 	return nil
@@ -79,9 +79,9 @@ func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
 func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 
-	var n [maxNameLength]byte
-	copy(n[:maxNameLength], anp.Name)
-	buf.Write(n[:maxNameLength])
+	var n [MaxNameLength]byte
+	copy(n[:MaxNameLength], anp.Name)
+	buf.Write(n[:MaxNameLength])
 
 	add := base58.Decode(anp.Address)
 	var a [38]byte
@@ -101,12 +101,11 @@ func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 func (anp *AddressNamePair) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
 
-	nameData := bytes.Trim(newData[:maxNameLength], "\x00")
+	nameData := bytes.Trim(newData[:MaxNameLength], "\x00")
 	anp.Name = fmt.Sprintf("%s", nameData)
-	newData = newData[maxNameLength:]
+	newData = newData[MaxNameLength:]
 
 	anp.Address = base58.Encode(newData[:38])
-
 	newData = newData[38:]
 
 	booldata := newData[:5]
@@ -130,7 +129,7 @@ func (anp *AddressNamePair) UnmarshalBinary(data []byte) (err error) {
 
 //Address List
 type AddressList struct {
-	Length uint32
+	Length uint64
 	List   []AddressNamePair
 }
 
@@ -220,7 +219,7 @@ func (addList *AddressList) Remove(removeAdd string) error {
 func (addList *AddressList) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	var number [8]byte
-	binary.BigEndian.PutUint32(number[:], addList.Length)
+	binary.BigEndian.PutUint64(number[:], addList.Length)
 	buf.Write(number[:])
 
 	for _, anp := range addList.List {
@@ -237,10 +236,10 @@ func (addList *AddressList) MarshalBinary() (data []byte, err error) {
 func (addList *AddressList) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
 
-	addList.Length = binary.BigEndian.Uint32(data[:8])
+	addList.Length = binary.BigEndian.Uint64(data[:8])
 	newData = newData[8:]
 
-	var i uint32 = 0
+	var i uint64 = 0
 	for i < addList.Length {
 		anp := new(AddressNamePair)
 		newData, err = anp.UnmarshalBinaryData(newData)

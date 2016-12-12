@@ -4,4 +4,4 @@
 
 
  ## Minify Code
- Uses https://github.com/tdewolff/minify , MIT License
+ Uses https://github.com/FactomProject/minify, MIT License
