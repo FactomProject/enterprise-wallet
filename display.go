@@ -93,7 +93,7 @@ func doEvery(d time.Duration, f func(time.Time)) {
 func pageHandler(w http.ResponseWriter, r *http.Request) {
 	// Remove any GET data
 	request := strings.Split(r.RequestURI, "?")
-	fmt.Println(r.RequestURI)
+	//fmt.Println(r.RequestURI)
 
 	var err error
 
