@@ -16,10 +16,6 @@ import (
 	//"github.com/FactomProject/factom/wallet"
 )
 
-// LoadTestWallet is werid to use. Should only turn on 1 at a time. Current 0-3 taken
-// -1 turns all on. -2 Turns on all that don't need to wipe the TestWallet
-var LoadTestWalletMethod int = -2
-
 var longtest = false
 var _ = fmt.Sprintf("")
 
@@ -28,11 +24,8 @@ func TestGetRelatedTransaction(t *testing.T) {
 	if !longtest {
 		return
 	}
-	if !(LoadTestWalletMethod == 0 || LoadTestWalletMethod == -1) {
-		return
-	}
 	//fmt.Println(0)
-	err := LoadTestWallet(8089)
+	err := LoadTestWallet(8075)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -182,9 +175,6 @@ func sendTrans(address string, amt uint64) (string, error) {
 }
 
 func TestGUIUpdate(t *testing.T) {
-	if !(LoadTestWalletMethod == 1 || LoadTestWalletMethod == -1) {
-		return
-	}
 	//fmt.Println(1)
 	var err error
 	TestWallet = nil // Need fresh
@@ -242,6 +232,7 @@ func TestGUIUpdate(t *testing.T) {
 			t.Fatal("Should be there, but is not")
 		}
 	}
+
 	// All these should be in second map
 	for _, a := range ecList {
 		if _, ok := anpMap[a.String()]; !ok {
@@ -254,20 +245,18 @@ func TestGUIUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	TestWallet.UpdateGUIDB()
-	newAnps := TestWallet.GetAllGUIAddresses()
-	if len(newAnps) != 0 {
-		t.Fatal("Should be all deleted")
-	}
+	/*
+		TestWallet.UpdateGUIDB()
+		newAnps := TestWallet.GetAllGUIAddresses()
+		if len(newAnps) != 0 {
+			t.Fatal("Should be all deleted")
+		}*/
 }
 
 func TestDBInteraction(t *testing.T) {
-	if !(LoadTestWalletMethod == 2 || LoadTestWalletMethod == -1 || LoadTestWalletMethod == -1) {
-		return
-	}
+	fmt.Println("TestDBInteraction")
 	//fmt.Println(2)
-	err := LoadTestWallet(8089)
+	err := LoadTestWallet(8074)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -320,7 +309,7 @@ func CheckRemoveAddressTest(wal *WalletDB) error {
 		return err
 	}
 
-	anp, err := wal.AddAddress("ToBeRemoved", add.SecString())
+	anp, err := wal.AddExternalAddress("ToBeRemoved", add.String())
 	if err != nil {
 		return err
 	}

@@ -761,7 +761,9 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 
 // TODO: Fix, make wallet take the remove
 func (w *WalletDB) RemoveAddress(address string, list int) (*address.AddressNamePair, error) {
-	anp, err := w.guiWallet.RemoveAddress(address, list)
+	anp, _, _ := w.guiWallet.GetAddress(address)
+
+	_, err := w.guiWallet.RemoveAddress(anp.Address, list)
 	if err != nil {
 		return nil, err
 	}

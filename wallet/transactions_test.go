@@ -13,12 +13,9 @@ var _ = fmt.Sprint("")
 var TestWallet *WalletDB
 
 func TestSendFactoids(t *testing.T) {
-	if !(LoadTestWalletMethod == 3 || LoadTestWalletMethod == -1 || LoadTestWalletMethod == -2) {
-		return
-	}
 	//fmt.Println(3)
 	var err error
-	err = LoadTestWallet(8089)
+	err = LoadTestWallet(8077)
 	if err != nil {
 		t.Fatal(err.Error())
 	}

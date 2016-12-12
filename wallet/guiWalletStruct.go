@@ -295,50 +295,51 @@ func (w *WalletStruct) UnmarshalBinary(data []byte) error {
 }
 
 func (w *WalletStruct) RemoveAddressFromAnyList(address string) (*address.AddressNamePair, error) {
-	_, list, _ := w.GetAddress(address)
+	anp, list, _ := w.GetAddress(address)
 	if list > 3 {
 		return nil, fmt.Errorf("This should never happen")
 	}
-
-	return w.RemoveAddressFromAnyList(address)
+	_, err := w.RemoveAddress(address, list)
+	if err != nil {
+		return nil, err
+	}
+	return anp, nil
 }
 
-func (w *WalletStruct) RemoveAddress(address string, list int) (*address.AddressNamePair, error) {
+func (w *WalletStruct) RemoveAddress(address string, list int) (string, error) {
 	w.Lock()
 	defer w.Unlock()
 
-	anp, _, _ := w.GetAddress(address)
-
 	switch list {
 	case 0:
-		return nil, fmt.Errorf("No address found")
+		return "", fmt.Errorf("No address found")
 	case 1:
 		err := w.FactoidAddresses.Remove(address)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		// factom-wallet remove?
-		return anp, nil
+		return address, nil
 	case 2:
 		err := w.EntryCreditAddresses.Remove(address)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		// factom-wallet remove?
-		return anp, nil
+		return address, nil
 	case 3:
 		err := w.ExternalAddresses.Remove(address)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		// factom-wallet remove?
-		return anp, nil
+		return address, nil
 	}
 
-	return nil, fmt.Errorf("Impossible to reach.")
+	return "", fmt.Errorf("Impossible to reach.")
 }
 
 // Adds balances to addresses so the GUI can display
