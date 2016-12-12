@@ -392,6 +392,8 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	var moreTransactions []DisplayTransaction
 	anps := w.GetAllMyGUIAddresses()
 	var newAddrs []string
+	totalTransactions = 0
+	currentCheckpoint := 0
 	for _, a := range anps {
 		_, ok := w.addrMap[a.Address]
 		if ok { // Found
@@ -401,12 +403,12 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 			newAddrs = append(newAddrs, a.Address)
 			trans, err := w.TransactionDB.GetTXAddress(a.Address)
 			if err == nil {
-				totalTransactions = len(trans)
 				if len(trans) > 0 {
+					totalTransactions += len(trans)
 					// This takes some real time for huge amounts
 					for i, t := range trans {
 						if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
-							fmt.Printf("Step 2/3 for Transactions %d / %d\n", i, totalTransactions)
+							fmt.Printf("Step 2/3 for Transactions %d / %d\n", i+currentCheckpoint, totalTransactions)
 						}
 						dt, _ := w.NewDisplayTransaction(t)
 						moreTransactions = append(moreTransactions, *dt)
@@ -414,6 +416,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 					//moreTransactions = append(moreTransactions, trans...)
 				}
 			}
+			currentCheckpoint = totalTransactions
 		}
 	}
 	if totalTransactions > 1000 || printSteps {
