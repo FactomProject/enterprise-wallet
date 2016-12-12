@@ -1,3 +1,6 @@
+// Import/Export page acts differently
+importexport = false
+
 // Used for sending factoids or converting to entry credits
 PageTokenABR = "FCT"
 PageToken = "factoids"
@@ -9,6 +12,8 @@ if($("#token-header").attr("value") == "1") {
   PageToken = "entry credits"
   AddressPrefix = "EC"
   PageTransType = "ec"
+} else if ($("#token-header").attr("value") == "2"){
+  importexport = true
 }
 
 counter = 2
@@ -129,13 +134,26 @@ $("#all-outputs").on('click', '#output-factoid-address-container', function(){
 })
 
 $("#make-entire-transaction").on('click', function(){
+  //$("#sign-transaction").prop('checked')
   if(Input) {
-    MakeTransaction()
+    if($(this).attr("value") == "1") {
+      if($("#sign-transaction").prop('checked')) {
+        MakeTransaction(false)
+      } else {
+        MakeTransaction(true)
+      }
+    } else {
+      MakeTransaction(true)
+    }
   }
 })
 
-function MakeTransaction() {
+function MakeTransaction(sig) {
   transObject = getTransactionObject(true)
+
+  if(!sig) {
+    transObject.TransType = "nosig"
+  }
 
   if(transObject == null) {
     return
@@ -154,11 +172,24 @@ function MakeTransaction() {
       total = totalInput + feeFact 
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
-      $("#export-json").text(obj.Content.Json)
-      SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
+      if(importexport) {
+        setExportDownload(obj.Content.Json)
+        SetGeneralSuccess('Click "Export Transaction" to download, or go back to editing it')
+      } else {
+        SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
+      }
     } else {
       SetGeneralError("Error: " + obj.Error)
     }
+  })
+}
+
+function setExportDownload(json) {
+  obj = JSON.parse(json)
+  fileExt = parseInt(obj.millitimestamp)
+  $("#export-transaction").click(function() {
+    $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(json))
+    $(this).attr("download", "Exported-" + fileExt)
   })
 }
 
@@ -434,7 +465,6 @@ $("#fee-addresses-reveal-button").on("click", function(){
   if(newAddress == undefined) {
     return
   }
-  console.log("H:" + toChange)
 
   if(toChange == "-1") {
     $("#fee-factoid-address").val(newAddress)
@@ -519,15 +549,6 @@ function HideMessages(){
   $("#error-zone").slideUp(100)
   $("#success-zone").slideUp(100)
 }
-
-$("#copy-to-clipboard").on('click', function(){
-  var aux = document.createElement("input");
-  aux.setAttribute("value", $('#export-json').text());
-  document.body.appendChild(aux);
-  aux.select();
-  document.execCommand("copy");
-  document.body.removeChild(aux);
-})
 
 // Import/Export
 $("#import-file").on('click', function(){

@@ -107,7 +107,11 @@
 
             </div>
             <div id="second-stage-buttons" style="display:none">
+            {{if $divBottom}}
+                <a id="export-transaction" class="button" download="exported-transaction.txt">Export Transaction</a>
+            {{else}}
                 <a id="send-entire-transaction" class="button">Send Transaction</a>
+            {{end}}
                 <a id="edit-transaction" class="button">Edit Transaction</a>
             </div>
             <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
@@ -132,7 +136,7 @@
 
         </div>
         <div class="small-10 medium-4 large-3 columns">
-            <a id="make-entire-transaction" class="button expanded">View Transaction</a>
+            <a id="make-entire-transaction" class="button expanded" value="0">View Transaction</a>
         </div>
         <div class="small-2 medium-1 columns">
             

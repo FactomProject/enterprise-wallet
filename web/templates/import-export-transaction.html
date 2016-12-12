@@ -10,7 +10,7 @@
 <div class="row">
     <div class="columns">
         <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
-        <h1>Import/Export Transactions</h1>
+        <h1 id="token-header" value="2">Import/Export Transactions</h1>
         <div class="row columns">
             <input id="uploaded-file" type='file' name='userFile' class="input-group-field">
             <!-- <input type='submit' name='upload_btn' value='upload' class="input-group-field"> -->
@@ -25,9 +25,7 @@
         {{$divBottom := print $divBottom "</div>"}}
         {{$divBottom := print $divBottom "<div class='row'>"}}
         {{$divBottom := print $divBottom " <div class='columns'>"}}
-        {{$divBottom := print $divBottom "  <a id='make-entire-transaction' class='button'>View Transaction</a>"}}
-        {{$divBottom := print $divBottom "  <a class='button'>Export to file</a>"}}
-        {{$divBottom := print $divBottom "  <a class='button'>Broadcast Transaction</a>"}}
+        {{$divBottom := print $divBottom "  <a id='make-entire-transaction' class='button' value='1'>View Transaction</a>"}}
         {{$divBottom := print $divBottom " </div>"}}
         {{$divBottom := print $divBottom "</div>"}}
 

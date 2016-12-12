@@ -311,6 +311,26 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(secret))
+	case "get-address":
+		type Add struct {
+			Address string `json:"Address"`
+		}
+
+		j := r.FormValue("json")
+		a := new(Add)
+		err := json.Unmarshal([]byte(j), a)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, list := MasterWallet.GetGUIAddress(a.Address)
+		if list == -1 {
+			w.Write(jsonError("Not found"))
+			return
+		}
+
+		w.Write(jsonResp(anp))
 	case "is-valid-address":
 		add := r.FormValue("json")
 		v := MasterWallet.IsValidAddress(add)
@@ -437,9 +457,20 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			r.Total = rt.Total
 			r.Fee = rt.Fee
 		} else if trans.TransType == "custom" {
-			fmt.Println(trans)
 			newName, rt, err := MasterWallet.ConstructTransactionFromValuesStrings(
-				trans.ToAddresses, trans.ToAmounts, trans.FromAddresses, trans.FromAmounts, trans.FeeAddress)
+				trans.ToAddresses, trans.ToAmounts, trans.FromAddresses, trans.FromAmounts, trans.FeeAddress, true)
+			if err != nil {
+				MasterWallet.DeleteTransaction(name)
+				w.Write(jsonError(err.Error()))
+				return
+			}
+
+			name = newName
+			r.Total = rt.Total
+			r.Fee = rt.Fee
+		} else if trans.TransType == "nosig" {
+			newName, rt, err := MasterWallet.ConstructTransactionFromValuesStrings(
+				trans.ToAddresses, trans.ToAmounts, trans.FromAddresses, trans.FromAmounts, trans.FeeAddress, false)
 			if err != nil {
 				MasterWallet.DeleteTransaction(name)
 				w.Write(jsonError(err.Error()))
@@ -508,6 +539,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 		MasterSettings.KeyExport = st.Bools[1]
 		MasterSettings.CoinControl = st.Bools[2]
+		MasterSettings.ImportExport = st.Bools[3]
 
 		err = SaveSettings()
 		if err != nil {
@@ -516,6 +548,13 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp("Settings updated"))
+	case "get-seed":
+		seed, err := MasterWallet.ExportSeed()
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		w.Write(jsonResp(seed))
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

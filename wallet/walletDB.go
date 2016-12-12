@@ -355,6 +355,10 @@ func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTra
 	return dt, nil
 }
 
+func (w *WalletDB) ExportSeed() (string, error) {
+	return w.Wallet.GetSeed()
+}
+
 // This function grabs all transactions related to any address in the address book
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.

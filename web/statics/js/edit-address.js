@@ -8,6 +8,22 @@ $(window).load(function() {
 function GetDefaultData(){
 	Name = $("#address-name").val()
 	Address = $("#address-field").val()
+
+	jsonOBJ = '{"Address":"' + Address + '"}'
+	postRequest("get-address", jsonOBJ, function(resp){
+		console.log(resp)
+		obj = JSON.parse(resp)
+		console.log(obj)
+		if (obj.Error != "none") {
+			$("#balance-container").text("Can not find the addresses in address book")
+		} else {
+			if(obj.Content.Address.startsWith("FA")) {
+				$("#balance").text((obj.Content.Balance).toFixed(8))
+			} else {
+				$("#balance").text(obj.Content.Balance)
+			}
+		}
+	})
 	console.log(Name, Address)
 }
 

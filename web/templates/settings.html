@@ -16,8 +16,8 @@
                 <input type="checkbox" id="coin-control" name="coin-control" value="true" {{if .Settings.CoinControl}} checked{{end}}>
                 <label for="coin-control">Enable coin-control (specific or multiple input addresses for new transaction)</label>
                 <br>
-                <input type="checkbox" id="import-export" name="import-export" value="true" disabled>
-                <label class="disabled-input" for="import-export">Enable ability to import/export transactions</label>
+                <input type="checkbox" id="import-export" name="import-export" value="true" {{if .Settings.ImportExport}} checked{{end}}>
+                <label for="import-export">Enable ability to import/export transactions</label>
                 <br>
                 <input type="checkbox" id="export-keys" name="export-keys" value="true" {{if .Settings.KeyExport}} checked{{end}}>
                 <label for="export-keys">Enable ability to export public keys</label>
@@ -36,7 +36,7 @@
     <hr>
     <div class="row">
         <div class="columns">
-            <a class="button" disabled>Export Seed to file</a>
+            <a id="export-seed" class="button">Export Seed to file</a>
         </div>
     </div>
     <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>

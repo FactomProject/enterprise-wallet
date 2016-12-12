@@ -25,12 +25,34 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 // This is used on every page
 type SettingsStruct struct {
 	// Marshaled
-	DarkTheme   bool
-	KeyExport   bool // Allow export of private key
-	CoinControl bool
+	DarkTheme    bool
+	KeyExport    bool // Allow export of private key
+	CoinControl  bool
+	ImportExport bool //Transaction import/export
 
 	// Not marshaled
 	Theme string // darkTheme or ""
+}
+
+func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
+	if a.DarkTheme != b.DarkTheme {
+		return false
+	}
+	if a.KeyExport != b.KeyExport {
+		return false
+	}
+	if a.CoinControl != b.CoinControl {
+		return false
+	}
+	if a.ImportExport != b.ImportExport {
+		return false
+	}
+
+	if a.Theme != b.Theme {
+		return false
+	}
+
+	return true
 }
 
 func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
@@ -48,6 +70,10 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	}
 	b = strconv.AppendBool(b, s.CoinControl)
 	if s.CoinControl {
+		b = append(b, 0x00)
+	}
+	b = strconv.AppendBool(b, s.ImportExport)
+	if s.ImportExport {
 		b = append(b, 0x00)
 	}
 
@@ -99,6 +125,13 @@ func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err e
 		return data, err
 	}
 	newData = newData[5:]
+
+	s.ImportExport, err = unmarshalBool(newData[:5])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[5:]
+
 	return
 }
 

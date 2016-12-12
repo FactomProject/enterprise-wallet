@@ -134,7 +134,7 @@ func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []stri
 }
 
 // If inputs already given, outputs given, and amounts
-func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string, toAmounts []string, fromAddresses []string, fromAmounts []string, feeAddress string) (string, *ReturnTransStruct, error) {
+func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string, toAmounts []string, fromAddresses []string, fromAmounts []string, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
 	} else if len(fromAddresses) != len(fromAmounts) {
@@ -167,11 +167,11 @@ func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string,
 		}
 	}
 
-	return wal.ConstructTransactionFromValues(toAddresses, toAmts, fromAddresses, fromAmts, feeAddress)
+	return wal.ConstructTransactionFromValues(toAddresses, toAmts, fromAddresses, fromAmts, feeAddress, sign)
 }
 
 // Constructs a transaction from given input and output values. An error might contain the amount of input needed aswell if it is incorrect
-func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmounts []uint64, fromAddresses []string, fromAmounts []uint64, feeAddress string) (string, *ReturnTransStruct, error) {
+func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmounts []uint64, fromAddresses []string, fromAmounts []uint64, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		fmt.Println("FEFEF")
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
@@ -252,9 +252,11 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 		return trans, nil, fmt.Errorf("The amount of input is not enough to cover the transaction. The needed input is: %f FCT.\n", total/1e8)
 	}
 
-	err = wal.Wallet.SignTransaction(trans)
-	if err != nil {
-		return trans, nil, err
+	if sign {
+		err = wal.Wallet.SignTransaction(trans)
+		if err != nil {
+			return trans, nil, err
+		}
 	}
 
 	r := new(ReturnTransStruct)
@@ -291,8 +293,12 @@ func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, a
 }
 
 func (wal *WalletDB) ExportTransaction(name string) (string, error) {
-	trans := wal.Wallet.GetTransactions()[name]
-	return trans.JSONString()
+	req, err := wal.Wallet.ComposeTransaction(name)
+	if err != nil {
+		return "", err
+	}
+
+	return req.String(), nil
 }
 
 func (wal *WalletDB) DeleteTransaction(trans string) error {
