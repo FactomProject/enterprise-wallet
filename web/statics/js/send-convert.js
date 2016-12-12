@@ -537,6 +537,7 @@ function enableInput() {
   keepFeeDisabled()
 }
 
+// We need to keep these disabled.
 function keepFeeDisabled() {
   $("#fee-factoid-address").prop("disabled", true)
   $("#fee-factoid-address").addClass("disabled-input")

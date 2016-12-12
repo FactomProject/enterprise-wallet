@@ -13,8 +13,15 @@ var _ = fmt.Sprint("")
 var TestWallet *WalletDB
 
 func TestSendFactoids(t *testing.T) {
-	LoadTestWallet(8075)
+	if !(LoadTestWalletMethod == 3 || LoadTestWalletMethod == -1 || LoadTestWalletMethod == -2) {
+		return
+	}
+	//fmt.Println(3)
 	var err error
+	err = LoadTestWallet(8089)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
 	anp, list := TestWallet.GetGUIAddress("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q")
@@ -46,7 +53,7 @@ func TestSendFactoids(t *testing.T) {
 	*/
 
 	//20000e8
-	trans, _, err := TestWallet.ConstructSendFactoids(recs, amts)
+	trans, _, err := TestWallet.ConstructTransaction(recs, amts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +107,7 @@ func TestConvertToEC(t *testing.T) {
 	*/
 
 	//20000e8
-	trans, _, err := TestWallet.ConstructConvertToEC(recs, amts)
+	trans, _, err := TestWallet.ConstructTransaction(recs, amts)
 	if err != nil {
 		t.Fatal(err)
 	}

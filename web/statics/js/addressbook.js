@@ -1,5 +1,3 @@
-
-
 $(window).load(function() {
     LoadAddresses()
 });
@@ -31,7 +29,7 @@ function addressTableRow(address, type) {
 	console.log(address)
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
-		address.Balance = address.Balance.toFixed(4)
+		address.Balance = Number(address.Balance.toFixed(4))
 	} else {
 		token = " EC"
 	}
@@ -42,7 +40,8 @@ function addressTableRow(address, type) {
 	}
 
 	shortAddr = address.Address
-	shortAddr = shortAddr.substring(0, 52)
+	// Potential to shorten address
+	//shortAddr = shortAddr.substring(0, 52)
 
 	return		'<tr>' +
 				'<td><a href="receive-factoids?address=' + address.Address + '&name=' + address.Name + '"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
@@ -51,9 +50,3 @@ function addressTableRow(address, type) {
 				'<td>' + address.Balance + token + '</td>' +
 				'</tr>'
 }
-//<tr>
-//  <td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>
-//  <td>factoid1 <a href="edit-address-factoid"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>
-//  <td>FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1</td>
-//	<td>240.82 FCT</td>
-//</tr>

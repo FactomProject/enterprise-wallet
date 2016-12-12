@@ -107,11 +107,7 @@ func (anp *AddressNamePair) UnmarshalBinaryData(data []byte) (newData []byte, er
 
 	anp.Address = base58.Encode(newData[:38])
 
-	if len(newData) > 38 {
-		newData = newData[38:]
-	} else {
-		newData = nil
-	}
+	newData = newData[38:]
 
 	booldata := newData[:5]
 	if booldata[4] == 0x00 {

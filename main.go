@@ -10,9 +10,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/FactomProject/M2GUIWallet/wallet"
 	"github.com/FactomProject/factomd/util"
@@ -21,28 +18,21 @@ import (
 var MasterWallet *wallet.WalletDB
 
 func close() {
-	fmt.Println("Shutting down")
+	fmt.Println("Shutting down gracefully...")
 	if MasterWallet == nil {
 		return
 	}
+
 	err := MasterWallet.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Complete shut down.")
 }
 
-func main() {
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		close()
-		os.Exit(1)
-	}()
-	InitiateWalletAndWeb()
-}
-
-func InitiateWalletAndWeb() {
+// Initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
+// and will be created if they are not found.
+func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
 
 	filename := util.ConfigFilename() //file name and path to factomd.conf file
@@ -52,10 +42,35 @@ func InitiateWalletAndWeb() {
 	walletPort := cfg.Wallet.Port
 	factomdPort := cfg.App.PortNumber
 
+	var (
+		walletDB, guiDB, txDB int
+	)
+
 	// DB Types
-	walletDB := wallet.MAP // WalletDB is DB used by wallet wsapi
-	guiDB := wallet.MAP    // Holds names associated with addresses for gui
-	txDB := wallet.MAP     // Holds transactions cache
+	switch guiDBStr { // Holds names associated with addresses for gui. Also holds settings
+	case "Map":
+		guiDB = wallet.MAP
+	case "Bolt":
+		guiDB = wallet.BOLT
+	case "LDB":
+		guiDB = wallet.LDB
+	}
+	switch walDBStr { // WalletDB is DB used by wallet wsapi
+	case "Map":
+		walletDB = wallet.MAP
+	case "Bolt":
+		walletDB = wallet.BOLT
+	case "LDB":
+		walletDB = wallet.LDB
+	}
+	switch txDBStr { // Holds transactions cache
+	case "Map":
+		txDB = wallet.MAP
+	case "Bolt":
+		txDB = wallet.BOLT
+	case "LDB":
+		txDB = wallet.LDB
+	}
 
 	fmt.Printf("Starting wallet waspi on localhost:%d\n", walletPort)
 	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", IntToStringDBType(walletDB), IntToStringDBType(guiDB), IntToStringDBType(txDB))
@@ -82,11 +97,11 @@ func InitiateWalletAndWeb() {
 	}
 
 	// For Testing adds random addresses
-	addRandomAddresses()
-	//MasterWallet.AddBalancesToAddresses()
+	if ADD_RANDOM_ADDRESSES {
+		addRandomAddresses()
+	}
 	//
 
-	port := 8091
 	fmt.Printf("Starting wallet on localhost:%d\n", port)
 	ServeWallet(port)
 }

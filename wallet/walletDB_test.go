@@ -16,6 +16,10 @@ import (
 	//"github.com/FactomProject/factom/wallet"
 )
 
+// LoadTestWallet is werid to use. Should only turn on 1 at a time. Current 0-3 taken
+// -1 turns all on. -2 Turns on all that don't need to wipe the TestWallet
+var LoadTestWalletMethod int = -2
+
 var longtest = false
 var _ = fmt.Sprintf("")
 
@@ -24,9 +28,13 @@ func TestGetRelatedTransaction(t *testing.T) {
 	if !longtest {
 		return
 	}
-	err := LoadTestWallet(8074)
+	if !(LoadTestWalletMethod == 0 || LoadTestWalletMethod == -1) {
+		return
+	}
+	//fmt.Println(0)
+	err := LoadTestWallet(8089)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err.Error())
 	}
 
 	anp, list := TestWallet.GetGUIAddress("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q")
@@ -76,7 +84,7 @@ func TestGetRelatedTransaction(t *testing.T) {
 
 	// Ok we have some transactions around
 	TestWallet = nil // Need fresh
-	LoadTestWallet(8078)
+	LoadTestWallet(8071)
 
 	TestWallet.UpdateGUIDB()
 	transactions, err := TestWallet.GetRelatedTransactions()
@@ -160,7 +168,7 @@ func findTrans(transactions []DisplayTransaction, txid string) int {
 func sendTrans(address string, amt uint64) (string, error) {
 	toAddresses := []string{address}
 	amounts := []uint64{amt * 1e8}
-	name, _, err := TestWallet.ConstructSendFactoids(toAddresses, amounts)
+	name, _, err := TestWallet.ConstructTransaction(toAddresses, amounts)
 	if err != nil {
 		return "", err
 	}
@@ -174,9 +182,16 @@ func sendTrans(address string, amt uint64) (string, error) {
 }
 
 func TestGUIUpdate(t *testing.T) {
+	if !(LoadTestWalletMethod == 1 || LoadTestWalletMethod == -1) {
+		return
+	}
+	//fmt.Println(1)
 	var err error
 	TestWallet = nil // Need fresh
-	LoadTestWallet(8079)
+	err = LoadTestWallet(8070)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
 
 	var faList []*factom.FactoidAddress
 	var ecList []*factom.ECAddress
@@ -248,9 +263,13 @@ func TestGUIUpdate(t *testing.T) {
 }
 
 func TestDBInteraction(t *testing.T) {
+	if !(LoadTestWalletMethod == 2 || LoadTestWalletMethod == -1 || LoadTestWalletMethod == -1) {
+		return
+	}
+	//fmt.Println(2)
 	err := LoadTestWallet(8089)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err.Error())
 	}
 
 	wal := TestWallet
@@ -388,7 +407,7 @@ func DBAddingExternalAddress(wal *WalletDB) error {
 		return err
 	}
 
-	anp, err := wal.AddAddress("RandomSecret", add.SecString())
+	anp, err := wal.AddExternalAddress("RandomPublic", add.String())
 	if err != nil {
 		return err
 	}
@@ -397,7 +416,7 @@ func DBAddingExternalAddress(wal *WalletDB) error {
 		return fmt.Errorf("Address added does not match")
 	}
 
-	if strings.Compare("RandomSecret", anp.Name) != 0 {
+	if strings.Compare("RandomPublic", anp.Name) != 0 {
 		return fmt.Errorf("Name added does not match")
 	}
 
