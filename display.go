@@ -382,6 +382,27 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write(jsonResp(anp))
 		}
+	case "import-koinify":
+		type NewKoinifyStruct struct {
+			Name    string `json:"Name"`
+			Koinify string `json:"Koinify"`
+		}
+
+		nas := new(NewKoinifyStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), nas)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, err := MasterWallet.ImportKoinify(nas.Name, nas.Koinify)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
 	case "new-external-address":
 		type NewAddressStruct struct {
 			Name   string `json:"Name"`

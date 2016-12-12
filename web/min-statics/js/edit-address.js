@@ -1,9 +1,24 @@
-var $jscomp={scope:{},checkStringArgs:function(a,c,b){if(null==a)throw new TypeError("The 'this' value for String.prototype."+b+" must not be null or undefined");if(c instanceof RegExp)throw new TypeError("First argument to String.prototype."+b+" must not be a regular expression");return a+""}};
-$jscomp.defineProperty="function"==typeof Object.defineProperties?Object.defineProperty:function(a,c,b){if(b.get||b.set)throw new TypeError("ES3 does not support getters and setters.");a!=Array.prototype&&a!=Object.prototype&&(a[c]=b.value)};$jscomp.getGlobal=function(a){return"undefined"!=typeof window&&window===a?a:"undefined"!=typeof global&&null!=global?global:a};$jscomp.global=$jscomp.getGlobal(this);
-$jscomp.polyfill=function(a,c,b,d){if(c){b=$jscomp.global;a=a.split(".");for(d=0;d<a.length-1;d++){var e=a[d];e in b||(b[e]={});b=b[e]}a=a[a.length-1];d=b[a];c=c(d);c!=d&&null!=c&&$jscomp.defineProperty(b,a,{configurable:!0,writable:!0,value:c})}};
-$jscomp.polyfill("String.prototype.startsWith",function(a){return a?a:function(a,b){var d=$jscomp.checkStringArgs(this,a,"startsWith");a+="";for(var c=d.length,g=a.length,h=Math.max(0,Math.min(b|0,d.length)),f=0;f<g&&h<c;)if(d[h++]!=a[f++])return!1;return f>=g}},"es6-impl","es3");var Name="",Address="";$(window).load(function(){GetDefaultData()});
-function GetDefaultData(){Name=$("#address-name").val();Address=$("#address-field").val();jsonOBJ='{"Address":"'+Address+'"}';postRequest("get-address",jsonOBJ,function(a){console.log(a);obj=JSON.parse(a);console.log(obj);"none"!=obj.Error?$("#balance-container").text("Can not find the addresses in address book"):obj.Content.Address.startsWith("FA")?$("#balance").text(obj.Content.Balance.toFixed(8)):$("#balance").text(obj.Content.Balance)});console.log(Name,Address)}
-$("#display-private-key").click(function(){jsonOBJ='{"Address":"'+Address+'"}';postRequest("display-private-key",jsonOBJ,function(a){console.log(a);obj=JSON.parse(a);"none"!=obj.Error?($("#private-key-field").val(obj.Error),SetGeneralError("Error: "+obj.Error)):$("#private-key-field").val(obj.Content)})});
-$("#save-name-change").click(function(){NewName=$("#address-name").val();jsonOBJ='{"Address":"'+Address+'", "Name":"'+NewName+'"}';NewName!=Name?postRequest("address-name-change",jsonOBJ,function(a){obj=JSON.parse(a);"none"!=obj.Error?SetGeneralError("Error: "+obj.Error):SetGeneralSuccess(obj.Content+": The name has been changed")}):SetGeneralError("Newname is the same as the original")});
-$("#delete-address").on("click",function(){name=$("#address-name").val();jsonOBJ='{"Address":"'+Address+'", "Name":"'+name+'"}';postRequest("delete-address",jsonOBJ,function(a){obj=JSON.parse(a);"none"!=obj.Error?SetGeneralError("Error: "+obj.Error):SetGeneralSuccess(obj.Content+": The name has been changed")})});
-$("#copy-to-clipboard").on("click",function(){var a=document.createElement("input");a.setAttribute("value",$("#private-key-field").val());document.body.appendChild(a);a.select();document.execCommand("copy");document.body.removeChild(a)});
+var Name=""
+var Address=""
+$(window).load(function(){GetDefaultData()});function GetDefaultData(){Name=$("#address-name").val()
+Address=$("#address-field").val()
+jsonOBJ='{"Address":"'+Address+'"}'
+postRequest("get-address",jsonOBJ,function(resp){console.log(resp)
+obj=JSON.parse(resp)
+console.log(obj)
+if(obj.Error!="none"){$("#balance-container").text("Can not find the addresses in address book")}else{if(obj.Content.Address.startsWith("FA")){$("#balance").text((obj.Content.Balance).toFixed(8))}else{$("#balance").text(obj.Content.Balance)}}})
+console.log(Name,Address)}
+$("#display-private-key").click(function(){jsonOBJ='{"Address":"'+Address+'"}'
+postRequest("display-private-key",jsonOBJ,function(resp){console.log(resp)
+obj=JSON.parse(resp)
+if(obj.Error!="none"){$("#private-key-field").val(obj.Error)
+SetGeneralError("Error: "+obj.Error)}else{$("#private-key-field").val(obj.Content)}})})
+$("#save-name-change").click(function(){NewName=$("#address-name").val()
+jsonOBJ='{"Address":"'+Address+'", "Name":"'+NewName+'"}'
+if(NewName!=Name){postRequest("address-name-change",jsonOBJ,function(resp){obj=JSON.parse(resp)
+if(obj.Error!="none"){SetGeneralError("Error: "+obj.Error)}else{SetGeneralSuccess(obj.Content+": The name has been changed")}})}else{SetGeneralError("Newname is the same as the original")}})
+$("#delete-address").on('click',function(){name=$("#address-name").val()
+jsonOBJ='{"Address":"'+Address+'", "Name":"'+name+'"}'
+postRequest("delete-address",jsonOBJ,function(resp){obj=JSON.parse(resp)
+if(obj.Error!="none"){SetGeneralError("Error: "+obj.Error)}else{SetGeneralSuccess(obj.Content+": The name has been changed")}})})
+$("#copy-to-clipboard").on('click',function(){var aux=document.createElement("input");aux.setAttribute("value",$('#private-key-field').val());document.body.appendChild(aux);aux.select();document.execCommand("copy");document.body.removeChild(aux);})

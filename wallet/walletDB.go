@@ -266,7 +266,7 @@ func prtOff() {
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.
 func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error) {
-	if PROCESSING_RELATED_TRANSACTIONS {
+	if PROCESSING_RELATED_TRANSACTIONS { // Already working on it
 		return
 	}
 
@@ -330,7 +330,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	var newTransactions []DisplayTransaction
 	// Sort throught new transactions for any related
 	for i, trans := range transactions {
-		if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
+		if totalTransactions > STEPS_TO_PRINT && i%STEPS_TO_PRINT == 0 {
 			fmt.Printf("Step 1/3 for Transactions %d / %d\n", i, totalTransactions)
 		}
 		added := false
@@ -378,7 +378,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		}
 	}
 
-	if totalTransactions > 10000 || printSteps {
+	if totalTransactions > STEPS_TO_PRINT || printSteps {
 		printSteps = true
 		fmt.Printf("Step 1/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
@@ -406,8 +406,9 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 				if len(trans) > 0 {
 					totalTransactions += len(trans)
 					// This takes some real time for huge amounts
-					for i, t := range trans {
-						if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
+					for _, t := range trans {
+						currentCheckpoint++
+						if totalTransactions > STEPS_TO_PRINT && currentCheckpoint%STEPS_TO_PRINT == 0 {
 							fmt.Printf("Step 2/3 for Transactions %d / %d\n", i+currentCheckpoint, totalTransactions)
 						}
 						dt, _ := w.NewDisplayTransaction(t)
@@ -428,7 +429,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
 	for i, t := range moreTransactions {
-		if totalTransactions > 10000 && i%STEPS_TO_PRINT == 0 {
+		if totalTransactions > STEPS_TO_PRINT && i%STEPS_TO_PRINT == 0 {
 			fmt.Printf("Step 3/3 for Transactions %d / %d\n", i, totalTransactions)
 		}
 		if _, ok := w.transMap[t.TxID]; ok {
@@ -453,9 +454,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 			w.cachedTransactions = append(w.cachedTransactions[:i], append([]DisplayTransaction{t}, w.cachedTransactions[i:]...)...)
 		}
 	}
-	if totalTransactions > 10000 || printSteps {
+	if totalTransactions > STEPS_TO_PRINT || printSteps {
 		printSteps = true
 		fmt.Printf("Step 3/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
+		fmt.Printf("Finishing up sync....\n")
 	}
 	return w.cachedTransactions, nil
 }
@@ -735,6 +737,30 @@ func (w *WalletDB) AddExternalAddress(name string, public string) (*address.Addr
 	}
 
 	anp, err := w.addGUIAddress(name, public, 3)
+	if err != nil {
+		return nil, err
+	}
+
+	return anp, nil
+}
+
+func (w *WalletDB) ImportKoinify(name string, koinify string) (*address.AddressNamePair, error) {
+	add, err := factom.ImportKoinify(koinify)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Wallet.InsertFCTAddress(add)
+	if err != nil {
+		return nil, err
+	}
+
+	anp, err := w.addGUIAddress(name, add.String(), 1)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Save()
 	if err != nil {
 		return nil, err
 	}

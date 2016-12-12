@@ -5,7 +5,7 @@ $("#generate-source").on("change", function(){
 	} else {
 		$("#sec-pub").text("Private")
 	}
-	if(selected == "import-address" || selected == "new-external-address"){
+	if(selected == "import-address" || selected == "new-external-address" || selected == "import-koinify"){
 		$('#private-key-input').prop("disabled", false);
 
 		$('#private-key-input').removeClass("disabled-input");
@@ -40,6 +40,8 @@ $("#generate-source").on('change', function(){
 		$("#private-key-input").attr("placeholder","A new factoid address will be created")
 	} else if(selected == "new-external-address"){
 		$("#private-key-input").attr("placeholder","Type a public address to add to your contacts")
+	} else if(selected == "import-koinify"){
+		$("#private-key-input").attr("placeholder","Type in your Koinify phrase")
 	}
 })
 
@@ -129,6 +131,23 @@ $("#add-to-addressbook").on("click", function(){
 						SetError(obj.Error)
 					}
 				})
+			}
+		})
+	} else if(selected == "import-koinify") {
+		koinify = $("#private-key-input").val()
+
+		var newAddressObj = {
+	    	Name:Name,
+			Koinify:koinify
+		}
+
+		j = JSON.stringify(newAddressObj)
+		postRequest("import-koinify", j, function(resp){
+			obj = JSON.parse(resp)
+			if(obj.Error == "none"){
+				SetSuccess(obj)
+			} else {
+				SetError(obj.Error)
 			}
 		})
 	} else {
