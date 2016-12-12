@@ -1,0 +1,34 @@
+{{define "indexPage"}}
+
+{{$pageTitle := "Transactions"}}
+{{$mainClass := "transactions"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 1}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+
+<table>
+    <tbody id="transaction-list">
+        <div id="loading-container" class="loader-container">
+            <div class="loader-body" style="">
+                <h4 id="loading-message">Initial loading may take some time</h4>
+                <div id="loading" class="loader"></div>
+            </div>
+        </div>
+    </tbody>
+</table>
+<div id="error-zone" class="callout alert text-center" style="display:none">An error has occured</div>
+<div class="newCTA">
+    <a href="#" class="transaction"></a>
+    <ul>
+        <li><a href="send-factoids">Send Factoids</a></li>
+        <li><a href="receive-factoids">Receive Factoids</a></li>
+        <li><a href="create-entry-credits">Buy Entry Credits</a></li>
+        {{if .Settings.ImportExport}}
+        <li><a href="import-export-transaction">Import/Export Transaction</a></li>
+        {{end}}
+    </ul>
+</div>
+{{template "templateBottom" "index"}}
+{{end}}

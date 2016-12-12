@@ -42,7 +42,7 @@ func ServeWallet(port int) {
 
 	// Mux for static files
 	mux = http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir("./web/statics")))
+	mux.Handle("/", http.FileServer(http.Dir(FILES_PATH+"statics")))
 
 	http.HandleFunc("/", static(pageHandler))
 	http.HandleFunc("/GET", HandleGETRequests)

@@ -1,0 +1,60 @@
+{{define "edit-address-factoid"}}
+
+{{$pageTitle := "Edit Factoid Address"}}
+{{$mainClass := "send-factoids"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 2}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+{{template "templateTop" $info}}
+
+<div class="row">
+    <div class="columns">
+        <a href="/AddressBook" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+        <h1>Edit Factoid Address</h1>
+        <form>
+            <div class="row">
+                <div class="medium-8 columns">
+                    <label>Public key:</label>
+                </div>
+                <div class="medium-4 columns">
+                    <label>Nickname:</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="medium-8 columns">
+                    <pre><input id="address-field" type="text" disabled="true" name="public-key" value="{{.Address}}" class="percent95"></pre>
+                </div>
+                <div class="medium-4 columns">
+                    <input id="address-name" type="text" name="alias" value="{{.Name}}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="medium-8 hide-for-small-only columns">
+                <label>Balance: <span id="balance">0.00</span> FCT</label>
+                </div>
+                <div class="medium-4 small-12 columns">
+                    <a id="save-name-change" class="button expanded">Save Changes</a>
+                </div>
+            </div>
+            <hr>
+            <div class="row collapse">
+                <div class="large-4 medium-6 small-12 columns">
+                    <a id="display-private-key" class="button expanded">Display Private Key</a>
+                </div>
+                <div class="large-8 medium-6 small-12 columns">
+                    <pre><input id="private-key-field" type="text" name="private-key" readonly="true" value="" class="percent95"></pre>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="columns text-right">
+                <a id="copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
+            </div>
+        </div>
+        <div id="error-zone" class="callout alert text-center" style="display:none">An error has occured</div>
+        <div id="success-zone" class="callout success text-center" style="display:none">
+    </div>
+</div>
+
+{{template "templateBottom" "edit-address"}}
+{{end}}

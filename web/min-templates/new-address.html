@@ -1,0 +1,58 @@
+{{define "new-address"}}
+
+{{$pageTitle := "New Address"}}
+{{$mainClass := "send-factoids"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 2}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+{{template "templateTop" $info}}
+
+<div class="row">
+    <div class="columns">
+        <a href="/AddressBook" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+        <h1>New Address</h1>
+        <form>
+            <div class="row">
+                <div class="small-12 medium-8 large-6 columns">
+                    <label>Generate address from:</label>
+                    <select id="generate-source" name="generate-source">
+                        <option value="random-factoid">Random new factoid address</option>
+                        <option value="random-ec">Random new entry credit address</option>
+                        <option value="import-address">Import from private key</option>
+                        <option value="new-external-address">New contact in contact list</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 medium-7 large-8 columns">
+                    <label><span id="sec-pub">Private</span> key:</label>
+                    <div class="input-group" id="private-key-input-container">
+                      <pre><input id="private-key-input" type="text" name="private-key" class="input-group-field percent95 disabled-input" placeholder="Type factoid address" disabled></pre>
+                    </div>
+                    <!-- <input id="private-key-input" type="text" name="private-key" class="disabled-input percent95" placeholder="Type factoid address" disabled> -->
+                </div>
+                <div class="small-12 medium-5 large-4 columns">
+                    <label>Nickname:</label>
+                    <input id="nickname-input" type="text" name="alias" placeholder="Alias of address" class="input-group-error">
+                </div>
+            </div>
+            <div class="row">
+                <div class="medium-8 hide-for-small-only columns">
+
+                </div>
+                <div class="medium-4 small-12 columns">
+                    <a id="add-to-addressbook" class="button expanded">Add to Address Book</a>
+                </div>
+            </div>
+            <div id="error-zone" class="callout alert text-center" style="display:none">An error has occured</div>
+            <div id="success-zone" class="callout success text-center" style="display:none">
+                <div> A New address was created with the following details: <a id="success-link"><small>Open address in new tab</small></a></div>
+                Name: <span id="name"> Name</span>
+                <pre> Address</pre>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{template "templateBottom" "new-address"}}
+{{end}}

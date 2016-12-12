@@ -18,6 +18,8 @@ func main() {
 		walDB = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
 		txDB  = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
 		port  = flag.Int("port", 8091, "The port for the GUIWallet")
+
+		min = flag.Bool("min", false, "Temporary flag, for testing")
 	)
 	flag.Parse()
 	c := make(chan os.Signal, 2)
@@ -30,6 +32,10 @@ func main() {
 
 	if *walDB == "Map" {
 		ADD_RANDOM_ADDRESSES = true
+	}
+
+	if *min {
+		FILES_PATH += "min-"
 	}
 
 	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port)

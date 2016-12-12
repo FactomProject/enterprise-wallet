@@ -1,0 +1,66 @@
+{{define "addressBook"}}
+
+{{$pageTitle := "Address Book"}}
+{{$mainClass := "address-book"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 2}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+
+<ul class="tabs" data-tabs id="transaction-tabs" data-options="deep_linking:true">
+    <li class="tabs-title is-active"><a href="#factoid-addresses" aria-selected="true">Factoid Addresses</a></li>
+    <li class="tabs-title"><a href="#credit-addresses">Entry Credit Addresses</a></li>
+    <li class="tabs-title"><a href="#external-addresses">Contact List</a></li>
+</ul>
+<div class="tabs-content" data-tabs-content="transaction-tabs">
+    <div class="tabs-panel is-active" id="factoid-addresses">
+        <table id="factoid-addresses-table">
+            <tbody>
+                <!-- <tr>
+                    <td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>
+                    <td>factoid1 <a href="edit-address-factoid"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>
+                    <td>FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1 <span class="fa fa-star" aria-hidden="true"></span></td>
+                    <td>240.82 FCT</td>
+                </tr> -->
+            </tbody>
+        </table>
+        <small><span class="fa fa-star" aria-hidden="true"></span> = seed generated</small>
+        <div class="newCTA">
+            <a href="new-address" class="address"></a>
+        </div>
+    </div>
+    <div class="tabs-panel" id="credit-addresses">
+        <table id="credit-addresses-table">
+            <tbody>
+                <!-- <tr>
+                    <td>&nbsp;</td>
+                    <td>entrycredit1 <a href="edit-address-entry-credits"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>
+                    <td>EC3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1</td>
+                    <td>500 EC</td>
+                </tr> -->
+            </tbody>
+        </table>
+        <div class="newCTA">
+            <a href="new-address" class="address"></a>
+        </div>
+    </div>
+    <div class="tabs-panel" id="external-addresses">
+        <table id="external-addresses-table">
+            <tbody>
+                <!-- <tr>
+                    <td><a href="receive-factoids"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>
+                    <td>poloniex <a href="edit-address-external"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>
+                    <td>FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1</td>
+                    <td>800.0 FCT</td>
+                </tr> -->
+            </tbody>
+        </table>
+        <div class="newCTA">
+            <a href="new-address" class="address"></a>
+        </div>
+    </div>
+</div>
+
+{{template "templateBottom" "addressbook"}}
+{{end}}
