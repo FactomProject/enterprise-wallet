@@ -64,16 +64,16 @@ func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []
 		if len(outs) != len(amounts) {
 			return name, fmt.Errorf("A change in the amount of outputs has been detected")
 		}
+		amts, err := StringAmountsToUin64Amounts(toAddresses, amounts)
+		if err != nil {
+			return "", err
+		}
 		for i, o := range outs {
-			amt, err := strconv.Atoi(amounts[i])
-			if err != nil {
-				return name, fmt.Errorf("Amount was not able to be converted into a number")
-			}
+			amt := amts[i]
 
 			compAddr := ""
 			if toAddresses[i][:2] == "FA" {
 				compAddr = primitives.ConvertFctAddressToUserStr(o.GetAddress())
-				amt = amt * 1e8
 				if o.GetAmount() != uint64(amt) {
 					return name, fmt.Errorf("A change in the amount of an output has been detected")
 				}
@@ -97,18 +97,37 @@ type ReturnTransStruct struct {
 	Fee   uint64 `json:"Fee"`
 }
 
+// Assumed to be a float for a factoid and a uint64 for an entry credit
+// Will multiply by 1e8 for factoids so "1" is 1 factoid. Not 1 factoshi
+func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64, error) {
+	var amts []uint64
+	if len(addresses) != len(amounts) {
+		return nil, fmt.Errorf("Length of addresses and amounts do not match")
+	}
+	for i, a := range amounts {
+		if addresses[i][:2] == "FA" {
+			amt64, err := strconv.ParseFloat(a, 64)
+			if err != nil {
+				return nil, err
+			}
+			amts = append(amts, uint64(amt64*1e8))
+		} else {
+			amt64, err := strconv.ParseUint(a, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			amts = append(amts, uint64(amt64))
+		}
+	}
+
+	return amts, nil
+}
+
 func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []string) (uint64, error) {
 	var toAmts []uint64
-	for i, a := range toAmounts {
-		amt64, err := strconv.ParseFloat(a, 64)
-		if err != nil {
-			return 0, err
-		}
-		if toAddresses[i][:2] == "FA" {
-			toAmts = append(toAmts, uint64(amt64*1e8))
-		} else {
-			toAmts = append(toAmts, uint64(amt64))
-		}
+	toAmts, err := StringAmountsToUin64Amounts(toAddresses, toAmounts)
+	if err != nil {
+		return 0, err
 	}
 
 	rate, err := factom.GetRate()
@@ -134,37 +153,25 @@ func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []stri
 }
 
 // If inputs already given, outputs given, and amounts
+// Amounts are pased into a float or uint64 depending on factoid/ec
 func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string, toAmounts []string, fromAddresses []string, fromAmounts []string, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
 	} else if len(fromAddresses) != len(fromAmounts) {
 		return "", nil, fmt.Errorf("Lengths of input addresses to amounts does not match")
 	}
+	var err error
 
 	var toAmts []uint64
-	for i, a := range toAmounts {
-		amt64, err := strconv.ParseFloat(a, 64)
-		if err != nil {
-			return "", nil, err
-		}
-		if toAddresses[i][:2] == "FA" {
-			toAmts = append(toAmts, uint64(amt64*1e8))
-		} else {
-			toAmts = append(toAmts, uint64(amt64))
-		}
+	toAmts, err = StringAmountsToUin64Amounts(toAddresses, toAmounts)
+	if err != nil {
+		return "", nil, err
 	}
 
 	var fromAmts []uint64
-	for i, a := range fromAmounts {
-		amt64, err := strconv.ParseFloat(a, 64)
-		if err != nil {
-			return "", nil, err
-		}
-		if fromAddresses[i][:2] == "FA" {
-			fromAmts = append(fromAmts, uint64(amt64*1e8))
-		} else {
-			fromAmts = append(fromAmts, uint64(amt64))
-		}
+	fromAmts, err = StringAmountsToUin64Amounts(fromAddresses, fromAmounts)
+	if err != nil {
+		return "", nil, err
 	}
 
 	return wal.ConstructTransactionFromValues(toAddresses, toAmts, fromAddresses, fromAmts, feeAddress, sign)
@@ -173,7 +180,6 @@ func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string,
 // Constructs a transaction from given input and output values. An error might contain the amount of input needed aswell if it is incorrect
 func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmounts []uint64, fromAddresses []string, fromAmounts []uint64, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
-		fmt.Println("FEFEF")
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
 	} else if len(fromAddresses) != len(fromAmounts) {
 		return "", nil, fmt.Errorf("Lengths of input addresses to amounts does not match")
@@ -268,12 +274,9 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 
 func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts []string) (string, *ReturnTransStruct, error) {
 	var amts []uint64
-	for _, a := range amounts {
-		amt64, err := strconv.ParseFloat(a, 64)
-		if err != nil {
-			return "", nil, err
-		}
-		amts = append(amts, uint64(amt64*1e8))
+	amts, err := StringAmountsToUin64Amounts(toAddresses, amounts)
+	if err != nil {
+		return "", nil, err
 	}
 
 	return wal.ConstructTransaction(toAddresses, amts)
@@ -281,13 +284,17 @@ func (wal *WalletDB) ConstructSendFactoidsStrings(toAddresses []string, amounts 
 
 func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, amounts []string) (string, *ReturnTransStruct, error) {
 	var amts []uint64
-	for _, a := range amounts {
+	amts, err := StringAmountsToUin64Amounts(toAddresses, amounts)
+	if err != nil {
+		return "", nil, err
+	}
+	/*for _, a := range amounts {
 		amt64, err := strconv.ParseUint(a, 10, 64)
 		if err != nil {
 			return "", nil, err
 		}
 		amts = append(amts, amt64)
-	}
+	}*/
 
 	return wal.ConstructTransaction(toAddresses, amts)
 }
