@@ -184,7 +184,6 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 
 		w.Write(data)
 	case "balances":
-		//MasterWallet.AddBalancesToAddresses()
 		bals := struct {
 			EC int64
 			FC int64

@@ -378,7 +378,6 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 					w.ExternalAddresses.List[i].Balance = -1
 				} else {
 					w.ExternalAddresses.List[i].Balance = float64(bal) / 1e8
-					//w.FactoidTotal += bal
 				}
 			} else if a.Address[:2] == "EC" {
 				bal, err := factom.GetECBalance(a.Address)
@@ -386,7 +385,6 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 					w.ExternalAddresses.List[i].Balance = -1
 				} else {
 					w.ExternalAddresses.List[i].Balance = float64(bal)
-					//w.ECTotal += bal
 				}
 			}
 		}

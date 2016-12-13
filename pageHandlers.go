@@ -249,7 +249,11 @@ func HandleImportExportTransaction(w http.ResponseWriter, r *http.Request) error
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
 
-	templates.ExecuteTemplate(w, "import-export-transaction", NewPlaceHolderStruct())
+	if MasterSettings.ImportExport {
+		templates.ExecuteTemplate(w, "import-export-transaction", NewPlaceHolderStruct())
+	} else {
+		templates.ExecuteTemplate(w, "notFoundError", NewPlaceHolderStruct())
+	}
 	return nil
 }
 

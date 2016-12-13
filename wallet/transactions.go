@@ -123,6 +123,8 @@ func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64
 	return amts, nil
 }
 
+// Calculates how many factoids are needed to cover the outputs. Takes into consideration
+// the EC rate if EC is output
 func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []string) (uint64, error) {
 	var toAmts []uint64
 	toAmts, err := StringAmountsToUin64Amounts(toAddresses, toAmounts)
@@ -288,13 +290,6 @@ func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, a
 	if err != nil {
 		return "", nil, err
 	}
-	/*for _, a := range amounts {
-		amt64, err := strconv.ParseUint(a, 10, 64)
-		if err != nil {
-			return "", nil, err
-		}
-		amts = append(amts, amt64)
-	}*/
 
 	return wal.ConstructTransaction(toAddresses, amts)
 }
@@ -320,7 +315,7 @@ func (wal *WalletDB) DeleteTransaction(trans string) error {
 //		toAddresses = list of output addresses
 //		amounts = list of amounts to each output, indicies must match
 // Returns:
-//		Transaction Name, error
+//		Transaction Name, Transaction Info, error
 
 func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(amounts) {
@@ -329,10 +324,10 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 		return "", nil, fmt.Errorf("No recepient given")
 	}
 
-	// Add outputs, find total being sent
 	trans := hashStringList(toAddresses)
 	trans = trans[:32] // Name of transaction
 
+	// If the transaction exists, we will overwrite it
 	transMap := wal.Wallet.GetTransactions()
 	if t, _ := transMap[trans]; t != nil {
 		wal.DeleteTransaction(trans)
