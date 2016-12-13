@@ -271,7 +271,13 @@ function getTransactionObject(checkInput) {
   return transObject
 }
 
-$("#needed-input-button").on('click', GetNeededInput)
+$("#needed-input-button").on('click', function(evt){
+  if(!Input) {
+    evt.preventDefault()
+  } else {
+    GetNeededInput()
+  }
+})
 
 function GetNeededInput() {
   transObject = getTransactionObject(false)
@@ -505,6 +511,8 @@ function disableInput() {
     $(this).prop("disabled", true)
   })
 
+  $("#needed-input-button").addClass("disabled-input")
+  $("#needed-input-button").prop("disabled", true)
   $("#addressbook-button").addClass("disabled-input")
   $("#addressbook-button").prop("disabled", true)
   $("#make-entire-transaction").addClass("disabled-input")
@@ -526,6 +534,9 @@ function enableInput() {
 
   $("#transaction-fee").prop("disabled", true)
   $("#transaction-total").prop("disabled", true)
+
+  $("#needed-input-button").removeClass("disabled-input")
+  $("#needed-input-button").prop("disabled", false)
 
   $("#addressbook-button").removeClass("disabled-input")
   $("#addressbook-button").prop("disabled", false)
