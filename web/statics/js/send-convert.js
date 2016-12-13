@@ -133,6 +133,14 @@ $("#all-outputs").on('click', '#output-factoid-address-container', function(){
 	$(this).removeClass("input-group-error")
 })
 
+$("#all-inputs").on('click', '#input-factoid-amount', function(){
+  $(this).removeClass("input-group-error")
+})
+
+$("#all-outputs").on('click', '#output-factoid-amount', function(){
+  $(this).removeClass("input-group-error")
+})
+
 $("#make-entire-transaction").on('click', function(){
   //$("#sign-transaction").prop('checked')
   if(Input) {
@@ -211,6 +219,7 @@ function getTransactionObject(checkInput) {
   errMessage = ""
   faErr = false
   amtErr = false
+  feeErr = false
 
 
   $("#all-outputs #single-output").each(function(){
@@ -257,6 +266,11 @@ function getTransactionObject(checkInput) {
       })
 
       transObject.FeeAddress = $("#fee-factoid-address").val()
+      if(transObject.FeeAddress.length <  30) {
+        $("#fee-factoid-address").addClass("input-group-error")
+        feeErr = true
+        err = true
+      }
       transObject.TransType = "custom"
     }
   }
@@ -264,6 +278,7 @@ function getTransactionObject(checkInput) {
   if(err){
     if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
     if(amtErr){errMessage += "Amounts should not be 0. "}
+    if(feeErr){errMessage += "Fee Address must be given. "}
     SetGeneralError("Error(s): " + errMessage)
     return null
   }
@@ -473,6 +488,7 @@ $("#fee-addresses-reveal-button").on("click", function(){
 
   if(toChange == "-1") {
     $("#fee-factoid-address").val(newAddress)
+    $("#fee-factoid-address").removeClass("input-group-error")
   } else {
     $(".single-input-" + toChange + " #input-factoid-address").val(newAddress)
     $(".single-input-" + toChange + " #input-factoid-address-container").removeClass("input-group-error")

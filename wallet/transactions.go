@@ -105,6 +105,9 @@ func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64
 		return nil, fmt.Errorf("Length of addresses and amounts do not match")
 	}
 	for i, a := range amounts {
+		if len(addresses[i]) < 20 {
+			return nil, fmt.Errorf("Invalid address given")
+		}
 		if addresses[i][:2] == "FA" {
 			amt64, err := strconv.ParseFloat(a, 64)
 			if err != nil {
