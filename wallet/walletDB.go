@@ -459,7 +459,18 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 3/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 		fmt.Printf("Finishing up sync....\n")
 	}
-	return w.cachedTransactions, nil
+
+	// The edge case of no transactions. If you have no related transactions, we still need to signal we
+	// are completely loaded. So we will add a blank transaction with an "empty" txid, which is impossibe to get otherwise.
+	if len(w.cachedTransactions) == 0 {
+		empty := new(DisplayTransaction)
+		empty.TxID = "empty"
+		var temp []DisplayTransaction
+		temp = append(temp, *empty)
+		return temp, nil
+	} else {
+		return w.cachedTransactions, nil
+	}
 }
 
 // Binary search

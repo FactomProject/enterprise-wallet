@@ -8,6 +8,8 @@ rm -r min-templates/
 cp -r statics/ min-statics/
 cp -r templates/ min-templates/
 
+sh non-essentials.sh
+
 # These don't minify well, will adjust
 echo "Minfying templates..."
 # minify -r -o min-templates templates/
