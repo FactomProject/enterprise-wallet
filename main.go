@@ -41,6 +41,10 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	// Ports
 	walletPort := cfg.Wallet.Port
 	factomdPort := cfg.App.PortNumber
+	controlPanelPort := cfg.App.ControlPanelPort
+	if cfg.App.ControlPanelSetting == "disabled" {
+		controlPanelPort = -1
+	}
 
 	var (
 		walletDB, guiDB, txDB int
@@ -96,6 +100,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings = data.(*SettingsStruct)
 	}
 
+	MasterSettings.ControlPanelPort = controlPanelPort
 	// For Testing adds random addresses
 	if ADD_RANDOM_ADDRESSES {
 		addRandomAddresses()

@@ -31,7 +31,8 @@ type SettingsStruct struct {
 	ImportExport bool //Transaction import/export
 
 	// Not marshaled
-	Theme string // darkTheme or ""
+	Theme            string // darkTheme or ""
+	ControlPanelPort int
 }
 
 func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {

@@ -81,6 +81,7 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 func updateBalances(time.Time) {
 	MasterWallet.AddBalancesToAddresses()
 	MasterWallet.UpdateGUIDB()
+	MasterWallet.GetRelatedTransactions()
 }
 
 // For go routines. Calls function once each duration.

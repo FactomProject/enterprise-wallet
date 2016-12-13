@@ -153,13 +153,27 @@ $("main").bind('scroll', function() {
 	}
 });
 
+LOCAL_EXPLORER = true
 $("#transaction-list").on('click', '#transaction-link', function(){
-	//$("#transDetails #details").html(getTransDetails($(this).attr("value")))
+	port = $("#controlpanel-port").text()
 	setTransDetails($(this).attr("value"))
 	$("#transDetails #link").attr("href", "http://explorer.factom.org/tx/" + Transactions[$(this).attr("value")].TxID)
-	// TODO: Remove local link or correct port
-	$("#transDetails #local-link").attr("href", "http://localhost:8090/search?input=" + Transactions[$(this).attr("value")].TxID + "&type=facttransaction")
+	
+	if(port == -1) {
+		LOCAL_EXPLORER = false
+		$("#transDetails #local-link").addClass("disabled-input")
+		$("#transDetails #local-link").prop("disabled", true)
+		$("#transDetails #local-link").attr("href", "")
+	} else {
+		$("#transDetails #local-link").attr("href", "http://localhost:" + port + "/search?input=" + Transactions[$(this).attr("value")].TxID + "&type=facttransaction")
+	}
 })
+
+$('#transDetails #local-link').click(function(e) {
+	if (!LOCAL_EXPLORER) {
+		e.preventDefault();
+	}
+});
 
 function setTransDetails(index) {
 	trans = Transactions[index]
