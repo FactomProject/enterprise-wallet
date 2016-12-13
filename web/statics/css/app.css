@@ -3570,8 +3570,9 @@ header {
         max-width: 140px; } }
   header h1 {
     margin-bottom: 1rem;
-    color: #7faccc;
-    font-size: 21px;
+    color: #e8b521;
+    font-size: 20px;
+    letter-spacing: 3px;
     text-transform: uppercase; }
     @media screen and (max-width: 74.9375em) {
       header h1 {
@@ -3880,14 +3881,22 @@ header {
           border-width: 0 4px 4px 0;
           transform: rotate(45deg); }
       #frame section.rightCol main table {
-        display: block;
+        display: table;
         max-height: 100%;
         width: 100%;
+        max-width: 99.5%;
         margin: 0;
         background: transparent;
         border: none; }
+        #frame section.rightCol main table thead {
+          border: none; }
+          #frame section.rightCol main table thead th {
+            padding-top: 4px;
+            padding-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase; }
         #frame section.rightCol main table tbody {
-          display: table;
+          display: table-row-group;
           width: 100%;
           margin: 0;
           background: transparent;
@@ -4098,26 +4107,28 @@ header {
               border-bottom-right-radius: 24px; }
         #frame section.rightCol main .newCTA.active ul {
           display: inline-block; }
-      #frame section.rightCol main .reveal {
-        padding: 3em;
-        background: #fff; }
-        #frame section.rightCol main .reveal h1 {
-          font-size: 32px;
-          text-transform: uppercase; }
-        #frame section.rightCol main .reveal#transDetails {
-          width: 800px; }
-          #frame section.rightCol main .reveal#transDetails table thead, #frame section.rightCol main .reveal#transDetails table tfoot {
+    #frame section.rightCol .reveal {
+      padding: 3em;
+      background: #fff; }
+      #frame section.rightCol .reveal h1 {
+        font-size: 32px;
+        text-transform: uppercase; }
+      #frame section.rightCol .reveal#transDetails {
+        width: 800px; }
+        #frame section.rightCol .reveal#transDetails table {
+          width: 100%; }
+          #frame section.rightCol .reveal#transDetails table thead, #frame section.rightCol .reveal#transDetails table tfoot {
             display: block; }
-          #frame section.rightCol main .reveal#transDetails table table tr.total {
+          #frame section.rightCol .reveal#transDetails table table tr.total {
             border-top: solid 1px #939598; }
-          #frame section.rightCol main .reveal#transDetails table table td {
+          #frame section.rightCol .reveal#transDetails table table td {
             padding-top: 3px;
             padding-bottom: 3px;
             font-family: monospace;
             font-size: 14px; }
-          #frame section.rightCol main .reveal#transDetails table tr:hover table tr:nth-child(even) {
+          #frame section.rightCol .reveal#transDetails table tr:hover table tr:nth-child(even) {
             background: none; }
-          #frame section.rightCol main .reveal#transDetails table tr:hover table tr:hover {
+          #frame section.rightCol .reveal#transDetails table tr:hover table tr:hover {
             background: #fff; }
 
 .coin-control {
@@ -4140,7 +4151,7 @@ body.darkTheme {
   body.darkTheme hr {
     border-bottom-color: #656666; }
   body.darkTheme header h1 {
-    color: #939598; }
+    color: #e8b521; }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
     body.darkTheme header {
       background: #000; } }
