@@ -43,7 +43,6 @@ func ServeWallet(port int) {
 		templates = files.CustomParseGlob(templates, "templates/*.html")
 		templates = template.Must(templates, nil)
 	} else { // Use non-compiled
-		templates = template.New("main")
 		templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
 	}
 	templates.Funcs(template.FuncMap(funcMap))
