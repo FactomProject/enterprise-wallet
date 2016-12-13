@@ -28,6 +28,13 @@ function LoadTransactions() {
 		ContentLen = obj.Content.length
 		Transactions = obj.Content
 
+		if(obj.Content.length > 0 && obj.Content[0].TxID == "empty") {
+			SetGeneralError("Your addresses do not have any transactions in the blockchain")
+			return
+		} else if(obj.Content.length == 0) {
+			return
+		}
+
 		// Load past x transactions, then stop. Only load more if they scroll
 		if(ContentLen < Loopstop) {
 			Loopstop = ContentLen
