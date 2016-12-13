@@ -32,6 +32,7 @@ $("#nickname-input").on('click', function(){
 
 $("#generate-source").on('change', function(){
 	selected = $("#generate-source option:selected").val()
+	$("#private-key-input").val("")
 	if(selected == "import-address"){
 		$("#private-key-input").attr("placeholder","Type address private key")
 	} else if(selected == "random-ec"){
