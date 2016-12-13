@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/FactomProject/btcutil/base58"
@@ -13,20 +14,21 @@ import (
 
 var _ = fmt.Sprintf("")
 
-const maxNameLength int = 20
+const MaxNameLength int = 20
 
 // Name/Address pair
 type AddressNamePair struct {
 	Name    string // Length maxNameLength Characters
 	Address string
+	Seeded  bool // Derived from seeed
 
 	// Not Marshaled
 	Balance float64 // Unused except for JSON return
 }
 
 func NewAddress(name string, address string) (*AddressNamePair, error) {
-	if len(name) > maxNameLength {
-		return nil, fmt.Errorf("Name must be max %d characters", maxNameLength)
+	if len(name) > MaxNameLength {
+		return nil, fmt.Errorf("Name must be max %d characters", MaxNameLength)
 	}
 
 	if !factom.IsValidAddress(address) {
@@ -40,13 +42,25 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 
 	add.Name = name
 	add.Address = address
+	add.Seeded = false
 
 	return add, nil
 }
 
+// If addresses derives from the seed
+func NewSeededAddress(name string, address string) (*AddressNamePair, error) {
+	add, err := NewAddress(name, address)
+	if err != nil {
+		return nil, err
+	}
+
+	add.Seeded = true
+	return add, nil
+}
+
 func (anp *AddressNamePair) ChangeName(name string) error {
-	if len(name) > maxNameLength {
-		return fmt.Errorf("Name too long, must be less than %d characters", maxNameLength)
+	if len(name) > MaxNameLength {
+		return fmt.Errorf("Name too long, must be less than %d characters", MaxNameLength)
 	}
 	anp.Name = name
 	return nil
@@ -65,15 +79,21 @@ func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
 func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 
-	var n [maxNameLength]byte
-	copy(n[:maxNameLength], anp.Name)
-	buf.Write(n[:maxNameLength])
+	var n [MaxNameLength]byte
+	copy(n[:MaxNameLength], anp.Name)
+	buf.Write(n[:MaxNameLength])
 
 	add := base58.Decode(anp.Address)
 	var a [38]byte
 	copy(a[:38], add[:])
-
 	buf.Write(a[:38])
+
+	var b []byte
+	b = strconv.AppendBool(b, anp.Seeded)
+	if anp.Seeded {
+		b = append(b, 0x00)
+	}
+	buf.Write(b)
 
 	return buf.Next(buf.Len()), nil
 }
@@ -81,17 +101,23 @@ func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 func (anp *AddressNamePair) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
 
-	nameData := bytes.Trim(newData[:maxNameLength], "\x00")
+	nameData := bytes.Trim(newData[:MaxNameLength], "\x00")
 	anp.Name = fmt.Sprintf("%s", nameData)
-	newData = newData[maxNameLength:]
+	newData = newData[MaxNameLength:]
 
 	anp.Address = base58.Encode(newData[:38])
+	newData = newData[38:]
 
-	if len(newData) > 38 {
-		newData = newData[38:]
-	} else {
-		newData = nil
+	booldata := newData[:5]
+	if booldata[4] == 0x00 {
+		booldata = booldata[:4]
 	}
+	b, err := strconv.ParseBool(string(booldata))
+	if err != nil {
+		return data, err
+	}
+	anp.Seeded = b
+	newData = newData[5:]
 
 	return
 }
@@ -103,7 +129,7 @@ func (anp *AddressNamePair) UnmarshalBinary(data []byte) (err error) {
 
 //Address List
 type AddressList struct {
-	Length uint32
+	Length uint64
 	List   []AddressNamePair
 }
 
@@ -145,15 +171,26 @@ func (addList *AddressList) AddANP(anp *AddressNamePair) error {
 
 }
 
-func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
-	// We check for valid factom address higher up, this is just a basic check
-	if len(name) == 0 {
-		return nil, errors.New("Nil AddressNamePair")
+func (addList *AddressList) AddSeeded(name string, address string) (*AddressNamePair, error) {
+	anp, err := NewSeededAddress(name, address)
+	if err != nil {
+		return nil, err
 	}
+	return addList.add(anp)
+}
 
+func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
 	anp, err := NewAddress(name, address)
 	if err != nil {
 		return nil, err
+	}
+	return addList.add(anp)
+}
+
+func (addList *AddressList) add(anp *AddressNamePair) (*AddressNamePair, error) {
+	// We check for valid factom address higher up, this is just a basic check
+	if len(anp.Name) == 0 {
+		return nil, errors.New("Nil AddressNamePair")
 	}
 
 	_, i := addList.Get(anp.Address)
@@ -182,7 +219,7 @@ func (addList *AddressList) Remove(removeAdd string) error {
 func (addList *AddressList) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	var number [8]byte
-	binary.BigEndian.PutUint32(number[:], addList.Length)
+	binary.BigEndian.PutUint64(number[:], addList.Length)
 	buf.Write(number[:])
 
 	for _, anp := range addList.List {
@@ -199,10 +236,10 @@ func (addList *AddressList) MarshalBinary() (data []byte, err error) {
 func (addList *AddressList) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
 
-	addList.Length = binary.BigEndian.Uint32(data[:8])
+	addList.Length = binary.BigEndian.Uint64(data[:8])
 	newData = newData[8:]
 
-	var i uint32 = 0
+	var i uint64 = 0
 	for i < addList.Length {
 		anp := new(AddressNamePair)
 		newData, err = anp.UnmarshalBinaryData(newData)

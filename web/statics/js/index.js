@@ -4,15 +4,21 @@ $(window).load(function() {
 
 CurrentCount = 0
 ContentLen = 0
-LoopstopIncrement = 10 // Amount to load on scroll
-Loopstop = 15
-var Transactions
+LoopstopIncrement = 15 // Amount to load on scroll
+Loopstop = 20
+var Transactions = new Array()
 Done = false
 
 function LoadTransactions() {
 	getRequest("related-transactions", function(resp){
-		$("#loading-container").remove()
 		obj = JSON.parse(resp)
+		if(obj.Error == "none" && obj.Content == null){
+			setTimeout(function(){
+			  LoadTransactions()
+			}, 5000);
+			return
+		}
+		$("#loading-container").remove()
 
 		if(obj.Error != "none"){
 			SetGeneralError(obj.Error)
@@ -29,22 +35,45 @@ function LoadTransactions() {
 		for(; CurrentCount < Loopstop; CurrentCount++) {
 			AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
 		}
-
 	})
 }
 
+// Load past x transactions, then stop. Only load more if they scroll
+Empty = false
 function LoadCached() {
-		// Load past x transactions, then stop. Only load more if they scroll
-		if(ContentLen < Loopstop) {
-			Loopstop = ContentLen
+	if (Empty){return}
+	if(ContentLen < Loopstop * 2) {
+		// Request more
+		var requestObject = {
+			Current:ContentLen,
+		    More:Loopstop*5
 		}
-		for(; CurrentCount < Loopstop; CurrentCount++) {
-			AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
-		}
+		j = JSON.stringify(requestObject)
+		postRequest("more-cached-transaction", j, function(resp){
+			obj = JSON.parse(resp)
+			if(obj.Error != "none"){
+				return
+			}
+			if(obj.Content == null){
+				return
+			}
+			if(obj.Content.length == 0) {
+				Empty = true
+				return
+			}
+			ContentLen = ContentLen + obj.Content.length
+			Transactions = Transactions.concat(obj.Content)
+		})
+	}
+	if(ContentLen < Loopstop) {
+		Loopstop = ContentLen
+	}
+	for(; CurrentCount < Loopstop; CurrentCount++) {
+		AppendNewTransaction(Transactions[CurrentCount], CurrentCount)
+	}
 }
 
 function AppendNewTransaction(trans, index){
-
 	// Transactions are split into 3 transactions if sent/recieve/converted is all happening.
 	// function appendTrans(pic, index, amt, token, date, addrs)
 	if(trans.Action[0] == true) { // Sent
@@ -115,61 +144,64 @@ $("main").bind('scroll', function() {
 	//console.log($("main").outerHeight(), $("main").scrollTop(), $("main").innerHeight(), $("main").prop('scrollHeight'), $("main").prop('offsetHeight'))
 	// Total Height
 	// $("main").prop('scrollHeight')
+	//console.log("scroll", $("#transaction-list").scrollTop(), $("html").innerHeight(), $("html").prop('scrollHeight'))
+	//console.log("scroll", $("main").scrollTop(), $("main").innerHeight(), $("main").prop('scrollHeight'))
+	//console.log("scroll", $("body").scrollTop(), $("body").innerHeight(), $("body").prop('scrollHeight'))
 	if($("main").scrollTop() + $("main").innerHeight() >= .8 * $("main").prop('scrollHeight')) {
 		Loopstop += LoopstopIncrement
 		LoadCached()
 	}
 });
 
+LOCAL_EXPLORER = true
 $("#transaction-list").on('click', '#transaction-link', function(){
-	$("#transDetails #details").html(getTransDetails($(this).attr("value")))
+	port = $("#controlpanel-port").text()
+	setTransDetails($(this).attr("value"))
 	$("#transDetails #link").attr("href", "http://explorer.factom.org/tx/" + Transactions[$(this).attr("value")].TxID)
-	// TODO: Remove local link or correct port
-	$("#transDetails #local-link").attr("href", "http://localhost:8090/search?input=" + Transactions[$(this).attr("value")].TxID + "&type=facttransaction")
+	
+	if(port == -1) {
+		LOCAL_EXPLORER = false
+		$("#transDetails #local-link").addClass("disabled-input")
+		$("#transDetails #local-link").prop("disabled", true)
+		$("#transDetails #local-link").attr("href", "")
+	} else {
+		$("#transDetails #local-link").attr("href", "http://localhost:" + port + "/search?input=" + Transactions[$(this).attr("value")].TxID + "&type=facttransaction")
+	}
 })
 
-function getTransDetails(index){
+$('#transDetails #local-link').click(function(e) {
+	if (!LOCAL_EXPLORER) {
+		e.preventDefault();
+	}
+});
+
+function setTransDetails(index) {
 	trans = Transactions[index]
-	inputs =  ""
-	outputs = ""
-	ecOutputs = ""
+	$("#trans-detail-txid").text(trans.TxID)
 
-	htmlBody = '' +
-	'<div>Date Sent:' + trans.Date + ' at ' + trans.Time + '</div>' +
-	'<div>Total FCT Sent: ' + (trans.TotalInput / 1e8).toFixed(4) + '</div>' +
-	'<div>Transaction Hash: ' + trans.TxID + '</div>'
-
-
-	return htmlBody
-}
-
-function getTransDetailsOld(index){
-	trans = Transactions[index]
-	inputs =  ""
-	outputs = ""
-	ecOutputs = ""
-
+	$("#trans-details-inputs").html("")
 	for(var i = 0; i < trans.Inputs.length; i++) {
-		inputs += "<div>" + trans.Inputs[i].Name + "(<pre>" + trans.Inputs[i].Address + "</pre>)</div>"
-	} 
+		$("#trans-details-inputs").append('<tr>' +
+			'<td>' + trans.Inputs[i].Address + '</td>' +
+			'<td>' + FCTNormalize(trans.Inputs[i].Amount) + ' FCT</td>' +
+			'</tr>')
+	}
 
+	$("#trans-details-outputs").html("")
 	for(var i = 0; i < trans.Outputs.length; i++) {
-		if(trans.Outputs[i].Address.startsWith("FA")) {
-			outputs += "<div>" + trans.Outputs[i].Name + "(<pre>" + trans.Outputs[i].Address + "</pre>)</div>"
-		} else {
-			ecOutputs += "<div>" + trans.Outputs[i].Name + "(<pre>" + trans.Outputs[i].Address + "</pre>)</div>"
-		}
-	} 
+		$("#trans-details-outputs").append('<tr>' +
+			'<td>' + trans.Outputs[i].Address + '</td>' +
+			'<td>' + FCTNormalize(trans.Outputs[i].Amount) + ' FCT</td>' +
+			'</tr>')
+	}
 
-	htmlBody = '' +
-	'<div>Input Total: ' + (trans.TotalInput / 1e8).toFixed(4) + '</div>' +
-	inputs +
-	'<div>Output Total: ' + (trans.TotalFCTOutput / 1e8).toFixed(4) + ' FCT</div>' +
-	outputs +
-	'<div>EC Output Total: ' + (trans.TotalECOutput / 1e8).toFixed(4) + ' FCT</div>' +
-	ecOutputs
+	$("#trans-details-outputs").append('<tr class="total">' +
+	'<td> Total </td>' +
+	'<td>' + FCTNormalize(trans.TotalInput) + ' FCT</td>' +
+	'</tr>')
 
-	return htmlBody
+	$("#total-transacted").text(FCTNormalize(trans.TotalECOutput + trans.TotalFCTOutput))
+	$("#trans-date").text(trans.Date + " at " + trans.Time)
 }
 
 String.prototype.capitalize = function() {

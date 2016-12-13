@@ -16,7 +16,7 @@ var _ = strings.Compare("", "")
 var _ = fmt.Sprintf("")
 
 func TestAddressNamePairMarshal(t *testing.T) {
-	a, err := NewAddress("Factoid1ss", "FA27kaVcH76hDsLmZuSq2yad6zrmUDUm6KCHq6nibEZiKbBSLQ8C")
+	a, err := NewSeededAddress("Factoid1ss", "FA27kaVcH76hDsLmZuSq2yad6zrmUDUm6KCHq6nibEZiKbBSLQ8C")
 	if err != nil {
 		t.Fatalf("Error Creating")
 	}
@@ -52,8 +52,8 @@ func TestNewAddressFails(t *testing.T) {
 		t.Fatalf("Failed random address: %s", err.Error())
 	}
 
-	_, err = NewAddress(
-		"123456789012345678901", // Over 20 characters
+	_, err = NewSeededAddress(
+		"12345678901234567890111", // Over 20 characters
 		add)
 
 	if err == nil {
@@ -99,7 +99,7 @@ func TestAddressList(t *testing.T) {
 		if err != nil {
 			t.Fatalf(err.Error())
 		}
-		_, err = addList.Add(anp.Name, anp.Address)
+		_, err = addList.AddSeeded(anp.Name, anp.Address)
 		if err != nil {
 			t.Fatalf(err.Error())
 		}

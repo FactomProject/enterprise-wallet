@@ -13,8 +13,12 @@ var _ = fmt.Sprint("")
 var TestWallet *WalletDB
 
 func TestSendFactoids(t *testing.T) {
-	LoadTestWallet(8089)
+	//fmt.Println(3)
 	var err error
+	err = LoadTestWallet(8077)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
 	anp, list := TestWallet.GetGUIAddress("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q")
@@ -46,9 +50,23 @@ func TestSendFactoids(t *testing.T) {
 	*/
 
 	//20000e8
-	trans, _, err := TestWallet.ConstructSendFactoids(recs, amts)
+	trans, _, err := TestWallet.ConstructTransaction(recs, amts)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	var total uint64
+	var amtsStrs []string
+	for _, a := range amts {
+		total += a
+		amtsStrs = append(amtsStrs, fmt.Sprintf("%d", a/1e8))
+	}
+
+	nameComp, err := TestWallet.CheckTransactionAndGetName(recs, amtsStrs)
+	if err != nil {
+		t.Fatal(err)
+	} else if trans != nameComp {
+		t.Fatal("Names do not match")
 	}
 
 	_, err = TestWallet.SendTransaction(trans)
@@ -56,18 +74,26 @@ func TestSendFactoids(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_ = trans
+	// Test string versions
+	name, ret, err := TestWallet.ConstructSendFactoidsStrings(recs, amtsStrs)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	//_ = balance
-	/*if balance != balance+uint64(1e8) {
-		t.Error("Balance not changed")
-	}*/
+	if ret.Total != total {
+		t.Fatal("Total wrong")
+	}
+
+	_, err = TestWallet.SendTransaction(name)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	_ = anp
 }
 
 func TestConvertToEC(t *testing.T) {
-	LoadTestWallet(8089)
+	LoadTestWallet(8076)
 	var err error
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
@@ -100,9 +126,28 @@ func TestConvertToEC(t *testing.T) {
 	*/
 
 	//20000e8
-	trans, _, err := TestWallet.ConstructConvertToEC(recs, amts)
+	trans, _, err := TestWallet.ConstructTransaction(recs, amts)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	var total uint64
+	var amtsStrs []string
+	for _, a := range amts {
+		amtsStrs = append(amtsStrs, fmt.Sprintf("%d", a))
+	}
+
+	tStruct := TestWallet.Wallet.GetTransactions()[trans]
+	total, err = tStruct.TotalInputs()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nameComp, err := TestWallet.CheckTransactionAndGetName(recs, amtsStrs)
+	if err != nil {
+		t.Fatal(err)
+	} else if trans != nameComp {
+		t.Fatal("Names do not match")
 	}
 
 	_, err = TestWallet.SendTransaction(trans)
@@ -110,7 +155,20 @@ func TestConvertToEC(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_ = trans
+	// Test string versions
+	name, ret, err := TestWallet.ConstructConvertEntryCreditsStrings(recs, amtsStrs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ret.Total+ret.Fee != total {
+		t.Fatal("Total wrong")
+	}
+
+	_, err = TestWallet.SendTransaction(name)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	//_ = balance
 	/*if balance != balance+uint64(1e8) {

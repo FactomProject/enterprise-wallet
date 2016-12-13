@@ -8,13 +8,25 @@ $(window).load(function() {
 function GetDefaultData(){
 	Name = $("#address-name").val()
 	Address = $("#address-field").val()
-	console.log(Name, Address)
+
+	jsonOBJ = '{"Address":"' + Address + '"}'
+	postRequest("get-address", jsonOBJ, function(resp){
+		obj = JSON.parse(resp)
+		if (obj.Error != "none") {
+			$("#balance-container").text("Can not find the addresses in address book")
+		} else {
+			if(obj.Content.Address.startsWith("FA")) {
+				$("#balance").text((obj.Content.Balance).toFixed(8))
+			} else {
+				$("#balance").text(obj.Content.Balance)
+			}
+		}
+	})
 }
 
 $("#display-private-key").click(function(){
 	jsonOBJ = '{"Address":"' + Address + '"}'
 	postRequest("display-private-key", jsonOBJ, function(resp){
-				console.log(resp)
 		obj = JSON.parse(resp)
 		if (obj.Error != "none") {
 			$("#private-key-field").val(obj.Error)
@@ -41,6 +53,19 @@ $("#save-name-change").click(function(){
 	} else {
 		SetGeneralError("Newname is the same as the original")
 	}
+})
+
+$("#delete-address").on('click', function(){
+	name = $("#address-name").val()
+	jsonOBJ = '{"Address":"' + Address + '", "Name":"' + name + '"}'
+	postRequest("delete-address", jsonOBJ, function(resp){
+		obj = JSON.parse(resp)
+		if (obj.Error != "none") {
+			SetGeneralError("Error: " + obj.Error)
+		} else {
+			SetGeneralSuccess(obj.Content + ": The name has been changed")
+		}
+	})
 })
 
 $("#copy-to-clipboard").on('click', function(){

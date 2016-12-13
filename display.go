@@ -9,6 +9,8 @@ import (
 	"sync"
 	"text/template"
 	"time"
+
+	"github.com/FactomProject/M2GUIWallet/web/files"
 )
 
 var (
@@ -20,29 +22,46 @@ var (
 	TemplateMutex sync.Mutex
 )
 
+// Use or no use compiled statics. Keeping a non-compiled
+// option for front end design changes
+var COMPILED_STATICS = false
+
 func SaveSettings() error {
 	err := MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 	return err
 }
 
-// TODO: Compile statics into Go
 func ServeWallet(port int) {
-	templates = template.New("main")
+
+	// Templates
+	TemplateMutex.Lock()
 	// Put function into templates
-	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts}
+	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts, "compareStrings": compareStrings}
+	templates = template.New("main")
 	templates.Funcs(template.FuncMap(funcMap))
-	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
+	if COMPILED_STATICS { // Use compiled
+		templates = files.CustomParseGlob(templates, "templates/*.html")
+		templates = template.Must(templates, nil)
+	} else { // Use non-compiled
+		templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
+	}
+	templates.Funcs(template.FuncMap(funcMap))
+	TemplateMutex.Unlock()
 
 	// Update the balances every 10 seconds to keep it updated. We can force
 	// an update if we send a transaction or something
 	go doEvery(10*time.Second, updateBalances)
 
 	// Load the initial transaction DB. This takes some time, should start before user hits first page
-	go MasterWallet.TransactionDB.GetAllTXs()
+	go MasterWallet.GetRelatedTransactions()
 
 	// Mux for static files
 	mux = http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir("./web/statics")))
+	if COMPILED_STATICS {
+		mux.Handle("/", files.StaticServer)
+	} else {
+		mux.Handle("/", http.FileServer(http.Dir(FILES_PATH+"statics")))
+	}
 
 	http.HandleFunc("/", static(pageHandler))
 	http.HandleFunc("/GET", HandleGETRequests)
@@ -50,7 +69,7 @@ func ServeWallet(port int) {
 
 	portStr := "localhost:" + strconv.Itoa(port)
 
-	fmt.Println("Starting Wallet on http://localhost" + portStr + "/")
+	fmt.Println("Starting GUI on http://localhost" + portStr + "/")
 	http.ListenAndServe(portStr, nil)
 }
 
@@ -59,7 +78,13 @@ func mkArray(args ...interface{}) []interface{} {
 	return args
 }
 
+// Used inside templates to compare ints
 func compareInts(a int, b int) bool {
+	return (a == b)
+}
+
+// Used inside templates to compare strings
+func compareStrings(a string, b string) bool {
 	return (a == b)
 }
 
@@ -74,9 +99,12 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// Update various elements. Faster load times for user if these
+// are loaded when they are not asking
 func updateBalances(time.Time) {
 	MasterWallet.AddBalancesToAddresses()
 	MasterWallet.UpdateGUIDB()
+	MasterWallet.GetRelatedTransactions()
 }
 
 // For go routines. Calls function once each duration.
@@ -86,13 +114,10 @@ func doEvery(d time.Duration, f func(time.Time)) {
 	}
 }
 
+// Redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-	// Remove any GET data
 	request := strings.Split(r.RequestURI, "?")
-	fmt.Println(r.RequestURI)
-
 	var err error
-
 	switch request[0] {
 	case "/":
 		err = HandleIndexPage(w, r)
@@ -131,6 +156,7 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Used for responding to Post/Get Requests
 type jsonResponse struct {
 	Error   string      `json:"Error"`
 	Content interface{} `json:"Content"`
@@ -153,15 +179,16 @@ func (j *jsonResponse) Bytes() []byte {
 	return data
 }
 
+// If request is successful
 func jsonResp(content interface{}) []byte {
 	e := newJsonResponse("none", content)
 	return e.Bytes()
 }
 
+// If request has an error
 func jsonError(err string) []byte {
 	e := newJsonResponse(err, "none")
 	return e.Bytes()
-	//return []byte("{'error':'" + err + "'}")
 }
 
 func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
@@ -180,7 +207,6 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 
 		w.Write(data)
 	case "balances":
-		//MasterWallet.AddBalancesToAddresses()
 		bals := struct {
 			EC int64
 			FC int64
@@ -196,15 +222,29 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		trans, err := MasterWallet.GetRelatedTransactions()
 		if err != nil {
 			w.Write(jsonError(err.Error()))
+			return
 		} else {
-			w.Write(jsonResp(trans))
+			MasterWallet.ActiveCachedTransactions = trans
+			if len(trans) > 100 {
+				w.Write(jsonResp(trans[:100]))
+			} else {
+				w.Write(jsonResp(trans))
+			}
 		}
-	// TODO: Remove
-	case "test-error":
-		w.Write(jsonError("This is an error for tests"))
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}
+}
+
+// Transaction struct for sending transactions
+type SendTransStruct struct {
+	TransType   string   `json:"TransType"`
+	ToAddresses []string `json:"OutputAddresses"`
+	ToAmounts   []string `json:"OutputAmounts"`
+
+	FromAddresses []string `json:"InputAddresses"`
+	FromAmounts   []string `json:"InputAmounts"`
+	FeeAddress    string   `json:"FeeAddress"`
 }
 
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
@@ -233,6 +273,32 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = MasterWallet.ChangeAddressName(anc.Address, anc.ToName)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		} else {
+			w.Write(jsonResp("Success"))
+		}
+	case "delete-address":
+		type ANC struct {
+			Address string `json:"Address"`
+			Name    string `json:"Name"`
+		}
+		j := r.FormValue("json")
+		anc := new(ANC)
+		err := json.Unmarshal([]byte(j), anc)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		_, list := MasterWallet.GetGUIAddress(anc.Address)
+		if list != 3 {
+			w.Write(jsonError("You can only delete External Addresses."))
+			return
+		}
+
+		_, err = MasterWallet.RemoveAddress(anc.Address, list)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
@@ -270,6 +336,26 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(secret))
+	case "get-address":
+		type Add struct {
+			Address string `json:"Address"`
+		}
+
+		j := r.FormValue("json")
+		a := new(Add)
+		err := json.Unmarshal([]byte(j), a)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, list := MasterWallet.GetGUIAddress(a.Address)
+		if list == -1 {
+			w.Write(jsonError("Not found"))
+			return
+		}
+
+		w.Write(jsonResp(anp))
 	case "is-valid-address":
 		add := r.FormValue("json")
 		v := MasterWallet.IsValidAddress(add)
@@ -315,13 +401,66 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write(jsonResp(anp))
 		}
-	case "make-transaction":
-		type SendTransStruct struct {
-			TransType string   `json:"TransType"`
-			Addresses []string `json:"OutputAddresses"`
-			Amounts   []string `json:"OutputAmounts"`
+	case "import-koinify":
+		type NewKoinifyStruct struct {
+			Name    string `json:"Name"`
+			Koinify string `json:"Koinify"`
 		}
 
+		nas := new(NewKoinifyStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), nas)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, err := MasterWallet.ImportKoinify(nas.Name, nas.Koinify)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
+	case "new-external-address":
+		type NewAddressStruct struct {
+			Name   string `json:"Name"`
+			Public string `json:"Public"`
+		}
+
+		nas := new(NewAddressStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), nas)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, err := MasterWallet.AddExternalAddress(nas.Name, nas.Public)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
+	case "get-needed-input":
+		trans := new(SendTransStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), trans)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		needed, err := MasterWallet.CalculateNeededInput(trans.ToAddresses, trans.ToAmounts)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp(needed))
+	case "make-transaction":
 		trans := new(SendTransStruct)
 
 		jsonElement := r.FormValue("json")
@@ -335,13 +474,14 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			Name  string `json:"Name"`
 			Total uint64 `json:"Total"`
 			Fee   uint64 `json:"Fee"`
+			Json  string `json:"Json"`
 		}
 
 		var r ReturnTransStruct
 
 		name := ""
 		if trans.TransType == "factoid" {
-			newName, rt, err := MasterWallet.ConstructSendFactoidsStrings(trans.Addresses, trans.Amounts)
+			newName, rt, err := MasterWallet.ConstructSendFactoidsStrings(trans.ToAddresses, trans.ToAmounts)
 			if err != nil {
 				MasterWallet.DeleteTransaction(name)
 				w.Write(jsonError(err.Error()))
@@ -352,7 +492,31 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			r.Total = rt.Total
 			r.Fee = rt.Fee
 		} else if trans.TransType == "ec" {
-			newName, rt, err := MasterWallet.ConstructConvertEntryCreditsStrings(trans.Addresses, trans.Amounts)
+			newName, rt, err := MasterWallet.ConstructConvertEntryCreditsStrings(trans.ToAddresses, trans.ToAmounts)
+			if err != nil {
+				MasterWallet.DeleteTransaction(name)
+				w.Write(jsonError(err.Error()))
+				return
+			}
+
+			name = newName
+			r.Total = rt.Total
+			r.Fee = rt.Fee
+		} else if trans.TransType == "custom" {
+			newName, rt, err := MasterWallet.ConstructTransactionFromValuesStrings(
+				trans.ToAddresses, trans.ToAmounts, trans.FromAddresses, trans.FromAmounts, trans.FeeAddress, true)
+			if err != nil {
+				MasterWallet.DeleteTransaction(name)
+				w.Write(jsonError(err.Error()))
+				return
+			}
+
+			name = newName
+			r.Total = rt.Total
+			r.Fee = rt.Fee
+		} else if trans.TransType == "nosig" {
+			newName, rt, err := MasterWallet.ConstructTransactionFromValuesStrings(
+				trans.ToAddresses, trans.ToAmounts, trans.FromAddresses, trans.FromAmounts, trans.FeeAddress, false)
 			if err != nil {
 				MasterWallet.DeleteTransaction(name)
 				w.Write(jsonError(err.Error()))
@@ -367,15 +531,16 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		j, err := MasterWallet.ExportTransaction(name)
+		if err != nil {
+			r.Json = "Error exporting transaction."
+		} else {
+			r.Json = j
+		}
+
 		r.Name = name
 		w.Write(jsonResp(r))
 	case "send-transaction":
-		type SendTransStruct struct {
-			TransType string   `json:"TransType"`
-			Addresses []string `json:"OutputAddresses"`
-			Amounts   []string `json:"OutputAmounts"`
-		}
-
 		trans := new(SendTransStruct)
 
 		jsonElement := r.FormValue("json")
@@ -385,7 +550,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name, err := MasterWallet.CheckTransactionAndGetName(trans.Addresses, trans.Amounts)
+		name, err := MasterWallet.CheckTransactionAndGetName(trans.ToAddresses, trans.ToAmounts)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
@@ -419,6 +584,8 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			MasterSettings.Theme = ""
 		}
 		MasterSettings.KeyExport = st.Bools[1]
+		MasterSettings.CoinControl = st.Bools[2]
+		MasterSettings.ImportExport = st.Bools[3]
 
 		err = SaveSettings()
 		if err != nil {
@@ -427,6 +594,36 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp("Settings updated"))
+	case "get-seed":
+		seed, err := MasterWallet.ExportSeed()
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		w.Write(jsonResp(seed))
+	case "more-cached-transaction":
+		type MoreRelatedTransactionReq struct {
+			Current int `json:"Current"` // Current index in list
+			More    int `json:"More"`    // How many more
+		}
+
+		rt := new(MoreRelatedTransactionReq)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), rt)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		total := len(MasterWallet.ActiveCachedTransactions)
+		max := rt.Current + rt.More
+		if max > total {
+			w.Write(jsonResp(MasterWallet.ActiveCachedTransactions[rt.Current:]))
+		} else {
+			w.Write(jsonResp(MasterWallet.ActiveCachedTransactions[rt.Current:max]))
+		}
+
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}

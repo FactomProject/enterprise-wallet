@@ -1,6 +1,11 @@
 $("#generate-source").on("change", function(){
 	selected = $("#generate-source option:selected").val()
-	if(selected == "import-address"){
+	if(selected == "new-external-address") {
+		$("#sec-pub").text("Public")
+	} else {
+		$("#sec-pub").text("Private")
+	}
+	if(selected == "import-address" || selected == "new-external-address" || selected == "import-koinify"){
 		$('#private-key-input').prop("disabled", false);
 
 		$('#private-key-input').removeClass("disabled-input");
@@ -23,6 +28,21 @@ $("#private-key-input-container").on('click', function(){
 
 $("#nickname-input").on('click', function(){
 	$(this).removeClass("input-group-error")
+})
+
+$("#generate-source").on('change', function(){
+	selected = $("#generate-source option:selected").val()
+	if(selected == "import-address"){
+		$("#private-key-input").attr("placeholder","Type address private key")
+	} else if(selected == "random-ec"){
+		$("#private-key-input").attr("placeholder","A new entry credit address will be created")
+	} else if(selected == "random-factoid"){
+		$("#private-key-input").attr("placeholder","A new factoid address will be created")
+	} else if(selected == "new-external-address"){
+		$("#private-key-input").attr("placeholder","Type a public address to add to your contacts")
+	} else if(selected == "import-koinify"){
+		$("#private-key-input").attr("placeholder","Type in your Koinify phrase")
+	}
 })
 
 $("#add-to-addressbook").on("click", function(){
@@ -55,7 +75,12 @@ $("#add-to-addressbook").on("click", function(){
 
 				j = JSON.stringify(newAddressObj)
 				postRequest("new-address", j, function(resp){
-					console.log(resp)
+					obj = JSON.parse(resp)
+					if(obj.Error == "none"){
+						SetSuccess(obj)
+					} else {
+						SetError(obj.Error)
+					}
 				})
 			}
 		})
@@ -70,6 +95,54 @@ $("#add-to-addressbook").on("click", function(){
 		})
 	} else if(selected == "random-factoid"){
 		postRequest("generate-new-address-factoid", Name, function(resp){ // Generate new key
+			obj = JSON.parse(resp)
+			if(obj.Error == "none"){
+				SetSuccess(obj)
+			} else {
+				SetError(obj.Error)
+			}
+		})
+	} else if(selected == "new-external-address"){
+		pub = $("#private-key-input").val()
+		if(!(pub.startsWith("FA") || pub.startsWith("EC"))){
+			SetError("Not a valid public key. Should start with 'FA' for a factoid address or 'EC' for an entry credit address." +
+				" This option adds an address to your external addresses for easier use.")
+			$("#private-key-input-container").addClass("input-group-error");
+			return
+		}
+
+		postRequest("is-valid-address", pub, function(resp){
+			if(resp == "false") { // Not valid
+				SetError("Not a valid public key.")
+				$("#private-key-input-container").addClass("input-group-error");
+				return
+			} else { // Is valid, generate off new private key
+				var newAddressObj = {
+			    	Name:Name,
+					Public:pub
+				}
+
+				j = JSON.stringify(newAddressObj)
+				postRequest("new-external-address", j, function(resp){
+					obj = JSON.parse(resp)
+					if(obj.Error == "none"){
+						SetSuccess(obj)
+					} else {
+						SetError(obj.Error)
+					}
+				})
+			}
+		})
+	} else if(selected == "import-koinify") {
+		koinify = $("#private-key-input").val()
+
+		var newAddressObj = {
+	    	Name:Name,
+			Koinify:koinify
+		}
+
+		j = JSON.stringify(newAddressObj)
+		postRequest("import-koinify", j, function(resp){
 			obj = JSON.parse(resp)
 			if(obj.Error == "none"){
 				SetSuccess(obj)

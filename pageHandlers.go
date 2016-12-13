@@ -25,11 +25,35 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 // This is used on every page
 type SettingsStruct struct {
 	// Marshaled
-	DarkTheme bool
-	KeyExport bool // Allow export of private key
+	DarkTheme    bool
+	KeyExport    bool // Allow export of private key
+	CoinControl  bool
+	ImportExport bool //Transaction import/export
 
 	// Not marshaled
-	Theme string // darkTheme or ""
+	Theme            string // darkTheme or ""
+	ControlPanelPort int
+}
+
+func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
+	if a.DarkTheme != b.DarkTheme {
+		return false
+	}
+	if a.KeyExport != b.KeyExport {
+		return false
+	}
+	if a.CoinControl != b.CoinControl {
+		return false
+	}
+	if a.ImportExport != b.ImportExport {
+		return false
+	}
+
+	if a.Theme != b.Theme {
+		return false
+	}
+
+	return true
 }
 
 func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
@@ -45,6 +69,14 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	if s.KeyExport {
 		b = append(b, 0x00)
 	}
+	b = strconv.AppendBool(b, s.CoinControl)
+	if s.CoinControl {
+		b = append(b, 0x00)
+	}
+	b = strconv.AppendBool(b, s.ImportExport)
+	if s.ImportExport {
+		b = append(b, 0x00)
+	}
 
 	buf.Write(b)
 
@@ -56,34 +88,51 @@ func (s *SettingsStruct) UnmarshalBinary(data []byte) error {
 	return err
 }
 
-func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
-	newData = data
-
-	booldata := newData[:5]
+func unmarshalBool(booldata []byte) (bool, error) {
 	if booldata[4] == 0x00 {
 		booldata = booldata[:4]
 	}
 	b, err := strconv.ParseBool(string(booldata))
 	if err != nil {
-		return data, err
-	}
-	s.DarkTheme = b
-	newData = newData[5:]
-
-	if b {
-		s.Theme = "darkTheme"
+		return false, err
 	}
 
-	booldata = newData[:5]
-	if booldata[4] == 0x00 {
-		booldata = booldata[:4]
-	}
-	b, err = strconv.ParseBool(string(booldata))
+	return b, nil
+}
+
+func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
+	newData = data
+
+	s.DarkTheme, err = unmarshalBool(newData[:5])
 	if err != nil {
 		return data, err
 	}
-	s.KeyExport = b
 	newData = newData[5:]
+
+	if s.DarkTheme {
+		s.Theme = "darkTheme"
+	} else {
+		s.Theme = ""
+	}
+
+	s.KeyExport, err = unmarshalBool(newData[:5])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[5:]
+
+	s.CoinControl, err = unmarshalBool(newData[:5])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[5:]
+
+	s.ImportExport, err = unmarshalBool(newData[:5])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[5:]
+
 	return
 }
 
@@ -201,7 +250,11 @@ func HandleImportExportTransaction(w http.ResponseWriter, r *http.Request) error
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
 
-	templates.ExecuteTemplate(w, "import-export-transaction", NewPlaceHolderStruct())
+	if MasterSettings.ImportExport {
+		templates.ExecuteTemplate(w, "import-export-transaction", NewPlaceHolderStruct())
+	} else {
+		templates.ExecuteTemplate(w, "notFoundError", NewPlaceHolderStruct())
+	}
 	return nil
 }
 

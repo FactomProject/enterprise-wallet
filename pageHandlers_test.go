@@ -11,29 +11,58 @@ var _ = fmt.Sprintf("")
 
 func TestSettings(t *testing.T) {
 	s := new(SettingsStruct)
-	s.KeyExport = true
 
-	data, err := s.MarshalBinary()
+	n, err := MarshalSettingAndGetNewUnmarshaled(s)
 	if err != nil {
-		t.Fatalf("Did not marshal")
+		t.Fatalf(err.Error())
+	}
+	if !n.IsSameAs(s) {
+		t.Fatal("Not the Same")
+	}
+
+	s.KeyExport = true
+	n, err = MarshalSettingAndGetNewUnmarshaled(s)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	if !n.IsSameAs(s) {
+		t.Fatal("Not the Same")
+	}
+
+	s.ImportExport = true
+	n, err = MarshalSettingAndGetNewUnmarshaled(s)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	if !n.IsSameAs(s) {
+		t.Fatal("Not the Same")
+	}
+
+	s.CoinControl = true
+	n, err = MarshalSettingAndGetNewUnmarshaled(s)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	if !n.IsSameAs(s) {
+		t.Fatal("Not the Same")
+	}
+}
+
+func MarshalSettingAndGetNewUnmarshaled(a *SettingsStruct) (*SettingsStruct, error) {
+	data, err := a.MarshalBinary()
+	if err != nil {
+		return nil, fmt.Errorf("Did not marshal")
 	}
 	_ = data
 
 	n := new(SettingsStruct)
 	newdata, err := n.UnmarshalBinaryData(data)
 	if err != nil {
-		t.Fatalf("Did not unmarshal", err)
+		return nil, fmt.Errorf("Did not unmarshal", err)
 	}
 	if len(newdata) != 0 {
-		t.Fatalf("Did not unmarshal correctly")
+		return nil, fmt.Errorf("Did not unmarshal correctly")
 	}
 
-	if n.DarkTheme != s.DarkTheme {
-		t.Fatalf("Does not match")
-	} else if n.Theme != s.Theme {
-		t.Fatalf("Does not match")
-	} else if n.KeyExport != s.KeyExport {
-		t.Fatalf("Does not match")
-	}
-
+	return n, nil
 }

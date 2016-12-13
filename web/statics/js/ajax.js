@@ -1,3 +1,5 @@
+FCTDecminalLength = 8 // Number of decimals places
+
 function getRequest(item, func) {
   var req = new XMLHttpRequest()
 
@@ -53,11 +55,15 @@ function updateBalances() {
 }
 
 function formatFC(fcBalance){
-  dec = (fcBalance/1e8).toFixed(8)
+  dec = FCTNormalize(fcBalance)
   decStr = dec.toString()
   decSplit = decStr.split(".")
 
   return decSplit
+}
+
+function FCTNormalize(fct) {
+  return Number((fct/1e8).toFixed(FCTDecminalLength))
 }
 
 // On most pages

@@ -3,19 +3,25 @@ function LoadRecAddresses(){
 	resp = getRequest("addresses",function(resp){
 		obj = JSON.parse(resp)
 		
-		obj.FactoidAddresses.List.forEach(function(address){
-			$('#receiving-address').append(dropDownOption(address));
-		})
+		if(obj.FactoidAddresses.List != null){
+			obj.FactoidAddresses.List.forEach(function(address){
+				$('#receiving-address').append(dropDownOption(address));
+			})
+		}
 
-		obj.EntryCreditAddresses.List.forEach(function(address){
-			$('#receiving-address').append(dropDownOption(address));
-		})
+		if(obj.EntryCreditAddresses.List != null){
+			obj.EntryCreditAddresses.List.forEach(function(address){
+				$('#receiving-address').append(dropDownOption(address));
+			})
+		}
 
-		obj.ExternalAddresses.List.forEach(function(address){
+		if(obj.ExternalAddresses.List != null) {
+			obj.ExternalAddresses.List.forEach(function(address){
 			//if(address.Address.startsWith("FA") == true) {
 				$('#receiving-address').append(dropDownOption(address));
 			//}
-		})
+			})
+		}
 
 		UpdateSelectedInfo()
  	})
@@ -57,6 +63,22 @@ function updateWithGivenAddress(address){
 	splits = splits[1].split(")")
 	$("#selected-address-info").val(splits[0])
 	$("#selected-address-info").text(splits[0])
+
+	jsonOBJ = '{"Address":"' + splits[0] + '"}'
+	postRequest("get-address", jsonOBJ, function(resp){
+		obj = JSON.parse(resp)
+		if (obj.Error != "none") {
+			$("#balance").val("Error")
+		} else {
+			if(obj.Content.Address.startsWith("FA")) {
+				$("#balance").val((obj.Content.Balance).toFixed(8))
+				$("#balance-type").text("FCT")
+			} else {
+				$("#balance").val(obj.Content.Balance)
+				$("#balance-type").text("EC")
+			}
+		}
+	})
 
 	// Remove last QR code
 	$('#qrcode').text("")
