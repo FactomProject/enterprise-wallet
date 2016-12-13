@@ -1,11 +1,11 @@
 $("#generate-source").on("change",function(){selected=$("#generate-source option:selected").val()
 if(selected=="new-external-address"){$("#sec-pub").text("Public")}else{$("#sec-pub").text("Private")}
-if(selected=="import-address"||selected=="new-external-address"){$('#private-key-input').prop("disabled",false);$('#private-key-input').removeClass("disabled-input");$('#nickname-input').addClass("input-group-error");$("#private-key-input-container").addClass("input-group-error");}else{$('#private-key-input').prop("disabled",true);$('#private-key-input').addClass("disabled-input")
+if(selected=="import-address"||selected=="new-external-address"||selected=="import-koinify"){$('#private-key-input').prop("disabled",false);$('#private-key-input').removeClass("disabled-input");$('#nickname-input').addClass("input-group-error");$("#private-key-input-container").addClass("input-group-error");}else{$('#private-key-input').prop("disabled",true);$('#private-key-input').addClass("disabled-input")
 $('#nickname-input').addClass("input-group-error");$("#private-key-input-container").removeClass("input-group-error");}})
 $("#private-key-input-container").on('click',function(){$(this).removeClass("input-group-error")})
 $("#nickname-input").on('click',function(){$(this).removeClass("input-group-error")})
 $("#generate-source").on('change',function(){selected=$("#generate-source option:selected").val()
-if(selected=="import-address"){$("#private-key-input").attr("placeholder","Type address private key")}else if(selected=="random-ec"){$("#private-key-input").attr("placeholder","A new entry credit address will be created")}else if(selected=="random-factoid"){$("#private-key-input").attr("placeholder","A new factoid address will be created")}else if(selected=="new-external-address"){$("#private-key-input").attr("placeholder","Type a public address to add to your contacts")}})
+if(selected=="import-address"){$("#private-key-input").attr("placeholder","Type address private key")}else if(selected=="random-ec"){$("#private-key-input").attr("placeholder","A new entry credit address will be created")}else if(selected=="random-factoid"){$("#private-key-input").attr("placeholder","A new factoid address will be created")}else if(selected=="new-external-address"){$("#private-key-input").attr("placeholder","Type a public address to add to your contacts")}else if(selected=="import-koinify"){$("#private-key-input").attr("placeholder","Type in your Koinify phrase")}})
 $("#add-to-addressbook").on("click",function(){$("#error-zone").slideUp(100)
 Name=$("#nickname-input").val()
 if(Name==""){SetError("Need a NickName for the new address")
@@ -27,7 +27,11 @@ postRequest("is-valid-address",pub,function(resp){if(resp=="false"){SetError("No
 $("#private-key-input-container").addClass("input-group-error");return}else{var newAddressObj={Name:Name,Public:pub}
 j=JSON.stringify(newAddressObj)
 postRequest("new-external-address",j,function(resp){obj=JSON.parse(resp)
-if(obj.Error=="none"){SetSuccess(obj)}else{SetError(obj.Error)}})}})}else{SetError("An error has occurred. No address type selected, please try selecting from the dropdown menu again, or reload this page.")}})
+if(obj.Error=="none"){SetSuccess(obj)}else{SetError(obj.Error)}})}})}else if(selected=="import-koinify"){koinify=$("#private-key-input").val()
+var newAddressObj={Name:Name,Koinify:koinify}
+j=JSON.stringify(newAddressObj)
+postRequest("import-koinify",j,function(resp){obj=JSON.parse(resp)
+if(obj.Error=="none"){SetSuccess(obj)}else{SetError(obj.Error)}})}else{SetError("An error has occurred. No address type selected, please try selecting from the dropdown menu again, or reload this page.")}})
 function SetError(err){$("#success-zone").slideUp(100)
 $("#error-zone").text(err)
 $("#error-zone").slideDown(100)}
