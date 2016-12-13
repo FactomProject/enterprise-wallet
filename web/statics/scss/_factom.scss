@@ -183,8 +183,9 @@ header {
     }
     h1 {
 		margin-bottom: 1rem;
-        color: lighten($primary-color, 20%);
-        font-size: 21px;
+        color: $tertiary-color;
+        font-size: 20px;
+		letter-spacing: 3px;
 		text-transform: uppercase;
         @include breakpoint(medium down) { font-size: 15px; }
     }
@@ -499,16 +500,26 @@ header {
                 }
             }
             table {
-                display: block;
+                display: table;
                 //max-height: 650px;
                 max-height: 100%;
                 width: 100%;
+				max-width: 99.5%;
                 margin: 0;
                 background: transparent;
                 //border: solid 8px $dark-gray;
                 border: none;
+				thead {
+					border: none;
+					th {
+						padding-top: 4px;
+						padding-bottom: 4px;
+						font-size: 12px;
+						text-transform: uppercase;
+					}
+				}
                 tbody {
-                    display: table;
+                    display: table-row-group;
                     width: 100%;
                     margin: 0;
                     background: transparent;
@@ -765,36 +776,37 @@ header {
                     ul { display: inline-block; }
                 }
             }
-			.reveal {
-				padding: 3em;
-				background: $white;
-				h1 {
-					font-size: 32px;
-					text-transform: uppercase;
-				}
-				&#transDetails {
-					width: 800px;
+        }
+		.reveal {
+			padding: 3em;
+			background: $white;
+			h1 {
+				font-size: 32px;
+				text-transform: uppercase;
+			}
+			&#transDetails {
+				width: 800px;
+				table {
+					width: 100%;
+					thead, tfoot { display: block; }
 					table {
-						thead, tfoot { display: block; }
-						table {
-							tr.total {
-								border-top: solid 1px $medium-gray;
-							}
-							td { 
-								padding-top: 3px;
-								padding-bottom: 3px;
-								font-family: monospace;
-								font-size: 14px;
-							}
+						tr.total {
+							border-top: solid 1px $medium-gray;
 						}
-						tr:hover table { 
-							tr:nth-child(even) { background: none; }
-							tr:hover { background: $white; }
+						td { 
+							padding-top: 3px;
+							padding-bottom: 3px;
+							font-family: monospace;
+							font-size: 14px;
 						}
+					}
+					tr:hover table { 
+						tr:nth-child(even) { background: none; }
+						tr:hover { background: $white; }
 					}
 				}
 			}
-        }
+		}
     }
 }
 
@@ -819,7 +831,7 @@ body.darkTheme {
 	}
 	hr { border-bottom-color: $dark-gray; }
 	header {
-		h1 { color: #939598; }
+		h1 { color: $tertiary-color; }
 		@include breakpoint(small only) { background: #000; }
 	}
 	#frame {
