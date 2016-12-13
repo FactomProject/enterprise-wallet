@@ -29,7 +29,9 @@ function LoadTransactions() {
 		Transactions = obj.Content
 
 		if(obj.Content.length > 0 && obj.Content[0].TxID == "empty") {
-			SetGeneralError("Your addresses do not have any transactions in the blockchain")
+			SetGeneralError("Your addresses do not have any transactions in the blockchain. " +
+				"It could be the blockchain is not fully synced, the Control Panel will inform you of your current height. " +
+				"Please try again in a few minutes.")
 			return
 		} else if(obj.Content.length == 0) {
 			return
