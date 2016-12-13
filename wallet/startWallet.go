@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet/wsapi"
@@ -25,6 +26,8 @@ func StartWallet(walletPort int, factomdPort int, guiDBType int, walletDBType in
 	}
 
 	// TODO: Adjust start of WSAPI -- RpcConfig
+	portStr := "localhost:" + strconv.Itoa(walletPort)
+	fmt.Println("Starting Wallet WSAPI on http://localhost" + portStr + "/")
 	go wsapi.Start(wal.Wallet, fmt.Sprintf(":%d", walletPort), *(factom.RpcConfig))
 
 	return wal, nil

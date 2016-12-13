@@ -15,7 +15,6 @@ $("#save-changes").on('click', function(){
 
 	j = JSON.stringify(SettingsStruct)
 	postRequest("adjust-settings", j, function(resp){
-		console.log(resp)
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {
 	      location.reload();

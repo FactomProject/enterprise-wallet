@@ -898,10 +898,14 @@ func (w *WalletDB) IsValidAddress(address string) bool {
 }
 
 func (w *WalletDB) GetECBalance() int64 {
+	w.guiWallet.RLock()
+	defer w.guiWallet.RUnlock()
 	return w.guiWallet.ECTotal
 }
 
 func (w *WalletDB) GetFactoidBalance() int64 {
+	w.guiWallet.RLock()
+	defer w.guiWallet.RUnlock()
 	return w.guiWallet.FactoidTotal
 }
 

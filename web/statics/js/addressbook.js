@@ -26,7 +26,6 @@ function LoadAddresses(){
 }
 
 function addressTableRow(address, type) {
-	console.log(address)
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
 		address.Balance = Number(address.Balance.toFixed(4))

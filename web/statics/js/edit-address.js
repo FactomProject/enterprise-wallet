@@ -11,9 +11,7 @@ function GetDefaultData(){
 
 	jsonOBJ = '{"Address":"' + Address + '"}'
 	postRequest("get-address", jsonOBJ, function(resp){
-		console.log(resp)
 		obj = JSON.parse(resp)
-		console.log(obj)
 		if (obj.Error != "none") {
 			$("#balance-container").text("Can not find the addresses in address book")
 		} else {
@@ -24,13 +22,11 @@ function GetDefaultData(){
 			}
 		}
 	})
-	console.log(Name, Address)
 }
 
 $("#display-private-key").click(function(){
 	jsonOBJ = '{"Address":"' + Address + '"}'
 	postRequest("display-private-key", jsonOBJ, function(resp){
-				console.log(resp)
 		obj = JSON.parse(resp)
 		if (obj.Error != "none") {
 			$("#private-key-field").val(obj.Error)

@@ -1,8 +1,10 @@
 #!/bin/bash
 # minify -o out.html in.html
-$1
 
 echo "Moving all files to min-directory..."
+rm -r min-statics/
+rm -r min-templates/
+
 cp -r statics/ min-statics/
 cp -r templates/ min-templates/
 
@@ -21,7 +23,7 @@ else
 fi
 
 echo "Minfying css..."
+echo "  Minifying statics/css/app.css..."
 minify -o min-statics/css/app.css statics/css/app.css
+echo "  Minifying statics/css/other.css..."
 minify -o min-statics/css/other.css statics/css/other.css
-
-echo "Done"

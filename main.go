@@ -107,7 +107,6 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	}
 	//
 
-	fmt.Printf("Starting wallet on localhost:%d\n", port)
 	ServeWallet(port)
 }
 

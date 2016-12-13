@@ -66,9 +66,7 @@ function updateWithGivenAddress(address){
 
 	jsonOBJ = '{"Address":"' + splits[0] + '"}'
 	postRequest("get-address", jsonOBJ, function(resp){
-		console.log(resp)
 		obj = JSON.parse(resp)
-		console.log(obj)
 		if (obj.Error != "none") {
 			$("#balance").val("Error")
 		} else {

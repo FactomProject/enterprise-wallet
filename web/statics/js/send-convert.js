@@ -416,7 +416,6 @@ $("#addresses-reveal-button").on("click", function(){
     return
   }
 
-  console.log($(".single-output-1 #output-factoid-address").html())
   $(".single-output-" + toChange + " #output-factoid-address").val(newAddress)
   $(".single-output-" + toChange + " #output-factoid-address-container").removeClass("input-group-error")
   /* Old Method

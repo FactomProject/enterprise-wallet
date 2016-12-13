@@ -9,6 +9,8 @@ import (
 	"sync"
 	"text/template"
 	"time"
+
+	"github.com/FactomProject/M2GUIWallet/web/files"
 )
 
 var (
@@ -20,18 +22,32 @@ var (
 	TemplateMutex sync.Mutex
 )
 
+// Use or no use compiled statics. Keeping a non-compiled
+// option for front end design changes
+var COMPILED_STATICS = false
+
 func SaveSettings() error {
 	err := MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 	return err
 }
 
-// TODO: Compile statics into Go
 func ServeWallet(port int) {
-	templates = template.New("main")
+
+	// Templates
+	TemplateMutex.Lock()
 	// Put function into templates
 	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts, "compareStrings": compareStrings}
+	templates = template.New("main")
 	templates.Funcs(template.FuncMap(funcMap))
-	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
+	if COMPILED_STATICS { // Use compiled
+		templates = files.CustomParseGlob(templates, "templates/*.html")
+		templates = template.Must(templates, nil)
+	} else { // Use non-compiled
+		templates = template.New("main")
+		templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
+	}
+	templates.Funcs(template.FuncMap(funcMap))
+	TemplateMutex.Unlock()
 
 	// Update the balances every 10 seconds to keep it updated. We can force
 	// an update if we send a transaction or something
@@ -42,7 +58,11 @@ func ServeWallet(port int) {
 
 	// Mux for static files
 	mux = http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir(FILES_PATH+"statics")))
+	if COMPILED_STATICS {
+		mux.Handle("/", files.StaticServer)
+	} else {
+		mux.Handle("/", http.FileServer(http.Dir(FILES_PATH+"statics")))
+	}
 
 	http.HandleFunc("/", static(pageHandler))
 	http.HandleFunc("/GET", HandleGETRequests)
@@ -50,7 +70,7 @@ func ServeWallet(port int) {
 
 	portStr := "localhost:" + strconv.Itoa(port)
 
-	fmt.Println("Starting Wallet on http://localhost" + portStr + "/")
+	fmt.Println("Starting GUI on http://localhost" + portStr + "/")
 	http.ListenAndServe(portStr, nil)
 }
 
@@ -59,10 +79,12 @@ func mkArray(args ...interface{}) []interface{} {
 	return args
 }
 
+// Used inside templates to compare ints
 func compareInts(a int, b int) bool {
 	return (a == b)
 }
 
+// Used inside templates to compare strings
 func compareStrings(a string, b string) bool {
 	return (a == b)
 }
@@ -78,6 +100,8 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// Update various elements. Faster load times for user if these
+// are loaded when they are not asking
 func updateBalances(time.Time) {
 	MasterWallet.AddBalancesToAddresses()
 	MasterWallet.UpdateGUIDB()
@@ -91,13 +115,10 @@ func doEvery(d time.Duration, f func(time.Time)) {
 	}
 }
 
+// Redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-	// Remove any GET data
 	request := strings.Split(r.RequestURI, "?")
-	//fmt.Println(r.RequestURI)
-
 	var err error
-
 	switch request[0] {
 	case "/":
 		err = HandleIndexPage(w, r)
@@ -136,6 +157,7 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Used for responding to Post/Get Requests
 type jsonResponse struct {
 	Error   string      `json:"Error"`
 	Content interface{} `json:"Content"`
@@ -158,15 +180,16 @@ func (j *jsonResponse) Bytes() []byte {
 	return data
 }
 
+// If request is successful
 func jsonResp(content interface{}) []byte {
 	e := newJsonResponse("none", content)
 	return e.Bytes()
 }
 
+// If request has an error
 func jsonError(err string) []byte {
 	e := newJsonResponse(err, "none")
 	return e.Bytes()
-	//return []byte("{'error':'" + err + "'}")
 }
 
 func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
@@ -209,9 +232,6 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 				w.Write(jsonResp(trans))
 			}
 		}
-	// TODO: Remove
-	case "test-error":
-		w.Write(jsonError("This is an error for tests"))
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}
