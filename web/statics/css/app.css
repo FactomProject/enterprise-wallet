@@ -3570,8 +3570,9 @@ header {
         max-width: 140px; } }
   header h1 {
     margin-bottom: 1rem;
-    color: #7faccc;
-    font-size: 21px;
+    color: #e8b521;
+    font-size: 20px;
+    letter-spacing: 3px;
     text-transform: uppercase; }
     @media screen and (max-width: 74.9375em) {
       header h1 {
@@ -3802,6 +3803,7 @@ header {
         font-weight: 400;
         text-transform: uppercase; }
       #frame section.rightCol main form .row {
+        width: 100%;
         max-width: none;
         margin-left: -0.625rem;
         margin-right: -0.625rem; }
@@ -3879,68 +3881,76 @@ header {
           border: solid #7faccc;
           border-width: 0 4px 4px 0;
           transform: rotate(45deg); }
-      #frame section.rightCol main table, #frame section.rightCol main .abTable {
-        display: block;
+      #frame section.rightCol main table {
+        display: table;
         max-height: 100%;
         width: 100%;
+        max-width: 99.5%;
         margin: 0;
         background: transparent;
         border: none; }
-        #frame section.rightCol main table tbody, #frame section.rightCol main .abTable tbody {
-          display: table;
+        #frame section.rightCol main table thead {
+          border: none; }
+          #frame section.rightCol main table thead th {
+            padding-top: 4px;
+            padding-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase; }
+        #frame section.rightCol main table tbody {
+          display: table-row-group;
           width: 100%;
           margin: 0;
           background: transparent;
           border: none;
           border-right: solid 8px transparent; }
           @media screen and (min-width: 0em) and (max-width: 39.9375em) {
-            #frame section.rightCol main table tbody, #frame section.rightCol main .abTable tbody {
+            #frame section.rightCol main table tbody {
               border-right: none; } }
-          #frame section.rightCol main table tbody tr, #frame section.rightCol main .abTable tbody tr {
+          #frame section.rightCol main table tbody tr {
             background: transparent;
             transition: ease 0.15s background-color; }
-            #frame section.rightCol main table tbody tr:nth-child(even), #frame section.rightCol main .abTable tbody tr:nth-child(even) {
+            #frame section.rightCol main table tbody tr:nth-child(even) {
               background: #f8f8f8; }
-            #frame section.rightCol main table tbody tr td, #frame section.rightCol main .abTable tbody tr td {
+            #frame section.rightCol main table tbody tr td {
               padding: 1.25rem 1rem;
               transition: ease 0.15s color;
               font-size: 16px; }
               @media screen and (min-width: 0em) and (max-width: 39.9375em) {
-                #frame section.rightCol main table tbody tr td, #frame section.rightCol main .abTable tbody tr td {
+                #frame section.rightCol main table tbody tr td {
                   padding: 0.75rem 1rem;
                   font-size: 12px; } }
-              #frame section.rightCol main table tbody tr td a, #frame section.rightCol main .abTable tbody tr td a {
+              #frame section.rightCol main table tbody tr td a {
                 transition: ease 0.15s color; }
-                #frame section.rightCol main table tbody tr td a i svg path, #frame section.rightCol main table tbody tr td a i svg rect, #frame section.rightCol main table tbody tr td a i svg poly, #frame section.rightCol main table tbody tr td a i .svg path, #frame section.rightCol main table tbody tr td a i .svg rect, #frame section.rightCol main table tbody tr td a i .svg poly, #frame section.rightCol main .abTable tbody tr td a i svg path, #frame section.rightCol main .abTable tbody tr td a i svg rect, #frame section.rightCol main .abTable tbody tr td a i svg poly, #frame section.rightCol main .abTable tbody tr td a i .svg path, #frame section.rightCol main .abTable tbody tr td a i .svg rect, #frame section.rightCol main .abTable tbody tr td a i .svg poly {
+                #frame section.rightCol main table tbody tr td a i svg path, #frame section.rightCol main table tbody tr td a i svg rect, #frame section.rightCol main table tbody tr td a i svg poly, #frame section.rightCol main table tbody tr td a i .svg path, #frame section.rightCol main table tbody tr td a i .svg rect, #frame section.rightCol main table tbody tr td a i .svg poly {
                   fill: #e8b521 !important; }
-                #frame section.rightCol main table tbody tr td a:hover, #frame section.rightCol main .abTable tbody tr td a:hover {
+                #frame section.rightCol main table tbody tr td a:hover {
                   text-decoration: underline; }
-                  #frame section.rightCol main table tbody tr td a:hover i svg path, #frame section.rightCol main table tbody tr td a:hover i svg rect, #frame section.rightCol main table tbody tr td a:hover i svg poly, #frame section.rightCol main table tbody tr td a:hover i .svg path, #frame section.rightCol main table tbody tr td a:hover i .svg rect, #frame section.rightCol main table tbody tr td a:hover i .svg poly, #frame section.rightCol main .abTable tbody tr td a:hover i svg path, #frame section.rightCol main .abTable tbody tr td a:hover i svg rect, #frame section.rightCol main .abTable tbody tr td a:hover i svg poly, #frame section.rightCol main .abTable tbody tr td a:hover i .svg path, #frame section.rightCol main .abTable tbody tr td a:hover i .svg rect, #frame section.rightCol main .abTable tbody tr td a:hover i .svg poly {
+                  #frame section.rightCol main table tbody tr td a:hover i svg path, #frame section.rightCol main table tbody tr td a:hover i svg rect, #frame section.rightCol main table tbody tr td a:hover i svg poly, #frame section.rightCol main table tbody tr td a:hover i .svg path, #frame section.rightCol main table tbody tr td a:hover i .svg rect, #frame section.rightCol main table tbody tr td a:hover i .svg poly {
                     fill: #417ba4 !important; }
-              #frame section.rightCol main table tbody tr td i, #frame section.rightCol main .abTable tbody tr td i {
+              #frame section.rightCol main table tbody tr td i {
                 display: block;
                 width: 64px;
                 height: 40px;
                 margin: 0 auto; }
-                #frame section.rightCol main table tbody tr td i.received, #frame section.rightCol main .abTable tbody tr td i.received {
+                #frame section.rightCol main table tbody tr td i.received {
                   width: 48px;
                   height: 52px; }
-                #frame section.rightCol main table tbody tr td i.converted, #frame section.rightCol main .abTable tbody tr td i.converted {
+                #frame section.rightCol main table tbody tr td i.converted {
                   width: 81px;
                   height: 60px; }
-                #frame section.rightCol main table tbody tr td i svg path, #frame section.rightCol main table tbody tr td i svg rect, #frame section.rightCol main table tbody tr td i svg poly, #frame section.rightCol main table tbody tr td i .svg path, #frame section.rightCol main table tbody tr td i .svg rect, #frame section.rightCol main table tbody tr td i .svg poly, #frame section.rightCol main .abTable tbody tr td i svg path, #frame section.rightCol main .abTable tbody tr td i svg rect, #frame section.rightCol main .abTable tbody tr td i svg poly, #frame section.rightCol main .abTable tbody tr td i .svg path, #frame section.rightCol main .abTable tbody tr td i .svg rect, #frame section.rightCol main .abTable tbody tr td i .svg poly {
+                #frame section.rightCol main table tbody tr td i svg path, #frame section.rightCol main table tbody tr td i svg rect, #frame section.rightCol main table tbody tr td i svg poly, #frame section.rightCol main table tbody tr td i .svg path, #frame section.rightCol main table tbody tr td i .svg rect, #frame section.rightCol main table tbody tr td i .svg poly {
                   transition: ease 0.15s fill; }
                 @media screen and (min-width: 0em) and (max-width: 39.9375em) {
-                  #frame section.rightCol main table tbody tr td i, #frame section.rightCol main .abTable tbody tr td i {
+                  #frame section.rightCol main table tbody tr td i {
                     width: 36px;
                     height: 25px; }
-                    #frame section.rightCol main table tbody tr td i.received, #frame section.rightCol main .abTable tbody tr td i.received {
+                    #frame section.rightCol main table tbody tr td i.received {
                       width: 28px;
                       height: 28px; }
-                    #frame section.rightCol main table tbody tr td i.converted, #frame section.rightCol main .abTable tbody tr td i.converted {
+                    #frame section.rightCol main table tbody tr td i.converted {
                       width: 40px;
                       height: 36px; } }
-            #frame section.rightCol main table tbody tr:hover, #frame section.rightCol main .abTable tbody tr:hover {
+            #frame section.rightCol main table tbody tr:hover {
               background: #fbf3da; }
       #frame section.rightCol main.transactions table tbody tr td a i svg path, #frame section.rightCol main.transactions table tbody tr td a i svg rect, #frame section.rightCol main.transactions table tbody tr td a i svg poly, #frame section.rightCol main.transactions table tbody tr td a i .svg path, #frame section.rightCol main.transactions table tbody tr td a i .svg rect, #frame section.rightCol main.transactions table tbody tr td a i .svg poly {
         fill: #656666 !important; }
@@ -4107,26 +4117,20 @@ header {
       #frame section.rightCol .reveal#transDetails {
         width: 800px; }
         #frame section.rightCol .reveal#transDetails table {
-          width: 100%;
-          background: #fafafa; }
-          #frame section.rightCol .reveal#transDetails table thead {
-            background: #417ba4;
-            border: none;
-            color: #fff; }
-          #frame section.rightCol .reveal#transDetails table tbody {
-            background: none;
-            border: none; }
-          #frame section.rightCol .reveal#transDetails table table {
+          width: 100%; }
+          #frame section.rightCol .reveal#transDetails table thead, #frame section.rightCol .reveal#transDetails table tfoot {
+            display: block; }
+          #frame section.rightCol .reveal#transDetails table table tr.total {
+            border-top: solid 1px #939598; }
+          #frame section.rightCol .reveal#transDetails table table td {
+            padding-top: 3px;
+            padding-bottom: 3px;
+            font-family: monospace;
+            font-size: 14px; }
+          #frame section.rightCol .reveal#transDetails table tr:hover table tr:nth-child(even) {
+            background: none; }
+          #frame section.rightCol .reveal#transDetails table tr:hover table tr:hover {
             background: #fff; }
-            #frame section.rightCol .reveal#transDetails table table tr:nth-child(even) {
-              background: #fafafa; }
-            #frame section.rightCol .reveal#transDetails table table tr.total {
-              border-top: solid 1px #939598; }
-            #frame section.rightCol .reveal#transDetails table table td {
-              padding-top: 3px;
-              padding-bottom: 3px;
-              font-family: monospace;
-              font-size: 14px; }
 
 .coin-control {
   display: none; }
@@ -4148,7 +4152,7 @@ body.darkTheme {
   body.darkTheme hr {
     border-bottom-color: #656666; }
   body.darkTheme header h1 {
-    color: #939598; }
+    color: #e8b521; }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
     body.darkTheme header {
       background: #000; } }
@@ -4199,6 +4203,12 @@ body.darkTheme {
         background: #4f2b12; }
     body.darkTheme #frame section.rightCol main form input[type='checkbox'] + label:before {
       background-color: #323333; }
+    body.darkTheme #frame section.rightCol main .reveal {
+      background: #111;
+      border-color: #417ba4; }
+      body.darkTheme #frame section.rightCol main .reveal thead, body.darkTheme #frame section.rightCol main .reveal tfoot {
+        background: #222;
+        border-color: #333; }
     body.darkTheme #frame section.rightCol main .newCTA.active ul {
       background: #000;
       box-shadow: 0 0 90px 0 rgba(255, 255, 255, 0.3); }
@@ -4208,11 +4218,5 @@ body.darkTheme {
         body.darkTheme #frame section.rightCol main .newCTA.active ul li a:hover {
           background: #e8b521;
           color: #fff; }
-    body.darkTheme #frame section.rightCol .reveal {
-      background: #111;
-      border-color: #417ba4; }
-      body.darkTheme #frame section.rightCol .reveal thead, body.darkTheme #frame section.rightCol .reveal tfoot {
-        background: #222;
-        border-color: #333; }
 
 /*# sourceMappingURL=app.css.map */

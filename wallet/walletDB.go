@@ -744,7 +744,7 @@ func (w *WalletDB) RemoveAddressFromAnyList(address string) (*address.AddressNam
 
 func (w *WalletDB) AddExternalAddress(name string, public string) (*address.AddressNamePair, error) {
 	if !factom.IsValidAddress(public) {
-		return nil, fmt.Errorf("Not a valid private key")
+		return nil, fmt.Errorf("Not a valid public key")
 	}
 
 	anp, err := w.addGUIAddress(name, public, 3)

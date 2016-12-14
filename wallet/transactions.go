@@ -105,6 +105,9 @@ func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64
 		return nil, fmt.Errorf("Length of addresses and amounts do not match")
 	}
 	for i, a := range amounts {
+		if len(addresses[i]) < 20 {
+			return nil, fmt.Errorf("Invalid address given")
+		}
 		if addresses[i][:2] == "FA" {
 			amt64, err := strconv.ParseFloat(a, 64)
 			if err != nil {
@@ -241,6 +244,12 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 		}
 	}
 
+	if total > totalIn {
+		return trans, nil, fmt.Errorf("The amount of input is not enough to cover the transaction. The needed input is: %f FCT.\n", float64(total)/1e8)
+	} else if total < totalIn {
+		return trans, nil, fmt.Errorf("The amount of input is too much for the transaction. The needed input is: %f FCT.\n", float64(total)/1e8)
+	}
+
 	transStruct := wal.Wallet.GetTransactions()[trans]
 	if transStruct == nil {
 		return trans, nil, fmt.Errorf("Transaction not found")
@@ -254,10 +263,6 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 	err = wal.Wallet.AddFee(trans, feeAddress, rate)
 	if err != nil {
 		return trans, nil, err
-	}
-
-	if total != totalIn {
-		return trans, nil, fmt.Errorf("The amount of input is not enough to cover the transaction. The needed input is: %f FCT.\n", total/1e8)
 	}
 
 	if sign {
