@@ -232,7 +232,8 @@ function getTransactionObject(checkInput) {
     }
 
     amt = $(this).find("#output-factoid-amount").val()
-    if(amt == 0 || amt == undefined) {
+          console.log(amt, Number(amt))
+    if(Number(amt) == 0 || amt == undefined || amt == "") {
       $(this).find("#output-factoid-amount").addClass("input-group-error")
       amtErr = true
       err = true
@@ -246,7 +247,6 @@ function getTransactionObject(checkInput) {
     // Only FCT for inputs
     if(!$("#coin-control").hasClass("coin-control")) {
       $("#all-inputs #single-input").each(function(){
-        err = false
         add = $(this).find("#input-factoid-address").val()
         if(!add.startsWith("FA")) {
           $(this).find("#input-factoid-address-container").addClass("input-group-error")
@@ -255,7 +255,7 @@ function getTransactionObject(checkInput) {
         }
 
         amt = $(this).find("#input-factoid-amount").val()
-        if(amt == 0 || amt == undefined) {
+        if(Number(amt) == 0 || amt == undefined || amt == "") {
           $(this).find("#input-factoid-amount").addClass("input-group-error")
           amtErr = true
           err = true

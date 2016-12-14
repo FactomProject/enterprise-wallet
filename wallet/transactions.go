@@ -113,13 +113,13 @@ func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64
 		if addresses[i][:2] == "FA" {
 			amt64, err := strconv.ParseFloat(a, 64)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("Invalid amount given")
 			}
 			amts = append(amts, uint64(amt64*1e8))
 		} else {
 			amt64, err := strconv.ParseUint(a, 10, 64)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("Invalid amount given")
 			}
 			amts = append(amts, uint64(amt64))
 		}
