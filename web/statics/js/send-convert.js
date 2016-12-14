@@ -146,9 +146,9 @@ $("#make-entire-transaction").on('click', function(){
   if(Input) {
     if($(this).attr("value") == "1") {
       if($("#sign-transaction").prop('checked')) {
-        MakeTransaction(false)
-      } else {
         MakeTransaction(true)
+      } else {
+        MakeTransaction(false)
       }
     } else {
       MakeTransaction(true)
@@ -159,8 +159,7 @@ $("#make-entire-transaction").on('click', function(){
 function MakeTransaction(sig) {
   transObject = getTransactionObject(true)
 
-  console.log(sig)
-  if(sig) {
+  if(!sig) {
     transObject.TransType = "nosig"
   }
 
