@@ -711,7 +711,6 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 	return anp, nil
 }
 
-// TODO: Fix, make wallet take the remove
 func (w *WalletDB) RemoveAddress(address string, list int) (*address.AddressNamePair, error) {
 	anp, _, _ := w.guiWallet.GetAddress(address)
 
@@ -753,6 +752,19 @@ func (w *WalletDB) AddExternalAddress(name string, public string) (*address.Addr
 	}
 
 	return anp, nil
+}
+
+func (w *WalletDB) ImportSeed(seed string) error {
+	seedStruct := new(wallet.DBSeed)
+	seedStruct.MnemonicSeed = seed
+	err := w.Wallet.InsertDBSeed(seedStruct)
+	if err != nil {
+		return err
+	}
+
+	w.guiWallet.ResetSeeded()
+	w.UpdateGUIDB()
+	return nil
 }
 
 func (w *WalletDB) ImportKoinify(name string, koinify string) (*address.AddressNamePair, error) {

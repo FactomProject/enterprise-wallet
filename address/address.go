@@ -216,6 +216,12 @@ func (addList *AddressList) Remove(removeAdd string) error {
 	return nil
 }
 
+func (addList *AddressList) ResetSeeded() {
+	for i := range addList.List {
+		addList.List[i].Seeded = false
+	}
+}
+
 func (addList *AddressList) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	var number [8]byte

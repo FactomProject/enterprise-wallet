@@ -600,8 +600,10 @@ $("#import-file").on('click', function(){
 
 // Do action with imported transaction
 function receivedText() {
+  x = fr.result
   console.log(fr.result)
 }
+
 
 /* http://stackoverflow.com/questions/12281775/get-data-from-file-input-in-jquery
 <script>        

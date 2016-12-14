@@ -198,6 +198,14 @@ func (w *WalletStruct) GetAllMyGUIAddresses() []address.AddressNamePair {
 	return anpList
 }
 
+// Simply remove all seeded flags
+func (w *WalletStruct) ResetSeeded() {
+	w.Lock()
+	w.FactoidAddresses.ResetSeeded()
+	w.EntryCreditAddresses.ResetSeeded()
+	w.Unlock()
+}
+
 func (w *WalletStruct) GetAllAddressesFromList(list int) []address.AddressNamePair {
 	w.RLock()
 	defer w.RUnlock()
@@ -231,8 +239,8 @@ func (w *WalletStruct) IsSameAs(b *WalletStruct) bool {
 }
 
 func (w *WalletStruct) MarshalBinary() ([]byte, error) {
-	w.RLock()
-	defer w.RUnlock()
+	w.Lock()
+	defer w.Unlock()
 	buf := new(bytes.Buffer)
 
 	data, err := w.FactoidAddresses.MarshalBinary()

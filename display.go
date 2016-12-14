@@ -606,6 +606,26 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Write(jsonResp(seed))
+	case "import-seed":
+		type SeedStruct struct {
+			Seed string `json:"Seed"`
+		}
+
+		ss := new(SeedStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), ss)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		err = MasterWallet.ImportSeed(ss.Seed)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		w.Write(jsonResp(ss.Seed))
 	case "more-cached-transaction":
 		type MoreRelatedTransactionReq struct {
 			Current int `json:"Current"` // Current index in list
