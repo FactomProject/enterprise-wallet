@@ -920,6 +920,15 @@ func (w *WalletDB) GetFactoidBalance() int64 {
 	return w.guiWallet.FactoidTotal
 }
 
+func (w *WalletDB) FactomdOnline() (bool, string) {
+	_, err := factom.GetHeights()
+	if err != nil {
+		return false, factom.FactomdServer()
+	} else {
+		return true, factom.FactomdServer()
+	}
+}
+
 func GetHomeDir() string {
 	// Get the OS specific home directory via the Go standard lib.
 	var homeDir string

@@ -40,7 +40,7 @@
         </div>
     </div>
     <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
-    <div id="success-zone" class="callout success text-center" style="display:none"></div>
+    <div id="success-zone" class="callout success text-center" {{if .Success}} {{else}} style="display:none" {{end}}>Settings Saved</div>
 </form>
 
 {{template "templateBottom" "settings"}}

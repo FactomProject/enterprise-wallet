@@ -17,9 +17,10 @@ $("#save-changes").on('click', function(){
 	postRequest("adjust-settings", j, function(resp){
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {
-	      location.reload();
+	    	window.location.href = window.location.href + "?success=true";
+	      	//location.reload();
 	    } else {
-	      SetGeneralError("Error: " + obj.Error)
+	    	SetGeneralError("Error: " + obj.Error)
 	    }
 	})
 })
@@ -28,12 +29,12 @@ $("#export-seed").on('click', function(){
 	postRequest("get-seed", "", function(resp){
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {
-	      var link = document.createElement("a");
-		   link.download = "WalletSeed.txt";
-		   link.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.Content);
-		   link.click();
+	    	var link = document.createElement("a");
+			link.download = "WalletSeed.txt";
+			link.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.Content);
+			link.click();
 	    } else {
-	      SetGeneralError("Error: " + obj.Error)
+	    	SetGeneralError("Error: " + obj.Error)
 	    }
 	})
 })

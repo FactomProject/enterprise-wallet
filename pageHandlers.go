@@ -161,11 +161,27 @@ func HandleAddressBook(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+type HandleSettingsStruct struct {
+	Settings *SettingsStruct
+
+	Success bool
+}
+
 func HandleSettings(w http.ResponseWriter, r *http.Request) error {
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
 
-	templates.ExecuteTemplate(w, "settings", NewPlaceHolderStruct())
+	suc := r.FormValue("success")
+
+	st := new(HandleSettingsStruct)
+	st.Settings = MasterSettings
+
+	st.Success = false
+	if suc == "true" {
+		st.Success = true
+	}
+
+	templates.ExecuteTemplate(w, "settings", st)
 	return nil
 }
 
