@@ -43,7 +43,7 @@ func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 
 // Doublechecks the transaction is the same (with amounts and addresses)
 // This is to confirm an already constructed transaction
-func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []string) (string, error) {
+func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []string, feeAddress string) (string, error) {
 	name := hashStringList(toAddresses)
 	name = name[:32] // name of transaction
 
@@ -75,7 +75,9 @@ func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []
 			if toAddresses[i][:2] == "FA" {
 				compAddr = primitives.ConvertFctAddressToUserStr(o.GetAddress())
 				if o.GetAmount() != uint64(amt) {
-					return name, fmt.Errorf("A change in the amount of an output has been detected")
+					if toAddresses[i] != feeAddress {
+						return name, fmt.Errorf("A change in the amount of an output has been detected")
+					}
 				}
 			} else {
 				compAddr = primitives.ConvertECAddressToUserStr(o.GetAddress())
@@ -260,9 +262,21 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 		return trans, nil, err
 	}
 
-	err = wal.Wallet.AddFee(trans, feeAddress, rate)
-	if err != nil {
-		return trans, nil, err
+	feeTakenCareOf := false // Did the loop find an address to deduct from
+	for _, add := range toAddresses {
+		if add[:2] == "FA" {
+			if add == feeAddress {
+				wal.Wallet.SubFee(trans, add, rate)
+				feeTakenCareOf = true
+				break
+			}
+		}
+	}
+	if !feeTakenCareOf {
+		err = wal.Wallet.AddFee(trans, feeAddress, rate)
+		if err != nil {
+			return trans, nil, err
+		}
 	}
 
 	if sign {

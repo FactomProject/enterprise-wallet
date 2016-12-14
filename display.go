@@ -550,7 +550,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name, err := MasterWallet.CheckTransactionAndGetName(trans.ToAddresses, trans.ToAmounts)
+		name, err := MasterWallet.CheckTransactionAndGetName(trans.ToAddresses, trans.ToAmounts, trans.FeeAddress)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
