@@ -159,7 +159,8 @@ $("#make-entire-transaction").on('click', function(){
 function MakeTransaction(sig) {
   transObject = getTransactionObject(true)
 
-  if(!sig) {
+  console.log(sig)
+  if(sig) {
     transObject.TransType = "nosig"
   }
 

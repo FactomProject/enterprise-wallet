@@ -39,32 +39,36 @@ $("#export-seed").on('click', function(){
 	})
 })
 
+//selected = false
 // Import/Export
 $("#import-file").on('click', function(e){
-  input = document.getElementById('uploaded-file');
-  if (!input) {
-  	SetGeneralError("Error: Couldn't find the fileinput element.")
-  	e.stopPropagation()
-  }
-  else if (!input.files) {
-  	SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
-  	e.stopPropagation()
-  }
-  else if (!input.files[0]) {
-  	SetGeneralError("Please select a file before clicking 'Import From File'")
-  	e.stopPropagation()  
-  }
-  else {
-    file = input.files[0];
-    fr = new FileReader();
-    fr.onload = receivedText;
-    fr.readAsText(file);
-    //fr.readAsDataURL(file);
-  }
+	document.getElementById('uploaded-file').click()
+})
+
+
+$("#uploaded-file").on('change', function(){
+	input = document.getElementById('uploaded-file');
+	if (!input) {
+		SetGeneralError("Error: Couldn't find the fileinput element.")
+	}
+	else if (!input.files) {
+		SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
+	}
+	else if (!input.files[0]) {
+		SetGeneralError("Please select a file before clicking 'Import From File'")
+	}
+	else {
+	file = input.files[0];
+	fr = new FileReader();
+	fr.onload = receivedText;
+	fr.readAsText(file);
+	//fr.readAsDataURL(file);
+	}
 })
 
 // Do action with imported transaction
 function receivedText() {
+	document.getElementById('data-expand').click()
 	is = fr.result
 	len = is.split(" ")
 	if(len.length != 12) {
