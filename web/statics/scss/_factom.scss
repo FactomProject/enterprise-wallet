@@ -664,6 +664,12 @@ header {
                     }
                 }
             }
+			&.settings {
+				.callout.warning {
+					border-color: $secondary-color;
+					p { color: $secondary-color; }
+				}
+			}
             .newCTA {
                 position: relative;
                 margin: 0;
@@ -778,6 +784,20 @@ header {
                 }
             }
         }
+		.input-group {
+			position: relative;
+			.calc {
+				position: absolute;
+				bottom: 100%;
+				left: 0;
+				width: 100%;
+				padding: 4px 16px;
+				background: lighten($secondary-color, 40%);
+				border-top-left-radius: 16px;
+				border-top-right-radius: 16px;
+				color: $secondary-color;
+			}
+		}
 		.reveal {
 			padding: 3em;
 			background: $white;
@@ -855,6 +875,9 @@ body.darkTheme {
 		section.rightCol { 
 			background: #000;
 			section.balances { background: #151515; }
+			main table thead {
+				background: darken($primary-color, 35%);
+			}
 			main table tbody tr td {
 				svg, .svg {
 					path, rect, poly { 
@@ -939,6 +962,10 @@ body.darkTheme {
 						color: $white;
 					}
 				}
+			}
+			.input-group .calc {
+				background: darken($tertiary-color, 35%);
+				color: $tertiary-color;
 			}
 		}
 	}
