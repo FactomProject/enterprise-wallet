@@ -231,9 +231,13 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			MasterWallet.ActiveCachedTransactions = trans
 			if len(trans) > 100 {
-				w.Write(jsonResp(trans[:100]))
+				next := trans[:100]
+				next = MasterWallet.ScrubDisplayTransactionsForNameChanges(next)
+				w.Write(jsonResp(next))
 			} else {
-				w.Write(jsonResp(trans))
+				next := trans
+				next = MasterWallet.ScrubDisplayTransactionsForNameChanges(next)
+				w.Write(jsonResp(next))
 			}
 		}
 	default:
@@ -704,9 +708,13 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		total := len(MasterWallet.ActiveCachedTransactions)
 		max := rt.Current + rt.More
 		if max > total {
-			w.Write(jsonResp(MasterWallet.ActiveCachedTransactions[rt.Current:]))
+			next := MasterWallet.ActiveCachedTransactions[rt.Current:]
+			next = MasterWallet.ScrubDisplayTransactionsForNameChanges(next)
+			w.Write(jsonResp(next))
 		} else {
-			w.Write(jsonResp(MasterWallet.ActiveCachedTransactions[rt.Current:max]))
+			next := MasterWallet.ActiveCachedTransactions[rt.Current:max]
+			next = MasterWallet.ScrubDisplayTransactionsForNameChanges(next)
+			w.Write(jsonResp(next))
 		}
 
 	default:

@@ -17,7 +17,11 @@ $("#save-changes").on('click', function(){
 	postRequest("adjust-settings", j, function(resp){
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {
-	    	window.location.href = window.location.href + "?success=true";
+	    	if((window.location.href).includes("success")){
+	    		window.location.href = window.location.href
+	    	} else {
+	    		window.location.href = window.location.href + "?success=true"
+	    	}
 	      	//location.reload();
 	    } else {
 	    	SetGeneralError("Error: " + obj.Error)
@@ -68,13 +72,13 @@ $("#uploaded-file").on('change', function(){
 
 // Do action with imported transaction
 function receivedText() {
-	document.getElementById('data-expand').click()
 	is = fr.result
 	len = is.split(" ")
 	if(len.length != 12) {
 		SetGeneralError("Seed must be 12 words");
 		return
 	}
+	document.getElementById('data-expand').click()
 	$("#import-seed-reveal-text").text(fr.result)
 	$("#import-seed-reveal-cancel").click()
 }
@@ -87,7 +91,6 @@ $("#import-seed-reveal-confirm").on('click', function(){
   	j = JSON.stringify(SeedStruct)
 	postRequest("import-seed", j, function(resp) {
 		obj = JSON.parse(resp)
-		console.log(obj)
 		if(obj.Error == "none") {
 	    	SetGeneralSuccess("Seed has been changed to: " + obj.Content)
 	    } else {

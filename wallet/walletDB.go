@@ -935,11 +935,44 @@ func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, 
 	return
 }
 
+func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
+	w.relatedTransactionLock.Lock()
+	for i := range list {
+		ins := list[i].Inputs
+		for ii := range ins {
+			add := list[i].Inputs[ii].Address
+			anp, ok := w.addrMap[add]
+			if ok {
+				list[i].Inputs[ii].Name = anp.Name
+			}
+		}
+		outs := list[i].Outputs
+		for ii := range outs {
+			add := list[i].Outputs[ii].Address
+			anp, ok := w.addrMap[add]
+			if ok {
+				list[i].Outputs[ii].Name = anp.Name
+			}
+		}
+	}
+	w.relatedTransactionLock.Unlock()
+
+	return list
+}
+
 func (w *WalletDB) ChangeAddressName(address string, toName string) error {
 	err := w.guiWallet.ChangeAddressName(address, toName)
 	if err != nil {
 		return err
 	}
+
+	w.relatedTransactionLock.Lock() // Related Transactions uses this
+	anp, ok := w.addrMap[address]
+	if ok {
+		anp.Name = toName
+		w.addrMap[address] = anp
+	}
+	w.relatedTransactionLock.Unlock()
 	return w.Save()
 }
 
