@@ -939,7 +939,8 @@ func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, 
 	return
 }
 
-// Scrub all transactions before serving to front end.
+// Scrub all transactions before serving to front end. Changes the names to the current names of the addresses, as
+// user can change the name of their addresses.
 func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
 	w.relatedTransactionLock.Lock()
 	for i := range list {
