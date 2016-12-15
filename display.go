@@ -515,7 +515,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 
 		w.Write(jsonResp(transRet))
 	case "broadcast-transaction":
-		err := MasterWallet.Wallet.SignTransaction("importedTX")
+		err := MasterWallet.Wallet.SignTransaction("importedTX", false)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return

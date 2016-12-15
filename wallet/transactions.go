@@ -280,7 +280,7 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 	}
 
 	if sign {
-		err = wal.Wallet.SignTransaction(trans)
+		err = wal.Wallet.SignTransaction(trans, false)
 		if err != nil {
 			return trans, nil, err
 		}
@@ -454,7 +454,7 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 		return trans, nil, err
 	}
 
-	err = wal.Wallet.SignTransaction(trans)
+	err = wal.Wallet.SignTransaction(trans, false)
 	if err != nil {
 		return trans, nil, err
 	}
