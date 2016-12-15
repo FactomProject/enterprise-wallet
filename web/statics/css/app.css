@@ -4221,12 +4221,6 @@ body.darkTheme {
         background: #4f2b12; }
     body.darkTheme #frame section.rightCol main form input[type='checkbox'] + label:before {
       background-color: #323333; }
-    body.darkTheme #frame section.rightCol main .reveal {
-      background: #111;
-      border-color: #417ba4; }
-      body.darkTheme #frame section.rightCol main .reveal thead, body.darkTheme #frame section.rightCol main .reveal tfoot {
-        background: #222;
-        border-color: #333; }
     body.darkTheme #frame section.rightCol main .newCTA.active ul {
       background: #000;
       box-shadow: 0 0 90px 0 rgba(255, 255, 255, 0.3); }
@@ -4236,8 +4230,24 @@ body.darkTheme {
         body.darkTheme #frame section.rightCol main .newCTA.active ul li a:hover {
           background: #e8b521;
           color: #fff; }
+    body.darkTheme #frame section.rightCol main.settings .callout.warning {
+      background-color: #261509; }
     body.darkTheme #frame section.rightCol .input-group .calc {
       background: #4e3c08;
       color: #e8b521; }
+    body.darkTheme #frame section.rightCol .reveal {
+      background: #111;
+      border-color: #417ba4; }
+      body.darkTheme #frame section.rightCol .reveal thead, body.darkTheme #frame section.rightCol .reveal tfoot {
+        background: #222;
+        border-color: #333; }
+      body.darkTheme #frame section.rightCol .reveal#transDetails table thead {
+        background: #162936;
+        border-color: #162936; }
+      body.darkTheme #frame section.rightCol .reveal#transDetails table tbody {
+        background: #222;
+        border-color: #222; }
+        body.darkTheme #frame section.rightCol .reveal#transDetails table tbody tr:nth-child(even) {
+          background: #333; }
 
 /*# sourceMappingURL=app.css.map */
