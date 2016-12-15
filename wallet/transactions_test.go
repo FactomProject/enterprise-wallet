@@ -189,7 +189,6 @@ func LoadTestWallet(port int) error {
 	TX_DB = MAP
 
 	wal, err := TestHelper.Start(port)
-	//wal, err := LoadWalletDB()
 	if err != nil {
 		return err
 	}

@@ -60,11 +60,11 @@ type WalletDB struct {
 }
 
 // For now is same as New
-func LoadWalletDB() (*WalletDB, error) {
-	return NewWalletDB()
+func LoadWalletDB(v1Import bool) (*WalletDB, error) {
+	return NewWalletDB(v1Import)
 }
 
-func NewWalletDB() (*WalletDB, error) {
+func NewWalletDB(v1Import bool) (*WalletDB, error) {
 	w := new(WalletDB)
 
 	var db interfaces.IDatabase
@@ -96,13 +96,47 @@ func NewWalletDB() (*WalletDB, error) {
 	}
 
 	var wal *wallet.Wallet
-	switch WALLET_DB { // Decides type of wallet DB
-	case MAP:
-		wal, err = wallet.NewMapDBWallet()
-	case LDB:
-		wal, err = wallet.NewOrOpenLevelDBWallet(GetHomeDir() + walletLDBPath)
-	case BOLT:
-		wal, err = wallet.NewOrOpenBoltDBWallet(GetHomeDir() + walletBoltPath)
+
+	switch v1Import {
+	case true:
+		if WALLET_DB == MAP {
+			// Let fallthrough
+		} else {
+			m2Path := ""
+			// If true, and there is no M2 file, we will check for M1 file before making a new
+			// If a map, then we ignore and do the else
+			switch WALLET_DB { // Decides type of wallet DB
+			case LDB:
+				m2Path = GetHomeDir() + walletLDBPath
+				_, err = os.Stat(GetHomeDir() + walletLDBPath)
+			case BOLT:
+				m2Path = GetHomeDir() + walletBoltPath
+				_, err = os.Stat(GetHomeDir() + walletBoltPath)
+			}
+			if err != nil { // No M2 file, lets grab from M1
+				fmt.Println(GetHomeDir() + WalletBoltV1)
+				_, err = os.Stat(GetHomeDir() + WalletBoltV1)
+				if err != nil { // No M1 file, lets go as normal
+					// Let fallthrough
+				} else { // M1 file found, no M2 file. Let's import
+					fmt.Println("Importing from M1 Wallet....")
+					wal, err = wallet.ImportV1Wallet(GetHomeDir()+WalletBoltV1, m2Path)
+					break // We got a wal file, let's break
+				}
+			} else { // There is an M2 file, we go as normal
+				// Let falltrhough
+			}
+		}
+		fallthrough
+	case false:
+		switch WALLET_DB {
+		case MAP:
+			wal, err = wallet.NewMapDBWallet()
+		case LDB:
+			wal, err = wallet.NewOrOpenLevelDBWallet(GetHomeDir() + walletLDBPath)
+		case BOLT:
+			wal, err = wallet.NewOrOpenBoltDBWallet(GetHomeDir() + walletBoltPath)
+		}
 	}
 	if err != nil {
 		return nil, err

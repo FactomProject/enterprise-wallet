@@ -13,7 +13,7 @@ func Start(port int) (*WalletDB, error) {
 	factom.SetWalletServer(fmt.Sprintf("localhost:%d", port))
 	factom.SetFactomdServer("localhost:8088")
 
-	wal, err := LoadWalletDB()
+	wal, err := LoadWalletDB(false)
 	if err != nil {
 		return nil, err
 	}

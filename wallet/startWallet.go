@@ -10,7 +10,7 @@ import (
 
 // Must give the port for the factomd instance and wallet wsapi
 // will start wallet wsapi on selected port
-func StartWallet(walletPort int, factomdPort int, guiDBType int, walletDBType int, txDBType int) (*WalletDB, error) {
+func StartWallet(walletPort int, factomdPort int, guiDBType int, walletDBType int, txDBType int, v1Import bool) (*WalletDB, error) {
 	// Set ports
 	factom.SetWalletServer("localhost:" + fmt.Sprintf("%d", walletPort))
 	factom.SetFactomdServer("localhost:" + fmt.Sprintf("%d", factomdPort))
@@ -20,7 +20,7 @@ func StartWallet(walletPort int, factomdPort int, guiDBType int, walletDBType in
 	WALLET_DB = walletDBType
 	TX_DB = txDBType
 
-	wal, err := LoadWalletDB()
+	wal, err := LoadWalletDB(v1Import)
 	if err != nil {
 		return nil, err
 	}
