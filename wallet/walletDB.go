@@ -124,7 +124,7 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 				if err != nil { // No M1 file, lets go as normal
 					// Let fallthrough
 				} else { // M1 file found, no M2 file. Let's import
-					fmt.Printf("Importing from M1 Wallet at %s....", m1Path)
+					fmt.Printf("Importing from M1 Wallet at %s....\n", m1Path)
 					wal, err = wallet.ImportV1Wallet(m1Path, m2Path)
 					break // We got a wal file, let's break
 				}
