@@ -34,13 +34,15 @@ func main() {
 		os.Exit(1)
 	}()
 
-	if *compiled {
-		COMPILED_STATICS = true
+	if !(*compiled) {
+		COMPILED_STATICS = false
 	}
 
 	if *walDB == "Map" {
 		if *randomAdds {
 			ADD_RANDOM_ADDRESSES = true
+		} else {
+			ADD_RANDOM_ADDRESSES = false
 		}
 	}
 
