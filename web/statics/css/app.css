@@ -4004,6 +4004,10 @@ header {
         border: none; }
         #frame section.rightCol main.address-book .tabs-content .tabs-panel {
           padding: 0; }
+      #frame section.rightCol main.settings .callout.warning {
+        border-color: #d37d41; }
+        #frame section.rightCol main.settings .callout.warning p {
+          color: #d37d41; }
       #frame section.rightCol main .newCTA {
         position: relative;
         margin: 0; }
@@ -4108,6 +4112,18 @@ header {
               border-bottom-right-radius: 24px; }
         #frame section.rightCol main .newCTA.active ul {
           display: inline-block; }
+    #frame section.rightCol .input-group {
+      position: relative; }
+      #frame section.rightCol .input-group .calc {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 100%;
+        padding: 4px 16px;
+        background: #f9eee7;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        color: #d37d41; }
     #frame section.rightCol .reveal {
       padding: 3em;
       background: #fff; }
@@ -4171,6 +4187,8 @@ body.darkTheme {
     background: #000; }
     body.darkTheme #frame section.rightCol section.balances {
       background: #151515; }
+    body.darkTheme #frame section.rightCol main table thead {
+      background: #0e1b24; }
     body.darkTheme #frame section.rightCol main table tbody tr td svg path, body.darkTheme #frame section.rightCol main table tbody tr td svg rect, body.darkTheme #frame section.rightCol main table tbody tr td svg poly, body.darkTheme #frame section.rightCol main table tbody tr td .svg path, body.darkTheme #frame section.rightCol main table tbody tr td .svg rect, body.darkTheme #frame section.rightCol main table tbody tr td .svg poly {
       fill: #939598 !important; }
     body.darkTheme #frame section.rightCol main table tbody tr td a svg path, body.darkTheme #frame section.rightCol main table tbody tr td a svg rect, body.darkTheme #frame section.rightCol main table tbody tr td a svg poly, body.darkTheme #frame section.rightCol main table tbody tr td a .svg path, body.darkTheme #frame section.rightCol main table tbody tr td a .svg rect, body.darkTheme #frame section.rightCol main table tbody tr td a .svg poly {
@@ -4218,5 +4236,8 @@ body.darkTheme {
         body.darkTheme #frame section.rightCol main .newCTA.active ul li a:hover {
           background: #e8b521;
           color: #fff; }
+    body.darkTheme #frame section.rightCol .input-group .calc {
+      background: #4e3c08;
+      color: #e8b521; }
 
 /*# sourceMappingURL=app.css.map */
