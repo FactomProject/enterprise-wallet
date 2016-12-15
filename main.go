@@ -46,7 +46,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		controlPanelPort = -1
 	}
 
-	wallet.WalletBoltV1 = v1Path
+	wallet.WalletBoltV1Path = v1Path
 
 	var (
 		walletDB, guiDB, txDB int

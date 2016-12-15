@@ -114,13 +114,18 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 				_, err = os.Stat(GetHomeDir() + walletBoltPath)
 			}
 			if err != nil { // No M2 file, lets grab from M1
-				fmt.Println(GetHomeDir() + WalletBoltV1)
-				_, err = os.Stat(GetHomeDir() + WalletBoltV1)
+				m1Path := ""
+				if WalletBoltV1Path == "/.factom/factoid_wallet_bolt.db" {
+					m1Path = GetHomeDir() + WalletBoltV1Path
+				} else {
+					m1Path = WalletBoltV1Path
+				}
+				_, err = os.Stat(m1Path)
 				if err != nil { // No M1 file, lets go as normal
 					// Let fallthrough
 				} else { // M1 file found, no M2 file. Let's import
-					fmt.Println("Importing from M1 Wallet....")
-					wal, err = wallet.ImportV1Wallet(GetHomeDir()+WalletBoltV1, m2Path)
+					fmt.Printf("Importing from M1 Wallet at %s....", m1Path)
+					wal, err = wallet.ImportV1Wallet(m1Path, m2Path)
 					break // We got a wal file, let's break
 				}
 			} else { // There is an M2 file, we go as normal
