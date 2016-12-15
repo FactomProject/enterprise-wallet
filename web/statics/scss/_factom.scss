@@ -943,14 +943,6 @@ body.darkTheme {
 					}
 				}
 			}
-			main .reveal {
-				background: #111;
-				border-color: $primary-color;
-				thead, tfoot { 
-					background: #222;
-					border-color: #333;
-				}
-			}
 			main .newCTA.active ul {
 				background: #000;
 				box-shadow: 0 0 90px 0 rgba(255, 255, 255, 0.3);
@@ -963,9 +955,33 @@ body.darkTheme {
 					}
 				}
 			}
+			main.settings .callout.warning {
+				background-color: darken($secondary-color, 45%);
+			}
 			.input-group .calc {
 				background: darken($tertiary-color, 35%);
 				color: $tertiary-color;
+			}
+			.reveal {
+				background: #111;
+				border-color: $primary-color;
+				thead, tfoot { 
+					background: #222;
+					border-color: #333;
+				}
+				&#transDetails {
+					table {
+						thead { 
+							background: darken($primary-color, 30%);
+							border-color: darken($primary-color, 30%);
+						}
+						tbody {
+							background: #222;
+							border-color: #222;
+							tr:nth-child(even) { background: #333; }
+						}
+					}
+				}
 			}
 		}
 	}
