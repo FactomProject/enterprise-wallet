@@ -250,6 +250,8 @@ type SendTransStruct struct {
 	FromAddresses []string `json:"InputAddresses"`
 	FromAmounts   []string `json:"InputAmounts"`
 	FeeAddress    string   `json:"FeeAddress"`
+
+	Signature bool `json:"Signature, omitempty"`
 }
 
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
@@ -465,6 +467,63 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(needed))
+	case "import-transaction":
+		// new(SendTransStruct)
+		transHex := r.FormValue("json")
+		err := MasterWallet.ImportTransaction("importedTX", transHex)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		trans := MasterWallet.Wallet.GetTransactions()["importedTX"]
+		if trans == nil {
+			w.Write(jsonError("Transaction had an error importing."))
+			return
+		}
+
+		transRet := new(SendTransStruct)
+		inputs := trans.GetInputs()
+		for _, in := range inputs {
+			transRet.FromAddresses = append(transRet.FromAddresses, MasterWallet.FactoidAddressToHumanReadable(in.GetAddress()))
+			transRet.FromAmounts = append(transRet.FromAmounts, fmt.Sprintf("%f", float64(in.GetAmount())/1e8))
+		}
+
+		outputs := trans.GetOutputs()
+		for _, out := range outputs {
+			transRet.ToAddresses = append(transRet.ToAddresses, MasterWallet.FactoidAddressToHumanReadable(out.GetAddress()))
+			transRet.ToAmounts = append(transRet.ToAmounts, fmt.Sprintf("%f", float64(out.GetAmount())/1e8))
+		}
+
+		ecouts := trans.GetECOutputs()
+		for _, out := range ecouts {
+			transRet.ToAddresses = append(transRet.ToAddresses, MasterWallet.ECAddressToHumanReadable(out.GetAddress()))
+			transRet.ToAmounts = append(transRet.ToAmounts, fmt.Sprintf("%u", out.GetAmount()))
+		}
+
+		err = trans.ValidateSignatures()
+		if err == nil {
+			transRet.Signature = true
+		} else {
+			transRet.Signature = false
+		}
+
+		w.Write(jsonResp(transRet))
+	case "broadcast-transaction":
+		err := MasterWallet.Wallet.SignTransaction("importedTX")
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		txid, err := MasterWallet.SendTransaction("importedTX")
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp(txid))
+
 	case "make-transaction":
 		trans := new(SendTransStruct)
 

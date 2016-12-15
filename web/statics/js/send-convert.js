@@ -17,7 +17,7 @@ if($("#token-header").attr("value") == "1") {
 }
 
 counter = 2
-function addNewOutputAddress(defaultVal, error) {
+function addNewOutputAddress(defaultAdd, defaultAmt, error, first) {
   eClass = ""
   if(error){
     eClass = "input-group-error"
@@ -28,22 +28,39 @@ function addNewOutputAddress(defaultVal, error) {
     str = "entry credit"
   }
 
+  defAdd = '<pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type ' + str + ' address"></pre>'
+  if(defaultAdd != "") {
+    defAdd = '<pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type ' + str + ' address" value="' + defaultAdd + '"></pre>'
+  }
+
+
+  defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '">'
+  if(defaultAmt != 0) {
+     defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '" value="' + defaultAmt + '">'
+  }
+
+  button = '<a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>'
+  if(first) {
+    button = '<a id="append-new-output" class="button expanded newPlus">&nbsp;</a>'
+  }
+
+
   $("#all-outputs").append(
   '<div class="row single-output-' + counter + '" id="single-output">' +
   '    <div class="small-12 medium-7 large-8 columns">' +
   '        <div class="input-group ' + eClass + '" id="output-factoid-address-container">' +
-  '            <pre><input id="output-factoid-address" type="text" name="output1" class="input-group-field percent95" placeholder="Type ' + str + ' address"></pre>' +
-    '        <a id="addressbook-button" data-toggle="addressbook" class="input-group-button button input-group-field" id="addressbook" value="' + counter + '"><i class="fa fa-book"></i></a>' +
+  '        ' + defAdd +
+  '        <a id="addressbook-button" data-toggle="addressbook" class="input-group-button button input-group-field" id="addressbook" value="' + counter + '"><i class="fa fa-book"></i></a>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-10 medium-4 large-3 columns">' +
   '        <div class="input-group">' +
-  '            <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '">' +
+  '            ' + defAmt + 
   '            <span class="input-group-label">' + PageTokenABR + '</span>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-2 medium-1 columns">' +
-  '            <a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>' +
+  '            ' + button + 
   '    </div>' +
   '</div>')
 
@@ -55,31 +72,47 @@ $("#append-new-output").click(function(){
   if($(this).hasClass("disabled-input")) {
     return
   }
-  addNewOutputAddress("", true)
+  addNewOutputAddress("", 0, true, false)
 })
 
-function addNewInputAddress(defaultVal, error) {
+function addNewInputAddress(defaultAdd, defaultAmt, error, first) {
   eClass = ""
   if(error){
     eClass = "input-group-error"
+  }
+
+  defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">'
+  if(defaultAmt != 0) {
+    defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids" value="' + defaultAmt + '">'
+  }
+
+
+  defAdd = '<pre><input id="input-factoid-address" type="text" name="input1" class="input-group-field percent95 disabled-input" placeholder="Choose factoid address" disabled></pre>'
+  if(defaultAdd != "") {
+     defAdd = '<pre><input id="input-factoid-address" type="text" name="input1" class="input-group-field percent95 disabled-input" placeholder="Choose factoid address" disabled value="' + defaultAdd  + '"></pre>'
+  }
+
+  button = '<a id="remove-new-input" class="button expanded newMinus">&nbsp;</a>'
+  if(first) {
+    button = '<a id="append-new-input" class="button expanded newPlus">&nbsp;</a>'
   }
 
   $("#all-inputs").append(
   '<div class="row single-input-' + counter + '" id="single-input">' +
   '    <div class="small-12 medium-7 large-8 columns">' +
   '        <div class="input-group ' + eClass + '" id="input-factoid-address-container">' +
-  '        <pre><input id="input-factoid-address" type="text" name="input1" class="input-group-field percent95 disabled-input" placeholder="Choose factoid address" disabled></pre>' +
+  '        ' + defAdd +
   '        <a id="addressbook-button" data-toggle="fee-addressbook" class="input-group-button button input-group-field" id="addressbook" value="' + counter + '"><i class="fa fa-book"></i></a>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-10 medium-4 large-3 columns">' +
   '        <div class="input-group">' +
-  '            <input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">' +
+  '            ' + defAmt +
   '            <span class="input-group-label">FCT</span>' +
   '        </div>' +
   '    </div>' +
   '    <div class="small-2 medium-1 columns">' +
-  '            <a id="remove-new-input" class="button expanded newMinus">&nbsp;</a>' +
+  '            ' + button +
   '    </div>' +
   '</div>')
   counter = counter + 1
@@ -89,7 +122,7 @@ $("#append-new-input").click(function(){
   if($(this).hasClass("disabled-input")) {
     return
   }
-  addNewInputAddress("", true)
+  addNewInputAddress("", 0, true, false)
 })
 
 // Remove output address
@@ -159,6 +192,9 @@ $("#make-entire-transaction").on('click', function(){
 function MakeTransaction(sig) {
   transObject = getTransactionObject(true)
 
+  if(transObject == null || transObject == undefined) {
+    return
+  }
   if(!sig) {
     transObject.TransType = "nosig"
   }
@@ -194,9 +230,10 @@ function MakeTransaction(sig) {
 
 function setExportDownload(json) {
   obj = JSON.parse(json)
-  fileExt = parseInt(obj.millitimestamp)
+  console.log(obj.params.transaction)
+  fileExt = Date.now()
   $("#export-transaction").click(function() {
-    $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(json))
+    $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.params.transaction))
     $(this).attr("download", "Exported-" + fileExt)
   })
 }
@@ -225,14 +262,13 @@ function getTransactionObject(checkInput) {
   $("#all-outputs #single-output").each(function(){
     err = false
     add = $(this).find("#output-factoid-address").val()
-    if(!add.startsWith(AddressPrefix)) {
+    if(!add.startsWith(AddressPrefix) && !importexport) {
       $(this).find("#output-factoid-address-container").addClass("input-group-error")
       faErr = true
       err = true
     }
 
     amt = $(this).find("#output-factoid-amount").val()
-          console.log(amt, Number(amt))
     if(Number(amt) == 0 || amt == undefined || amt == "") {
       $(this).find("#output-factoid-amount").addClass("input-group-error")
       amtErr = true
@@ -266,7 +302,7 @@ function getTransactionObject(checkInput) {
       })
 
       transObject.FeeAddress = $("#fee-factoid-address").val()
-      if(transObject.FeeAddress.length <  30) {
+      if(transObject.FeeAddress.length <  52) {
         $("#fee-factoid-address").addClass("input-group-error")
         feeErr = true
         err = true
@@ -439,28 +475,6 @@ $("#addresses-reveal-button").on("click", function(){
 
   $(".single-output-" + toChange + " #output-factoid-address").val(newAddress)
   $(".single-output-" + toChange + " #output-factoid-address-container").removeClass("input-group-error")
-  /* Old Method
-  newAddress = $("input[name='address']:checked").val()
-  if(newAddress == undefined) {
-    return
-  }
-
-  done = false
-  $("#all-outputs #single-output").each(function(){
-    if(!done) {
-      addressDOM = $(this).find("#output-factoid-address")
-      add = addressDOM.val()
-      if(add == "") {
-        addressDOM.val(newAddress)
-        done = true
-      }
-    }
-  })
-
-  // No empty slot found
-  if(!done){
-    addNewOutputAddress(newAddress, false)
-  }*/
 })
 
 toChange = "-1"
@@ -501,6 +515,9 @@ function HideNewButtons() {
 }
 
 function ShowNewButtons() {
+  $("#export-transaction").slideDown(100)
+  $("#broadcast-transaction").slideUp(100)
+
   $("#second-stage-buttons").slideDown(100)
   //$("#send-entire-transaction").slideDown(100)
 }
@@ -579,31 +596,86 @@ function HideMessages(){
 
 // Import/Export
 $("#import-file").on('click', function(){
+  document.getElementById('uploaded-file').click()
+})
+
+$("#uploaded-file").on('change', function(){
+  console.log("hey")
   input = document.getElementById('uploaded-file');
   if (!input) {
-    alert("Um, couldn't find the fileinput element.");
+    SetGeneralError("Error with upload file javascript.")
   }
   else if (!input.files) {
-    alert("This browser doesn't seem to support the `files` property of file inputs.");
+    SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
   }
   else if (!input.files[0]) {
-    alert("Please select a file before clicking 'Load'");               
+    SetGeneralError("No file found")             
   }
   else {
     file = input.files[0];
     fr = new FileReader();
-    fr.onload = receivedText;
-    //fr.readAsText(file);
-    fr.readAsDataURL(file);
+    fr.onload = importTrans;
+    fr.readAsText(file);
   }
 })
 
 // Do action with imported transaction
-function receivedText() {
+function importTrans() {
   x = fr.result
+  postRequest("import-transaction", fr.result, function(resp){
+    obj = JSON.parse(resp)
+    if(obj.Error == "none") {
+      total = 0
+      $("#all-inputs").html("")
+      for(var i = 0; i < obj.Content.InputAddresses.length; i++) {
+        first = false
+        if(i == 0) {
+          first = true
+        }
+        addNewInputAddress(obj.Content.InputAddresses[i], Number(obj.Content.InputAmounts[i]), false, first)
+        total += obj.Content.InputAmounts[i]
+      }
+      $("#all-outputs").html("")
+      for(var i = 0; i < obj.Content.OutputAddresses.length; i++) {
+        first = false
+        if(i == 0) {
+          first = true
+        }
+        addNewOutputAddress(obj.Content.OutputAddresses[i], Number(obj.Content.OutputAmounts[i]), false, first)
+      }
+
+      if(obj.Content.Signature) {
+        $("#sign-transaction").attr('checked', true)
+      } else {
+        $("#sign-transaction").attr('checked', false)
+      }
+
+      disableInput()
+      $("#transaction-total").val(Number(total))
+      ShowNewButtons()
+      $("#export-transaction").slideUp(1)
+      $("#broadcast-transaction").slideDown(1)
+    } else {
+      SetGeneralError(obj.Error)
+    }
+  })
   console.log(fr.result)
 }
 
+$("#broadcast-transaction").on('click', function(){
+  if(!$("#sign-transaction").prop('checked')){
+    SetGeneralError("Transaction is not signed. Click the sign button if you contain the private keys to the inputs.")
+    return
+  }
+  postRequest("broadcast-transaction", null, function(resp){
+    obj = JSON.parse(resp)
+    if(obj.Error == "none") {
+      SetGeneralSuccess('Transaction Sent, transaction ID: ' + obj.Content )
+    } else {
+      SetGeneralError(obj.Error)
+    }
+  })
+})
 
 /* http://stackoverflow.com/questions/12281775/get-data-from-file-input-in-jquery
 <script>        

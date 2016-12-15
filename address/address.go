@@ -66,14 +66,24 @@ func (anp *AddressNamePair) ChangeName(name string) error {
 	return nil
 }
 
-func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
-	if strings.Compare(anp.Name, b.Name) == 0 {
-		if strings.Compare(anp.Address, b.Address) == 0 {
-			return true
-		}
+func (anp *AddressNamePair) IsSimilarTo(b *AddressNamePair) bool {
+	if strings.Compare(anp.Address, b.Address) != 0 {
+		return false
 	}
 
-	return false
+	return true
+}
+
+func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
+	if !anp.IsSimilarTo(b) {
+		return false
+	}
+
+	if strings.Compare(anp.Name, b.Name) != 0 {
+		return false
+	}
+
+	return true
 }
 
 func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {

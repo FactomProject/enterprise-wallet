@@ -52,7 +52,7 @@ func (a *DisplayTransaction) IsSimilarTo(b DisplayTransaction) bool {
 	}
 
 	for i := 0; i < len(a.Inputs); i++ {
-		if !a.Inputs[i].IsSameAs(b.Inputs[i]) {
+		if !a.Inputs[i].IsSimilarTo(b.Inputs[i]) {
 			return false
 		}
 	}
@@ -60,7 +60,7 @@ func (a *DisplayTransaction) IsSimilarTo(b DisplayTransaction) bool {
 		return false
 	}
 	for i := 0; i < len(a.Outputs); i++ {
-		if !a.Outputs[i].IsSameAs(b.Outputs[i]) {
+		if !a.Outputs[i].IsSimilarTo(b.Outputs[i]) {
 			return false
 		}
 	}
@@ -121,10 +121,7 @@ func NewTransactionAddressInfo(name string, address string, amount uint64, token
 	return t
 }
 
-func (a *TransactionAddressInfo) IsSameAs(b TransactionAddressInfo) bool {
-	if a.Name != b.Name {
-		return false
-	}
+func (a *TransactionAddressInfo) IsSimilarTo(b TransactionAddressInfo) bool {
 	if a.Address != b.Address {
 		return false
 	}
@@ -132,6 +129,16 @@ func (a *TransactionAddressInfo) IsSameAs(b TransactionAddressInfo) bool {
 		return false
 	}
 	if a.Type != b.Type {
+		return false
+	}
+	return true
+}
+
+func (a *TransactionAddressInfo) IsSameAs(b TransactionAddressInfo) bool {
+	if !a.IsSimilarTo(b) {
+		return false
+	}
+	if a.Name != b.Name {
 		return false
 	}
 	return true

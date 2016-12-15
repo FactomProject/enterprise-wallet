@@ -313,6 +313,10 @@ func (wal *WalletDB) ConstructConvertEntryCreditsStrings(toAddresses []string, a
 	return wal.ConstructTransaction(toAddresses, amts)
 }
 
+func (wal *WalletDB) ImportTransaction(name string, hex string) error {
+	return wal.Wallet.ImportComposedTransaction(name, hex)
+}
+
 func (wal *WalletDB) ExportTransaction(name string) (string, error) {
 	req, err := wal.Wallet.ComposeTransaction(name)
 	if err != nil {
@@ -505,6 +509,22 @@ func (wal *WalletDB) SendTransaction(trans string) (string, error) {
 		return "", err
 	}
 	return transObj.TxID, nil
+}
+
+func (wal *WalletDB) FactoidAddressToHumanReadable(add interfaces.IAddress) string {
+	return primitives.ConvertFctAddressToUserStr(add)
+}
+
+func FactoidAddressToHumanReadable(add interfaces.IAddress) string {
+	return primitives.ConvertFctAddressToUserStr(add)
+}
+
+func (wal *WalletDB) ECAddressToHumanReadable(add interfaces.IAddress) string {
+	return primitives.ConvertECAddressToUserStr(add)
+}
+
+func ECAddressToHumanReadable(add interfaces.IAddress) string {
+	return primitives.ConvertECAddressToUserStr(add)
 }
 
 func hashStringList(list []string) string {
