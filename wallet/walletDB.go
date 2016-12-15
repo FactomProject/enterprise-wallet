@@ -662,7 +662,8 @@ func (w *WalletDB) Close() error {
 func (w *WalletDB) Save() error {
 	err := w.GUIlDB.Put([]byte("gui-wallet"), []byte("wallet"), w.guiWallet)
 	if err != nil {
-		return err
+		return fmt.Errorf("The GUI database encountered an error while saving. Your last action may not have been saved. Shutting down the GUI may lose your last action.")
+		//return err
 	}
 
 	return nil
@@ -672,7 +673,8 @@ func (w *WalletDB) GenerateFactoidAddress(name string) (*address.AddressNamePair
 	address, err := w.Wallet.GenerateFCTAddress()
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("There has been an error generating a new Factoid address, please try again.")
+		//return nil, err
 	}
 
 	anp, err := w.guiWallet.AddSeededAddress(name, address.String(), 1)
@@ -836,12 +838,14 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 	} else if secret[:2] == "Fs" {
 		add, err := factom.GetFactoidAddress(secret)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("There has been an error when trying to convert the secret key to an address, the secret key may not be valid.")
+			//return nil, err
 		}
 
 		err = w.Wallet.InsertFCTAddress(add)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("There has been an error trying to insert the new address into the wallet. Please try again.")
+			//return nil, err
 		}
 
 		anp, err := w.addGUIAddress(name, add.String(), 1)
@@ -935,6 +939,7 @@ func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, 
 	return
 }
 
+// Scrub all transactions before serving to front end.
 func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
 	w.relatedTransactionLock.Lock()
 	for i := range list {
