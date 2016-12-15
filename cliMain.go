@@ -18,7 +18,7 @@ func main() {
 		walDB      = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
 		txDB       = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
 		port       = flag.Int("port", 8091, "The port for the GUIWallet")
-		compiled   = flag.Bool("compiled", false, "Decides wheter to use the compiled statics or not. Useful for modifying")
+		compiled   = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
 		randomAdds = flag.Bool("randadd", true, "Overrides ADD_RANDOM_ADDRESSES if false and does not add random addresses")
 		v1Import   = flag.Bool("i", true, "Search for M1 wallet, if there is no M2 wallet file")
 		v1Path     = flag.String("v1path", "/.factom/factoid_wallet_bolt.db", "Change the path for V1 import")

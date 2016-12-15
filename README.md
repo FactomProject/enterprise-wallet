@@ -1,25 +1,33 @@
 # M2GUIWallet
 GUI Wallet for M2
 
-Must launch from M2GUIWallet directory until static files are compiled into Go.
-
 ## Branches to use
- - 'Develop' on everything, 'master' on M2GUIWallet
+ - 'Develop' on everything
 
 ## To Launch for testing
  - Run 'factomd'
- - Run 'M2GUIWallet', it will populate 5 random factoid and ec addresses, as well as add 1 external.
-    - **Must** run from the /M2GUIWallet directory as the web files are not yet compiled in.
-    - Just to repeat, **must** run from /M2GUIWallet directory.
- - localhost:8091 to get to wallet
+ - Run 'M2GUIWallet'
+  - Reccomend using ```-compiled=true``` flag. Will use all static files compiled into Go
 
 
-### Testing Notes
- - All databases are configured to be MapDb, so relaunching 'M2GUIWallet' will reset all the data in the wallet.
- - 11 Addresses are preloaded on startup, 5 Random Factoid, 5 random Entry credit, and 1 factoid addresses with factoids in it (in local networks that is)
+### Flags
+- ```-guiDB=TYPE``` - Gui Database Type, types can be 'Map', 'Bolt', or LDB
+  - Default: Bolt
+- ```-walDB=TYPE``` - Wallet Database Type, types can be 'Map', 'Bolt', or LDB
+  - Default: Bolt
+- ```-txDB=TYPE``` - Transaction Database Type, Types can be 'Map', 'Bolt', or LDB
+  - Default: Bolt
+- ```-port=PORT``` - Changes the port the wallet runs on.
+  - Default: 8091
+- ```-compiled=BOOLEAN``` - Uses statics compiled into GO if true.
+  - Default: true
+- ```-v1Import=BOOLEAN``` - If true, will look for a V1 database to import. It will only look if there is no M2 database
+  - Default: true
+- ```-v1Path=PATH_TO_M1``` - The path to look for an M1 wallet.
+  - Default: /.factom/factoid_wallet_bolt.db
 
-
-
-### Features not working as intended or not Working
-  - Import/Export Transactions is **not working**
-  - Settings do **not all work**
+## Other Flags - Don't bother with these
+- ```-randomAdds=BOOLEAN``` - If running on a Map db, this will override adding random addresses on bootup. Put false if you do not want random addresses.
+  - Default: true
+- ```-min=BOOLEAN``` - If not using compiled in statics, min will decide to use minified versions of the JS and CSS. Reccomend not touching this
+  - Default: false
