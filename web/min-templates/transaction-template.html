@@ -36,6 +36,7 @@
                 </div>
                 <div class="small-10 medium-4 large-3 columns">
                     <div class="input-group">
+					    <div class="calc hide">0</div>
                         <input id="input-factoid-amount" type="text" class="input-group-field" name="input1-num" placeholder="Amount of factoids">
                         <span class="input-group-label">FCT</span>
                     </div>
@@ -64,6 +65,7 @@
             </div>
             <div class="small-10 medium-4 large-3 columns">
                 <div class="input-group">
+					<div class="calc hide">0</div>
                     <input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of {{$whole}}s">
                     <span class="input-group-label">{{$abr}}<!-- FCT/EC --></span>
                 </div>
@@ -109,6 +111,7 @@
             <div id="second-stage-buttons" style="display:none">
             {{if $divBottom}}
                 <a id="export-transaction" class="button" download="exported-transaction.txt">Export Transaction</a>
+                <a id="broadcast-transaction" class="button" style="display: none;">Broadcast Transaction</a>
             {{else}}
                 <a id="send-entire-transaction" class="button">Send Transaction</a>
             {{end}}
@@ -124,7 +127,7 @@
             <label>Total:</label>
             <div class="input-group">
                 <input id="transaction-total" type="text" class="input-group-field" disabled="true" name="subtotal" id="subtotal" value="----">
-                <span class="input-group-label">{{$abr}}<!-- FCT/EC --></span>
+                <span class="input-group-label">FCT</span>
             </div>
         </div>
     </div>

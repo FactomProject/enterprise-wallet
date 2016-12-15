@@ -470,6 +470,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	case "import-transaction":
 		// new(SendTransStruct)
 		transHex := r.FormValue("json")
+		MasterWallet.Wallet.DeleteTransaction("importedTX")
 		err := MasterWallet.ImportTransaction("importedTX", transHex)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
@@ -709,7 +710,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 	default:
-		w.Write(jsonError("Not a valid request"))
+		w.Write(jsonError("Not a post valid request"))
 	}
 
 }

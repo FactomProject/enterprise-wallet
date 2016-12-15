@@ -330,18 +330,34 @@ $("#needed-input-button").on('click', function(evt){
   }
 })
 
+CurrentInput = 0
+TotalNeeded = 0
+InputLeft = 0
 function GetNeededInput() {
-  transObject = getTransactionObject(false)
+  transObject = getTransactionObject(true)
 
   if(transObject == null) {
     return
+  }
+
+  CurrentInput = 0
+  console.log(transObject)
+  for(var i = 0; i < transObject.InputAmounts.length; i++) {
+    if(transObject.InputAmounts[i] != undefined) {
+      CurrentInput += Number(transObject.InputAmounts[i])
+    }
   }
 
   j = JSON.stringify(transObject)
   postRequest("get-needed-input", j, function(resp){
     obj = JSON.parse(resp)
     if(obj.Error == "none") {
-      $("#input-needed-amount").val(FCTNormalize(obj.Content))
+      if(obj.Content != null || obj.Content != undefined) {
+        $("#input-needed-amount").val(FCTNormalize(obj.Content))
+        console.log(CurrentInput)
+        TotalNeeded = FCTNormalize(obj.Content)
+        InputLeft = TotalNeeded - CurrentInput
+      }
       HideMessages()
     } else {
       SetGeneralError("Error: " + obj.Error)
@@ -358,7 +374,6 @@ function SendTransaction() {
 
   j = JSON.stringify(transObject)
   postRequest("send-transaction", j, function(resp){
-    //console.log(resp)
     obj = JSON.parse(resp)
     if(obj.Error == "none") {
       disableInput()
@@ -551,6 +566,8 @@ function disableInput() {
   $("#make-entire-transaction").addClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", true)
   $("#first-stage-buttons").slideUp(100)
+  $("#import-file").addClass("disabled-input")
+  $("#import-file").prop("disabled", true)
 }
 
 function enableInput() {
@@ -576,6 +593,9 @@ function enableInput() {
   $("#make-entire-transaction").removeClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", false)
   $("#first-stage-buttons").slideDown(100)
+
+  $("#import-file").removeClass("disabled-input")
+  $("#import-file").prop("disabled", false)
 
   keepFeeDisabled()
 }
