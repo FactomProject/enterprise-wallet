@@ -7,8 +7,8 @@ import (
 	//"strings"
 	"testing"
 
-	//ad "github.com/FactomProject/M2GUIWallet/address"
-	. "github.com/FactomProject/M2GUIWallet/wallet"
+	//ad "github.com/FactomProject/EnterpriseWallet/address"
+	. "github.com/FactomProject/EnterpriseWallet/wallet"
 	//ed "github.com/FactomProject/ed25519"
 	//"github.com/FactomProject/factom"
 	//"github.com/FactomProject/factom/wallet"

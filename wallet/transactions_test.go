@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/FactomProject/M2GUIWallet/TestHelper"
-	. "github.com/FactomProject/M2GUIWallet/wallet"
+	"github.com/FactomProject/EnterpriseWallet/TestHelper"
+	. "github.com/FactomProject/EnterpriseWallet/wallet"
 )
 
 var _ = fmt.Sprint("")

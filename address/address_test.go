@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/FactomProject/M2GUIWallet/address"
+	. "github.com/FactomProject/EnterpriseWallet/address"
 	ed "github.com/FactomProject/ed25519"
 	"github.com/FactomProject/factom"
 )

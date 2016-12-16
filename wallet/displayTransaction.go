@@ -5,7 +5,7 @@ import (
 	//"encoding/binary"
 	//"fmt"
 	"time"
-	//"github.com/FactomProject/M2GUIWallet/address"
+	//"github.com/FactomProject/EnterpriseWallet/address"
 	//"github.com/FactomProject/btcutil/base58"
 )
 

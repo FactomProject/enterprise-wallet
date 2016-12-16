@@ -3,7 +3,7 @@ package TestHelper
 import (
 	"fmt"
 
-	. "github.com/FactomProject/M2GUIWallet/wallet"
+	. "github.com/FactomProject/EnterpriseWallet/wallet"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet/wsapi"
 )

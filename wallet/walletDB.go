@@ -13,8 +13,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/FactomProject/M2GUIWallet/address"
-	"github.com/FactomProject/M2GUIWallet/wallet/database"
+	"github.com/FactomProject/EnterpriseWallet/address"
+	"github.com/FactomProject/EnterpriseWallet/wallet/database"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet"
 	"github.com/FactomProject/factomd/common/primitives"
