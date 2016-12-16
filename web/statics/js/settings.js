@@ -33,15 +33,26 @@ $("#export-seed").on('click', function(){
 	postRequest("get-seed", "", function(resp){
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {
-	    	var link = document.createElement("a");
-			link.download = "WalletSeed.txt";
-			link.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.Content);
-			link.click();
+	    	saveTextAsFile(obj.Content, "WalletSeed.txt")
 	    } else {
 	    	SetGeneralError("Error: " + obj.Error)
 	    }
 	})
 })
+
+function saveTextAsFile(text, filename) {
+    var textToWrite = text
+    var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' })
+    var fileNameToSaveAs = filename
+
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    window.URL = window.URL || window.webkitURL;
+    downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
 
 //selected = false
 // Import/Export

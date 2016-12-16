@@ -78,3 +78,18 @@ function SetGeneralSuccess(mes) {
   $("#success-zone").text(mes)
   $("#success-zone").slideDown(100)
 }
+
+function saveTextAsFile(text, filename) {
+    var textToWrite = text
+    var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' })
+    var fileNameToSaveAs = filename
+
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    window.URL = window.URL || window.webkitURL;
+    downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
+
