@@ -98,6 +98,10 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		if err != nil {
 			panic("Error in loading settings: " + err.Error())
 		}
+
+		// Default dark
+		MasterSettings.DarkTheme = true
+		MasterSettings.Theme = "darkTheme"
 	} else {
 		MasterSettings = data.(*SettingsStruct)
 	}
