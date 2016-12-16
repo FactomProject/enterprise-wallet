@@ -26,7 +26,7 @@ function LoadAddresses(){
  	})
 }
 
-function addressTableRow(address, type) {
+function addressTableRow(address, type, star) {
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
 		address.Balance = Number(address.Balance.toFixed(4))
@@ -37,6 +37,10 @@ function addressTableRow(address, type) {
 	star = '<small><span id="star" class="fa fa-star-o" aria-hidden="true" value="0"></span></small>'
 	if(address.Seeded) {
 		star = '<small><span id="star" class="fa fa-star" aria-hidden="true" value="1"></span></small>'
+	}
+
+	if(type == "external") {
+		star = ""
 	}
 
 	shortAddr = address.Address
