@@ -3563,20 +3563,17 @@ header {
   header img {
     margin-bottom: 10px !important; }
   header .svg, header svg {
-    max-width: 209px;
-    margin-bottom: 3px; }
-    @media screen and (max-width: 74.9375em) {
-      header .svg, header svg {
-        max-width: 140px; } }
+    max-width: 92px;
+    margin-bottom: 8px; }
   header h1 {
     margin-bottom: 1rem;
     color: #e8b521;
-    font-size: 20px;
+    font-size: 26px;
     letter-spacing: 3px;
     text-transform: uppercase; }
     @media screen and (max-width: 74.9375em) {
       header h1 {
-        font-size: 15px; } }
+        font-size: 20px; } }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
     header {
       background: #fff; } }
