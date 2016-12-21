@@ -177,17 +177,16 @@ header {
     }
     img { margin-bottom: 10px !important; }
     .svg, svg {
-        max-width: 209px;
-		margin-bottom: 3px;
-        @include breakpoint(medium down) { max-width: 140px; }
+        max-width: 92px;
+		margin-bottom: 8px;
     }
     h1 {
 		margin-bottom: 1rem;
         color: $tertiary-color;
-        font-size: 20px;
+        font-size: 26px;
 		letter-spacing: 3px;
 		text-transform: uppercase;
-        @include breakpoint(medium down) { font-size: 15px; }
+        @include breakpoint(medium down) { font-size: 20px; }
     }
 	@include breakpoint(small only) { background: $white; }
 }
