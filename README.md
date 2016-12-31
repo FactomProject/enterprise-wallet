@@ -20,8 +20,7 @@ When backing up, backing up #1 is most important. #2 is good to have if you plan
 
 ## To Launch for testing
  - Run 'factomd'
- - Run 'M2GUIWallet'
-  - Reccomend using ```-compiled=true``` flag. Will use all static files compiled into Go
+ - Run 'EnterpriseWaller'
  - Default, open localhost:8091 in any browser
 
 
