@@ -23,7 +23,7 @@ func main() {
 		randomAdds      = flag.Bool("randadd", true, "Overrides ADD_RANDOM_ADDRESSES if false and does not add random addresses")
 		v1Import        = flag.Bool("i", true, "Search for M1 wallet, if there is no M2 wallet file")
 		v1Path          = flag.String("v1path", "/.factom/factoid_wallet_bolt.db", "Change the path for V1 import")
-		factomdLocation = flag.String("factomdLocation", "", "Change the location of factomd. Default comes from the config file")
+		factomdLocation = flag.String("factomdlocation", "", "Change the location of factomd. Default comes from the config file")
 
 		min = flag.Bool("min", false, "Temporary flag, for testing")
 	)
