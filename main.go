@@ -32,7 +32,7 @@ func close() {
 
 // Initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
 // and will be created if they are not found.
-func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, walletdPort int, v1Import bool, v1Path string) {
+func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, walletdPort int, v1Import bool, v1Path string, factomdLocFlag string) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
 
 	filename := util.ConfigFilename() //file name and path to factomd.conf file
@@ -41,6 +41,10 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	// Ports
 	walletPort := walletdPort
 	factomdLocation := cfg.Walletd.FactomdLocation
+	if factomdLocFlag != "" {
+		factomdLocation = factomdLocFlag
+	}
+
 	controlPanelPort := cfg.App.ControlPanelPort
 	if cfg.App.ControlPanelSetting == "disabled" {
 		controlPanelPort = -1

@@ -14,15 +14,16 @@ var (
 func main() {
 	// configure the server
 	var (
-		guiDB       = flag.String("guiDB", "Bolt", "GUI Database: Bolt, LDB, or Map")
-		walDB       = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
-		txDB        = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
-		port        = flag.Int("port", 8091, "The port for the GUIWallet")
-		walletdPort = flag.Int("walletport", 8089, "The port for factom-walletd instance to be run on")
-		compiled    = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
-		randomAdds  = flag.Bool("randadd", true, "Overrides ADD_RANDOM_ADDRESSES if false and does not add random addresses")
-		v1Import    = flag.Bool("i", true, "Search for M1 wallet, if there is no M2 wallet file")
-		v1Path      = flag.String("v1path", "/.factom/factoid_wallet_bolt.db", "Change the path for V1 import")
+		guiDB           = flag.String("guiDB", "Bolt", "GUI Database: Bolt, LDB, or Map")
+		walDB           = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
+		txDB            = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
+		port            = flag.Int("port", 8091, "The port for the GUIWallet")
+		walletdPort     = flag.Int("walletport", 8089, "The port for factom-walletd instance to be run on")
+		compiled        = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
+		randomAdds      = flag.Bool("randadd", true, "Overrides ADD_RANDOM_ADDRESSES if false and does not add random addresses")
+		v1Import        = flag.Bool("i", true, "Search for M1 wallet, if there is no M2 wallet file")
+		v1Path          = flag.String("v1path", "/.factom/factoid_wallet_bolt.db", "Change the path for V1 import")
+		factomdLocation = flag.String("factomdLocation", "", "Change the location of factomd. Default comes from the config file")
 
 		min = flag.Bool("min", false, "Temporary flag, for testing")
 	)
@@ -51,5 +52,5 @@ func main() {
 		FILES_PATH += "min-"
 	}
 
-	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *walletdPort, *v1Import, *v1Path)
+	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *walletdPort, *v1Import, *v1Path, *factomdLocation)
 }
