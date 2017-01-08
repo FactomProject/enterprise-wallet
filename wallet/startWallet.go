@@ -26,7 +26,7 @@ func StartWallet(walletPort int, factomdLocation string, guiDBType int, walletDB
 	}
 
 	portStr := "localhost:" + strconv.Itoa(walletPort)
-	fmt.Println("Starting Wallet WSAPI on http://localhost" + portStr + "/")
+	fmt.Println("Starting Wallet WSAPI on http://" + portStr + "/")
 	go wsapi.Start(wal.Wallet, fmt.Sprintf(":%d", walletPort), *(factom.RpcConfig))
 
 	return wal, nil

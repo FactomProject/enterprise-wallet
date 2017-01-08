@@ -70,7 +70,7 @@ func ServeWallet(port int) {
 
 	portStr := "localhost:" + strconv.Itoa(port)
 
-	fmt.Println("Starting GUI on http://localhost" + portStr + "/")
+	fmt.Println("Starting GUI on http://" + portStr + "/")
 	http.ListenAndServe(portStr, nil)
 }
 
