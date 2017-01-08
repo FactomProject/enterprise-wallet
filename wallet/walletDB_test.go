@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	ad "github.com/FactomProject/M2GUIWallet/address"
-	. "github.com/FactomProject/M2GUIWallet/wallet"
+	ad "github.com/FactomProject/enterprise-wallet/address"
+	. "github.com/FactomProject/enterprise-wallet/wallet"
 	ed "github.com/FactomProject/ed25519"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet"
