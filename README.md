@@ -1,5 +1,5 @@
 # Enterprise Wallet - GUI Wallet for M2
-This uses the same wallet file as factom-walletd and the same port. This means, EnterpriseWallet cannot run alongside factom-walletd. EnterpriseWallet will import any and all addresses created in the CLI and will monitor any changes the CLI makes and be sure to update itself to reflect those changes. Any addresses created from the CLI however will be marked as not created from the seed, so it is recommended to create all addresses from within the GUI.
+This uses the same wallet file as factom-walletd and the same port. This means, enterprise-wallet cannot run alongside factom-walletd. enterprise-wallet will import any and all addresses created in the CLI and will monitor any changes the CLI makes and be sure to update itself to reflect those changes. Any addresses created from the CLI however will be marked as not created from the seed, so it is recommended to create all addresses from within the GUI.
 
 Three files are created and used by the wallet:
  1. ~/.factom/wallet/factom_wallet.db

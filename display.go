@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/FactomProject/EnterpriseWallet/web/files"
+	"github.com/FactomProject/enterprise-wallet/web/files"
 )
 
 var (

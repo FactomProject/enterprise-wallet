@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FactomProject/EnterpriseWallet/web/files/statics"
-	"github.com/FactomProject/EnterpriseWallet/web/files/templates"
+	"github.com/FactomProject/enterprise-wallet/web/files/statics"
+	"github.com/FactomProject/enterprise-wallet/web/files/templates"
 )
 
 // This is the general handler. The files are split into two catagories to speed

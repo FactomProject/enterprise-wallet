@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/FactomProject/EnterpriseWallet"
+	. "github.com/FactomProject/enterprise-wallet"
 )
 
 var _ = fmt.Sprintf("")

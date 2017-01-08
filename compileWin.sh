@@ -2,5 +2,5 @@ echo "Compiling for windows"
 GOOS=windows GOARCH=386 go build
 # GOOS=windows GOARCH=386 go build -v
 echo "Moving to folder"
-rm windows-binaries/EnterpriseWallet.exe
-mv EnterpriseWallet.exe windows-binaries/EnterpriseWallet.exe
+rm windows-binaries/enterprise-wallet.exe
+mv enterprise-wallet.exe windows-binaries/enterprise-wallet.exe

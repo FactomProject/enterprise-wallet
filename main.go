@@ -11,7 +11,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/FactomProject/EnterpriseWallet/wallet"
+	"github.com/FactomProject/enterprise-wallet/wallet"
 	"github.com/FactomProject/factomd/util"
 )
 
