@@ -50,5 +50,6 @@
                         </div>
                     </div>
                 </section>
+                <section id="synced-indicator" class="loading callout alert" {{if $settings.Synced}} style="display:none" {{else}}{{end}}><div class="column text-center">Warning: The Wallet is still loading the blockchain. Until it is fully synced, balances and fees may not be correct.</div></section>
                 <main class="{{$mainClass}}">
 {{end}}

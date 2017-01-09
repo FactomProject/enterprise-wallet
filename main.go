@@ -110,6 +110,8 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	}
 
 	MasterSettings.ControlPanelPort = controlPanelPort
+	// We always need to load transactions, even if in database. So let's start as not synced
+	MasterSettings.Synced = false
 	// For Testing adds random addresses
 	if ADD_RANDOM_ADDRESSES {
 		addRandomAddresses()

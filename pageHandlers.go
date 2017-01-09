@@ -33,6 +33,29 @@ type SettingsStruct struct {
 	// Not marshaled
 	Theme            string // darkTheme or ""
 	ControlPanelPort int
+	Synced           bool
+}
+
+// Refreshes the "synced" flag, and anything else that needs to be done
+// before a page loads
+func (s *SettingsStruct) Refresh() {
+	h, err := factom.GetHeights()
+	if err != nil || h == nil {
+		s.Synced = false
+	}
+	// 1 block grace period
+	if h.EntryHeight >= (h.LeaderHeight - 1) {
+		fBlockHeight, err := MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
+		if err != nil {
+			s.Synced = false
+			return
+		}
+		if fBlockHeight >= uint32(h.EntryHeight) {
+			s.Synced = true
+			return
+		}
+	}
+	s.Synced = false
 }
 
 func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
