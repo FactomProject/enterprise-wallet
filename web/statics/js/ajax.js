@@ -66,7 +66,22 @@ function FCTNormalize(fct) {
   return Number((fct/1e8).toFixed(FCTDecminalLength))
 }
 
+Synced = false
 // On most pages
+setInterval(checkSynced,3000);
+function checkSynced(){
+  if(Synced) {
+    return
+  }
+  getRequest("synced", function(resp){
+    console.log(resp)
+    obj = JSON.parse(resp)
+    if (obj.Content == true) {
+      $("#synced-indicator").slideUp(100)
+    }
+  })
+}
+
 function SetGeneralError(err) {
   $("#success-zone").slideUp(100)
   $("#error-zone").text(err)

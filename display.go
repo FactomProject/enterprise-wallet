@@ -117,6 +117,8 @@ func doEvery(d time.Duration, f func(time.Time)) {
 
 // Redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
+	// Updted "synced" and other prcesses run before page loads
+	MasterSettings.Refresh()
 	request := strings.Split(r.RequestURI, "?")
 	var err error
 	switch request[0] {
@@ -199,6 +201,9 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	}
 	req := r.FormValue("request")
 	switch req {
+	case "synced":
+		MasterSettings.Refresh()
+		w.Write(jsonResp(MasterSettings.Synced))
 	case "addresses":
 		data, err := MasterWallet.GetGUIWalletJSON()
 		if err != nil {
