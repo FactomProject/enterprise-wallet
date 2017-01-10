@@ -340,7 +340,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 
 				w.TransactionDB.GetAllTXs()
 			} else {
-				return nil, fmt.Errorf("Error with loading transaction database.")
+				return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
 			}
 		} else {
 			break
@@ -357,7 +357,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		w.cachedHeight = block.GetDatabaseHeight()
 	} else {
 		w.TransactionDB.GetAllTXs() // UpdateDB for next attempt if user tries again
-		return nil, fmt.Errorf("Error with loading transaction database.")
+		return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
 	}
 
 	// Get all new transaction to go through

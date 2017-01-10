@@ -42,9 +42,10 @@ func (s *SettingsStruct) Refresh() {
 	h, err := factom.GetHeights()
 	if err != nil || h == nil {
 		s.Synced = false
+		return
 	}
 	// 1 block grace period
-	if h.EntryHeight >= (h.LeaderHeight - 1) {
+	if (h.EntryHeight >= (h.LeaderHeight - 1)) {
 		fBlockHeight, err := MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
 		if err != nil {
 			s.Synced = false
