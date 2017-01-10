@@ -26,10 +26,10 @@
                     <h1>Enterprise</h1>
                 </header>
                 <nav>
-                    <ul>
-                        <li {{if compareInts $activeNav 1 }} class="active" {{end}}><a href="/" class="transactions"><i><img src="img/nav_transactions.svg" class="svg" alt="Transactions"></i>Transactions</a></li>
-                        <li {{if compareInts $activeNav 2 }} class="active" {{end}}><a href="AddressBook" class="address-book"><i><img src="img/nav_address-book.svg" class="svg" alt="Address Book"></i>Address Book</a></li>
-                        <li {{if compareInts $activeNav 3 }} class="active" {{end}}><a href="Settings" class="settings"><i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>Settings</a></li>
+                    <ul id="nav-list">
+                        <li id="transactions-nav" {{if compareInts $activeNav 1 }} class="active" {{end}}><a href="/" class="transactions" nav-click="true"><i><img src="img/nav_transactions.svg" class="svg" alt="Transactions"></i>Transactions</a></li>
+                        <li id="address-book-nav" {{if compareInts $activeNav 2 }} class="active" {{end}}><a href="AddressBook" class="address-book nav-element" nav-click="true"><i><img src="img/nav_address-book.svg" class="svg" alt="Address Book"></i>Address Book</a></li>
+                        <li id="settings-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}><a href="Settings" class="settings nav-element" nav-click="true"><i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>Settings</a></li>
                     </ul>
                 </nav>
             </section>
@@ -52,4 +52,5 @@
                 </section>
                 <section id="synced-indicator" class="loading callout alert" {{if $settings.Synced}} style="display:none" {{else}}{{end}}><div class="column text-center">Warning: The Wallet is still loading the blockchain. Until it is fully synced, balances and fees may not be correct.</div></section>
                 <main class="{{$mainClass}}">
+                <section id="dynamic-content">
 {{end}}

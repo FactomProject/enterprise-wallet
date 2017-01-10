@@ -107,4 +107,3 @@ function saveTextAsFile(text, filename) {
     document.body.appendChild(downloadLink);
     downloadLink.click();
 }
-

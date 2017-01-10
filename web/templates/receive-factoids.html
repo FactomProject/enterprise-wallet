@@ -6,60 +6,57 @@
 {{$activeNav := 1}}
 {{ $info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
-
-<div class="row">
-    <div class="columns">
-        <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
-        <h1>Receive Factoids/Entry Credits</h1>
-        <div class="row">
-            <div class="small-12 large-4 columns" id="qrcode">
-                <!-- <img src="img/qr_receiving.png" class="qr-receiving"><br><br> -->
-            </div>
-            <label class="hide" id="selected-address-info"></label>
-            <div class="small-12 large-8 columns">
-                <form>
-                    <label>Receiving address: <small><a href="/AddressBook">Manage Addresses</a></small></label>
-            {{if .Address}}
-                    <div id="receiving-address-fixed" name="receiving-address" class="pad20">
-                        <small>{{.Name}} <br><pre>({{.Address}})</pre></small>
-                        <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
-                    </div>
-            {{else}}
-                    <select id="receiving-address" name="receiving-address">
-                        <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
-                    </select>
-            {{end}}
-                </form>
-                <form>  
-                    <div class="row small-12 large-8 columns">
-                        <label>Balance:</label>
-                        <div class="row">
-                            <div class="small-12 medium-8 large-6">
-                                <div class="input-group">
-                                    <input id="balance" type="text" class="input-group-field disabled-input" placeholder="0" disabled="true">
-                                    <span id="balance-type" class="input-group-label"></span>
+<div id="guts">
+    <div class="row">
+        <div class="columns">
+            <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+            <h1>Receive Factoids/Entry Credits</h1>
+            <div class="row">
+                <div class="small-12 large-4 columns" id="qrcode">
+                    <!-- <img src="img/qr_receiving.png" class="qr-receiving"><br><br> -->
+                </div>
+                <label class="hide" id="selected-address-info"></label>
+                <div class="small-12 large-8 columns">
+                    <form>
+                        <label>Receiving address: <small><a href="/AddressBook">Manage Addresses</a></small></label>
+                {{if .Address}}
+                        <div id="receiving-address-fixed" name="receiving-address" class="pad20">
+                            <small>{{.Name}} <br><pre>({{.Address}})</pre></small>
+                            <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
+                        </div>
+                {{else}}
+                        <select id="receiving-address" name="receiving-address">
+                            <!-- <option value="factoid1">factoid1 (FA22iH4u8cvTEac94PggP66rtM61NS3mURshXcPH6UwUQ5Mpoxch8)</option> -->
+                        </select>
+                {{end}}
+                    </form>
+                    <form>  
+                        <div class="row small-12 large-8 columns">
+                            <label>Balance:</label>
+                            <div class="row">
+                                <div class="small-12 medium-8 large-6">
+                                    <div class="input-group">
+                                        <input id="balance" type="text" class="input-group-field disabled-input" placeholder="0" disabled="true">
+                                        <span id="balance-type" class="input-group-label"></span>
+                                    </div>
+                                </div>
+                                <div class="columns text-right small-12 medium-4 large-6">
+                                    <a id="copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
                                 </div>
                             </div>
-                            <div class="columns text-right small-12 medium-4 large-6">
-                                <a id="copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
-                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{{template "templateBottom" "recieve-factoids"}}
+{{template "templateBottom" ""}}
 
 {{if .Address}}
-<script type="text/javascript">
-    window.onload = LoadFixedAddress;
-</script>
+    <script type="text/javascript">window.onload = LoadFixedAddress;</script>
 {{else}}
-<script type="text/javascript">
-    window.onload = LoadRecAddresses;
-</script>
+    <script type="text/javascript">window.onload = LoadRecAddresses;</script>
 {{end}}
 {{end}}

@@ -1,6 +1,14 @@
 // Import/Export page acts differently
 importexport = false
 
+// Load the Reveal
+/*$(window).load(function() {
+    LoadAddresses()
+    if($("#coin-control").hasClass("coin-control")) {
+      $("#fee-address-input").css("display", "none")
+    }
+});*/
+
 // Used for sending factoids or converting to entry credits
 PageTokenABR = "FCT"
 PageToken = "factoids"
@@ -399,15 +407,7 @@ $("#edit-transaction").on('click', function(){
   HideMessages()
 })
 
-// Load the Reveal
-$(window).load(function() {
-    LoadAddresses()
-    if($("#coin-control").hasClass("coin-control")) {
-      $("#fee-address-input").css("display", "none")
-    }
-});
-
-function LoadAddresses(){
+function LoadAddressesSendConvert(){
   resp = getRequest("addresses",function(resp){
     obj = JSON.parse(resp)
 

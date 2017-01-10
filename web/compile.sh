@@ -1,4 +1,7 @@
 #!/bin/bash
+
+#
+sh concatJs.sh
 # Minifies static files
 if [ "$1" == "closure" ] # Closure compile by google
 	then

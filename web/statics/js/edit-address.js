@@ -1,9 +1,9 @@
 var Name = ""
 var Address = ""
 
-$(window).load(function() {
+/*$(window).load(function() {
     GetDefaultData()
-});
+});*/
 
 function GetDefaultData(){
 	Name = $("#address-name").val()
