@@ -68,13 +68,13 @@ function FCTNormalize(fct) {
 
 Synced = false
 // On most pages
+checkSynced()
 setInterval(checkSynced,3000);
 function checkSynced(){
   if(Synced) {
     return
   }
   getRequest("synced", function(resp){
-    console.log(resp)
     obj = JSON.parse(resp)
     if (obj.Content == true) {
       $("#synced-indicator").slideUp(100)
