@@ -4,7 +4,10 @@
   "description": "Factom Enterprise Wallet",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-packager . EnterpriseWallet --ignore=node_modules/electron-* --out=builds",
+    "build-win":"electron-packager . EnterpriseWallet --platform=win32 --arch=all --electronVersion=1.4.1 --out=builds --icon=EnterpriseWallet.ico --version-string.CompanyName='FactomFoundation' --version-string.ProductName='EnterpriseWallet'",
+    "build-interactive":"electron-packager-interactive"
   },
   "repository": "https://github.com/FactomProject/enterprise-wallet",
   "keywords": [
@@ -17,6 +20,8 @@
   "author": "Steven Masley",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^1.4.1"
+    "electron": "^1.4.1",
+    "electron-packager": "^8.5.0",
+    "asar":"^0.12.0"
   }
 }

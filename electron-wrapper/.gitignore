@@ -1,3 +1,4 @@
 node_modules
 bin/enterprise-wallet
 bin/enterprise-wallet.exe
+npm-debug.log

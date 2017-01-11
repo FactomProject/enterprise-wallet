@@ -3,3 +3,6 @@ web/closure
 vendor/*
 enterprise-wallet.exe
 windows-binaries/*
+tmp/*
+scripts/*
+builds/*

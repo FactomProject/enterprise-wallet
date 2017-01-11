@@ -32,6 +32,10 @@
                         <li id="settings-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}><a href="Settings" class="settings nav-element" nav-click="true"><i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>Settings</a></li>
                     </ul>
                 </nav>
+                <div id="sync-status" class="hide-for-small-only">
+			<small>Enterprise: Version v0.1.0.0</small><br>
+			<span id="sync-bar" class="label alert">Wallet Sync: <span id="load-percent">0</span>%</span>
+                </div>
             </section>
             <section class="rightCol small-12 medium-expand columns">
                 <section class="balances">

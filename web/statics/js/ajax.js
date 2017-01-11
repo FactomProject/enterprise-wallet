@@ -72,7 +72,6 @@ setInterval(checkSynced,3000);
 function checkSynced(){
   getRequest("synced", function(resp){
     obj = JSON.parse(resp)
-    console.log(obj)
     // Change progress
     switch (obj.Content.Stage) {
       case 0:
@@ -88,12 +87,39 @@ function checkSynced(){
         $("#load-message").text("Sorting transactions...")
         break;
     }
-    
+
+    eBlockPercent = obj.Content.EntryHeight / obj.Content.LeaderHeight
+    eBlockPercent = HelperFunctionForPercent(eBlockPercent, 50)
+
+    fBlockPercent = obj.Content.FblockHeight / obj.Content.LeaderHeight
+    fBlockPercent = HelperFunctionForPercent(fBlockPercent, 50)
+
+    percent = eBlockPercent + fBlockPercent
+
+    if(percent > 98) {
+      $("#sync-bar").removeClass("alert")
+    } else {
+      $("#sync-bar").addClass("alert")
+    }
+    $("#load-percent").text(percent.toFixed(2))
+
     // Remove error message
     if (obj.Content.Synced == true) {
       $("#synced-indicator").slideUp(100)
     }
   })
+}
+
+function HelperFunctionForPercent(percent, multiBy){
+  if(percent == undefined || percent == NaN) {
+    percent = 0
+  }
+
+  percent = percent * multiBy
+  if(percent > multiBy) {
+    percent = multiBy
+  }
+  return percent
 }
 
 function SetGeneralError(err) {
