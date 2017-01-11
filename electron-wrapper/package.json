@@ -1,0 +1,22 @@
+{
+  "name": "electron-enterprise-wallet",
+  "version": "1.0.0",
+  "description": "Factom Enterprise Wallet",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/FactomProject/enterprise-wallet",
+  "keywords": [
+    "Electron",
+    "Factom",
+    "Enterprise",
+    "Wallet",
+    "GUI"
+  ],
+  "author": "Steven Masley",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.4.1"
+  }
+}
