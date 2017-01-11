@@ -3585,6 +3585,7 @@ header {
   #frame > section {
     padding: 0; }
   #frame section.leftCol {
+    position: relative;
     max-width: 314px;
     background: #f3f3f3; }
     @media screen and (min-width: 0em) and (max-width: 39.9375em) {
@@ -3693,6 +3694,17 @@ header {
                 width: 40px; }
             #frame section.leftCol nav ul li.active a {
               background-color: #fff; } }
+    #frame section.leftCol #sync-status {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 2em 1em;
+      text-align: center; }
+      #frame section.leftCol #sync-status .label {
+        padding-left: 1em;
+        padding-right: 1em;
+        border-radius: 16px; }
   #frame section.rightCol {
     display: flex;
     flex-flow: column;
