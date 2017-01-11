@@ -298,6 +298,19 @@ header {
                 }
             }
         }
+	#sync-status {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		padding: 2em 1em;
+		text-align: center;
+		.label {
+			padding-left: 1em;
+			padding-right: 1em;
+			border-radius: 16px;
+		}
+	}
     }
     section.rightCol {
         display: flex;
