@@ -66,17 +66,32 @@ function FCTNormalize(fct) {
   return Number((fct/1e8).toFixed(FCTDecminalLength))
 }
 
-Synced = false
 // On most pages
 checkSynced()
 setInterval(checkSynced,3000);
 function checkSynced(){
   getRequest("synced", function(resp){
     obj = JSON.parse(resp)
-    // console.log(obj)
-    if (!Synced && obj.Content.Synced == true) {
+    console.log(obj)
+    // Change progress
+    switch (obj.Content.Stage) {
+      case 0:
+        $("#load-message").text("Setting up...")
+        break;
+      case 1:
+        $("#load-message").text("Gathering new transactions...")
+        break;
+      case 2:
+        $("#load-message").text("Checking any new addresses...")
+        break;
+      case 3:
+        $("#load-message").text("Sorting transactions...")
+        break;
+    }
+    
+    // Remove error message
+    if (obj.Content.Synced == true) {
       $("#synced-indicator").slideUp(100)
-      Synced = true
     }
   })
 }

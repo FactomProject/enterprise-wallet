@@ -207,6 +207,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 			LeaderHeight int64
 			EntryHeight  int64
 			FblockHeight uint32
+			Stage        int
 		}
 		s := new(SyncedStruct)
 
@@ -215,6 +216,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		s.LeaderHeight = lh
 		s.EntryHeight = eh
 		s.FblockHeight = fh
+		s.Stage = MasterWallet.GetStage()
 
 		w.Write(jsonResp(s))
 	case "addresses":

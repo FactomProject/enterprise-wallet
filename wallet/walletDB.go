@@ -301,6 +301,29 @@ func prtOff() {
 	PROCESSING_RELATED_TRANSACTIONS = false
 }
 
+// The user's need feedback on the sync. The function prints out the best information,
+// but to display to front end, we need a simple 1 percent number
+// 	Stage 0: Setup
+//	Stage 1: Gathering Transactions
+//	Stage 2: Checking New Addresses
+//	Stage 3: Sorting
+
+var RTLock sync.RWMutex
+var RTStage int = 0
+
+func (w *WalletDB) SetStage(stage int) {
+	RTLock.Lock()
+	RTStage = stage
+	RTLock.Unlock()
+}
+
+func (w *WalletDB) GetStage() int {
+	RTLock.RLock()
+	t := RTStage
+	RTLock.RUnlock()
+	return t
+}
+
 // This function grabs all transactions related to any address in the address book
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.
@@ -308,6 +331,8 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	if PROCESSING_RELATED_TRANSACTIONS { // Already working on it
 		return
 	}
+
+	w.SetStage(0)
 
 	// If we print 1 step, we should print all so user knows it is done
 	// Some steps may be very quick
@@ -333,14 +358,13 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	for i = 0; i < 2; i++ { // 2 tries, if fails first, updates transactions and trys again
 		block, err = w.TransactionDB.DBO.FetchFBlockHead()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("There has been an issue when trying to grab a block from the database. Please try again in a few seconds.")
 		}
 		if block == nil {
 			if i == 0 {
-
 				w.TransactionDB.GetAllTXs()
 			} else {
-				return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
+				return nil, fmt.Errorf("Error with loading transaction database. It could be in the process of loading all transactions. Try waiting a minute and reloading the page.")
 			}
 		} else {
 			break
@@ -360,10 +384,16 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
 	}
 
+	//
+	// STAGE 1
+	w.SetStage(1)
+	// Gather all new transactions, and add the ones related to us into a list
+	//
+
 	// Get all new transaction to go through
 	transactions, err := w.TransactionDB.GetTXRange(int(oldHeight), int(w.cachedHeight))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error with loading transactions from the database. When grabbing from transaction range.")
 	}
 	totalTransactions := len(transactions)
 	var newTransactions []DisplayTransaction
@@ -422,6 +452,12 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 1/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	//
+	// STAGE 2
+	w.SetStage(2)
+	// Sort transactions we already have, and get transactions from any new addresses
+	//
+
 	// Sort the new ones
 	sort.Sort(DisplayTransactions(newTransactions))
 
@@ -463,6 +499,12 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		printSteps = true
 		fmt.Printf("Step 2/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
+
+	//
+	// STAGE 3
+	w.SetStage(3)
+	// Insert any new transactions from new addresses into our list to append
+	//
 
 	totalTransactions = len(moreTransactions)
 	/* This to end of function breaks the attempt to build for windows for some reason */

@@ -34,7 +34,7 @@ function execWalletd() {
   }
 
   if(isWin){
-    walletd = exec('./bin/enterprise-wallet.exe -txDB=Map', function callback(error, stdout, stderr){
+    walletd = exec(path.join(__dirname, '/bin/enterprise-wallet.exe'), function callback(error, stdout, stderr){
       console.log(stdout)
       if (error !== null) {
 
@@ -44,7 +44,7 @@ function execWalletd() {
       }
     });
   } else {
-    walletd = exec('./bin/enterprise-wallet -txDB=Map', function callback(error, stdout, stderr){
+    walletd = exec(path.join(__dirname, '/bin/enterprise-wallet'), function callback(error, stdout, stderr){
       console.log(stdout)
       if (error !== null) {
 
