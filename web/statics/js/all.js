@@ -49,7 +49,7 @@ function addressTableRow(address, type, star) {
 
 	return		'<tr>' +
 				'<td><a nav-click="true" href="receive-factoids?address=' + address.Address + '&name=' + address.Name + '"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
-				'<td><span id="name">' + address.Name + '</span> <a href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
+				'<td><span id="name">' + address.Name + '</span> <a nav-click="true" href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
 				'<td><pre>' + star + " " + shortAddr + '</pre></td>' +
 				'<td><span id="balance">' + address.Balance  + "</span>" + token + '</td>' +
 				'</tr>'
@@ -924,6 +924,10 @@ function LoadAddressesSendConvert(){
       }
     }
   })
+
+  if($("#coin-control").hasClass("coin-control")) {
+    $("#fee-address-input").css("display", "none")
+  }
 }
 
 function factoidAddressRadio(address, name){
@@ -1098,7 +1102,6 @@ $("#import-file").on('click', function(){
 })
 
 $("#uploaded-file").on('change', function(){
-  console.log("hey")
   input = document.getElementById('uploaded-file');
   if (!input) {
     SetGeneralError("Error with upload file javascript.")
@@ -1273,12 +1276,12 @@ function saveTextAsFile(text, filename) {
 
 //selected = false
 // Import/Export
-$("#import-file").on('click', function(e){
-	document.getElementById('uploaded-file').click()
+$("#settings-import-file").on('click', function(e){
+	document.getElementById('settings-uploaded-file').click()
 })
 
 
-$("#uploaded-file").on('change', function(){
+$("#settings-uploaded-file").on('change', function(){
 	input = document.getElementById('uploaded-file');
 	if (!input) {
 		SetGeneralError("Error: Couldn't find the fileinput element.")
@@ -1366,7 +1369,7 @@ function dropDownOption(address) {
 }
 
 // Copy to clipboard
-$("#copy-to-clipboard").on('click', function(){
+$("#rec-copy-to-clipboard").on('click', function(){
 	var aux = document.createElement("input");
 	aux.setAttribute("value", $('#selected-address-info').val());
 	document.body.appendChild(aux);

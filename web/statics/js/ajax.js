@@ -71,13 +71,12 @@ Synced = false
 checkSynced()
 setInterval(checkSynced,3000);
 function checkSynced(){
-  if(Synced) {
-    return
-  }
   getRequest("synced", function(resp){
     obj = JSON.parse(resp)
-    if (obj.Content == true) {
+    // console.log(obj)
+    if (!Synced && obj.Content.Synced == true) {
       $("#synced-indicator").slideUp(100)
+      Synced = true
     }
   })
 }

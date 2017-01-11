@@ -9,7 +9,7 @@
 <div id="guts">
     <div class="row">
         <div class="columns">
-            <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+            <a nav-click="true" href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
             <h1 id="token-header" value="1">Buy Entry Credits</h1>
             {{$tokenInfo := mkArray "EC" "entry credit" nil .Settings.CoinControl}}
             {{template "transaction-template" $tokenInfo}}

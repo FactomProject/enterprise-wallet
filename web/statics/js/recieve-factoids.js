@@ -38,7 +38,7 @@ function dropDownOption(address) {
 }
 
 // Copy to clipboard
-$("#copy-to-clipboard").on('click', function(){
+$("#rec-copy-to-clipboard").on('click', function(){
 	var aux = document.createElement("input");
 	aux.setAttribute("value", $('#selected-address-info').val());
 	document.body.appendChild(aux);

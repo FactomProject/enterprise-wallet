@@ -56,12 +56,12 @@ function saveTextAsFile(text, filename) {
 
 //selected = false
 // Import/Export
-$("#import-file").on('click', function(e){
-	document.getElementById('uploaded-file').click()
+$("#settings-import-file").on('click', function(e){
+	document.getElementById('settings-uploaded-file').click()
 })
 
 
-$("#uploaded-file").on('change', function(){
+$("#settings-uploaded-file").on('change', function(){
 	input = document.getElementById('uploaded-file');
 	if (!input) {
 		SetGeneralError("Error: Couldn't find the fileinput element.")

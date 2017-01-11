@@ -87,7 +87,6 @@ $(function() {
                                     LoadAddresses()
                                     break;
                                 case "Settings":
-                                    console.log("what?")
                                     ChangeNav("settings", 3)
                                     break;
                                 case "send-factoids":
@@ -113,7 +112,15 @@ $(function() {
                                     LoadRecAddresses()
                                     break;
                                 default:
-                                    ChangeNav("", 1)
+                                    if(href.indexOf("receive-factoids?address") == 0){
+                                        ChangeNav("receive-factoids", 2)
+                                        LoadFixedAddress()
+                                    } else if(href.indexOf("edit-address") == 0){
+                                        ChangeNav("receive-factoids", 2)
+                                        GetDefaultData()
+                                    } else {
+                                        ChangeNav("", 1)
+                                    }
                                     break;
                             }
                         });
@@ -134,13 +141,10 @@ function ChangeNav(mainClass, activeWindow) {
     $("main").addClass(mainClass)
     if(activeWindow == 1) {
         $("#transactions-nav").addClass("active")
-        console.log("1")
     } else if(activeWindow == 2) {
         $("#address-book-nav").addClass("active")
-        console.log("2")
     } else {
         $("#settings-nav").addClass("active")
-        console.log("3")
     }
     fixUp();
     $(document).foundation();

@@ -202,8 +202,21 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	req := r.FormValue("request")
 	switch req {
 	case "synced":
-		MasterSettings.Refresh()
-		w.Write(jsonResp(MasterSettings.Synced))
+		type SyncedStruct struct {
+			Synced       bool
+			LeaderHeight int64
+			EntryHeight  int64
+			FblockHeight uint32
+		}
+		s := new(SyncedStruct)
+
+		lh, eh, fh := MasterSettings.Refresh()
+		s.Synced = MasterSettings.Synced
+		s.LeaderHeight = lh
+		s.EntryHeight = eh
+		s.FblockHeight = fh
+
+		w.Write(jsonResp(s))
 	case "addresses":
 		data, err := MasterWallet.GetGUIWalletJSON()
 		if err != nil {
@@ -714,6 +727,10 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		total := len(MasterWallet.ActiveCachedTransactions)
 		max := rt.Current + rt.More
 		if max > total {
+			if rt.Current >= total {
+				w.Write(jsonResp(nil))
+				return
+			}
 			next := MasterWallet.ActiveCachedTransactions[rt.Current:]
 			next = MasterWallet.ScrubDisplayTransactionsForNameChanges(next)
 			w.Write(jsonResp(next))

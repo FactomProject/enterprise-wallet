@@ -446,6 +446,10 @@ function LoadAddressesSendConvert(){
       }
     }
   })
+
+  if($("#coin-control").hasClass("coin-control")) {
+    $("#fee-address-input").css("display", "none")
+  }
 }
 
 function factoidAddressRadio(address, name){
@@ -620,7 +624,6 @@ $("#import-file").on('click', function(){
 })
 
 $("#uploaded-file").on('change', function(){
-  console.log("hey")
   input = document.getElementById('uploaded-file');
   if (!input) {
     SetGeneralError("Error with upload file javascript.")

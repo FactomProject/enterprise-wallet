@@ -49,7 +49,7 @@ function addressTableRow(address, type, star) {
 
 	return		'<tr>' +
 				'<td><a nav-click="true" href="receive-factoids?address=' + address.Address + '&name=' + address.Name + '"><i class="qr"><img src="img/icon_qr.svg" class="svg"></i></a></td>' +
-				'<td><span id="name">' + address.Name + '</span> <a href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
+				'<td><span id="name">' + address.Name + '</span> <a nav-click="true" href="edit-address-' + type + '?address=' + address.Address + '&name=' + address.Name + '"><i class="edit"><img src="img/icon_edit.svg" class="svg"></i></a></td>' +
 				'<td><pre>' + star + " " + shortAddr + '</pre></td>' +
 				'<td><span id="balance">' + address.Balance  + "</span>" + token + '</td>' +
 				'</tr>'

@@ -1,3 +1,8 @@
 mapStart.sh
 web/closure
 vendor/*
+electron-wrapper/bin/enterprise-wallet
+electron-wrapper/bin/enterprise-wallet.exe
+enterprise-wallet.exe
+windows-binaries/*
+electron-wrapper/node_modules/*

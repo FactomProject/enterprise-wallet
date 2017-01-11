@@ -38,25 +38,36 @@ type SettingsStruct struct {
 
 // Refreshes the "synced" flag, and anything else that needs to be done
 // before a page loads
-func (s *SettingsStruct) Refresh() {
+func (s *SettingsStruct) Refresh() (leaderHeight int64, entryHeight int64, fblockHeight uint32) {
+	var err error
+	leaderHeight = 0
+	entryHeight = 0
+	fblockHeight = 0
+
 	h, err := factom.GetHeights()
 	if err != nil || h == nil {
 		s.Synced = false
 		return
 	}
+
+	leaderHeight = h.LeaderHeight
+	entryHeight = h.EntryHeight
+
+	fblockHeight, err = MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
+	if err != nil {
+		s.Synced = false
+		return
+	}
+
 	// 1 block grace period
 	if h != nil && (h.EntryHeight >= (h.LeaderHeight - 1)) {
-		fBlockHeight, err := MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
-		if err != nil {
-			s.Synced = false
-			return
-		}
-		if fBlockHeight >= uint32(h.EntryHeight) {
+		if fblockHeight >= uint32(h.EntryHeight) {
 			s.Synced = true
 			return
 		}
 	}
 	s.Synced = false
+	return
 }
 
 func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {

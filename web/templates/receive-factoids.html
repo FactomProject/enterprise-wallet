@@ -9,7 +9,7 @@
 <div id="guts">
     <div class="row">
         <div class="columns">
-            <a href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+            <a nav-click="true" href="/" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
             <h1>Receive Factoids/Entry Credits</h1>
             <div class="row">
                 <div class="small-12 large-4 columns" id="qrcode">
@@ -18,7 +18,7 @@
                 <label class="hide" id="selected-address-info"></label>
                 <div class="small-12 large-8 columns">
                     <form>
-                        <label>Receiving address: <small><a href="/AddressBook">Manage Addresses</a></small></label>
+                        <label>Receiving address: <small><a nav-click="true" href="AddressBook">Manage Addresses</a></small></label>
                 {{if .Address}}
                         <div id="receiving-address-fixed" name="receiving-address" class="pad20">
                             <small>{{.Name}} <br><pre>({{.Address}})</pre></small>
@@ -41,7 +41,7 @@
                                     </div>
                                 </div>
                                 <div class="columns text-right small-12 medium-4 large-6">
-                                    <a id="copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
+                                    <a id="rec-copy-to-clipboard" class="button copy-address">Copy to Clipboard</a>
                                 </div>
                             </div>
                         </div>
