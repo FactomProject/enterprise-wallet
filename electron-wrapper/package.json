@@ -1,27 +1,52 @@
 {
-  "name": "electron-enterprise-wallet",
+  "name": "develop-enterprise-wallet",
   "version": "1.0.0",
-  "description": "Factom Enterprise Wallet",
-  "main": "main.js",
+  "description": "the develop package for distribution",
+  "main": "index.js",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-packager . EnterpriseWallet --ignore=node_modules/electron-* --out=builds",
-    "build-win":"electron-packager . EnterpriseWallet --platform=win32 --arch=all --electronVersion=1.4.1 --out=builds --icon=EnterpriseWallet.ico --version-string.CompanyName='FactomFoundation' --version-string.ProductName='EnterpriseWallet'",
-    "build-interactive":"electron-packager-interactive"
+    "postinstall": "install-app-deps",
+    "dist:mac": "build --mac"
   },
-  "repository": "https://github.com/FactomProject/enterprise-wallet",
-  "keywords": [
-    "Electron",
-    "Factom",
-    "Enterprise",
-    "Wallet",
-    "GUI"
-  ],
-  "author": "Steven Masley",
+  "author": "Steven Masley <steven@factom.org>",
   "license": "MIT",
   "devDependencies": {
+    "copyfiles": "~1.0.0",
+    "asar": "^0.12.0",
     "electron": "^1.4.1",
+    "electron-builder": "^11.2.4",
     "electron-packager": "^8.5.0",
-    "asar":"^0.12.0"
+    "mkdirp": "~0.5.1",
+    "npm-run-all": "~2.3.0",
+    "rimraf": "~2.5.3"
+  },
+  "build": {
+    "appId": "EnterpriseWallet",
+    "mac": {
+      "category": "your.app.category.type",
+      "asar": false
+    },
+    "dmg": {
+      "title": "EnterpriseWallet",
+      "background": "build/background.png",
+      "icon": "build/icon.icns",
+      "iconSize": 128,
+      "contents": [
+        {
+          "x": 355,
+          "y": 125,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 155,
+          "y": 125,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "iconUrl": "https://github.com/FactomProject/enterprise-wallet/blob/SOF-552/electron-wrapper/EnterpriseWallet.ico",
+      "asar": false
+    }
   }
 }
