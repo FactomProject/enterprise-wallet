@@ -1,5 +1,4 @@
 const electron = require('electron')
-const ipc = require('electron').ipcMain
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
@@ -13,6 +12,11 @@ var exec = require('child_process').exec;
 // Detect if windows
 var isWin = /^win/.test(process.platform);
 
+// For deployment
+const PATH_TO_BIN = "../app.asar.unpacked/bin/"
+// For local testing
+// const PATH_TO_BIN = "bin/"
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -22,42 +26,45 @@ let walletd
 // Start own enterprise-wallet daemon
 const startOwn = true
 
-ipc.on('asynchronous-message', function (event, arg) {
-  event.sender.send('asynchronous-reply', 'pong')
-})
-
 WALLETD_UP = false
 
+const PORT_TO_SERVE = "8091"
 function execWalletd() {
-  if(!startOwn){
+  if(!startOwn || WALLETD_UP){
     return
   }
 
   if(isWin){
-    walletd = exec(path.join(__dirname, '/bin/enterprise-wallet.exe'), function callback(error, stdout, stderr){
+    walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
       if (error !== null) {
 
       } else {
         console.log("Running as Windows OS")
-        mainWindow.loadURL('http://localhost:8091/');
+        mainWindow.loadURL('http://localhost:' + PORT_TO_SERVE + '/');
       }
     });
   } else {
-    walletd = exec(path.join(__dirname, '/bin/enterprise-wallet'), function callback(error, stdout, stderr){
+    walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
       if (error !== null) {
 
       } else {
         console.log("Running as Linux/Mac OS")
-        mainWindow.loadURL('http://localhost:8091/');
+        mainWindow.loadURL('http://localhost:' + PORT_TO_SERVE + '/');
       }
     });
   }
 }
 
-function createWindow () {
+function startApp() {
   execWalletd()
+  WALLETD_UP = true
+  createWindow()
+  deleteChromeCache()
+}
+function createWindow () {
+
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -68,7 +75,7 @@ function createWindow () {
     center: true
   })
 
-  mainWindow.loadURL('http://localhost:8091/');
+  mainWindow.loadURL('http://localhost:' + PORT_TO_SERVE + '/');
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
@@ -85,7 +92,7 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', startApp)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -110,22 +117,6 @@ app.on('activate', function () {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
 var deleteChromeCache = function() {
-    var chromeCacheDir = path.join(app.getPath('userData'), 'Cache'); 
-    if(fs.existsSync(chromeCacheDir)) {
-        var files = fs.readdirSync(chromeCacheDir);
-        for(var i=0; i<files.length; i++) {
-            var filename = path.join(chromeCacheDir, files[i]);
-            if(fs.existsSync(filename)) {
-                try {
-                    fs.unlinkSync(filename);
-                }
-                catch(e) {
-                    console.log(e);
-                }
-            }
-        }
-    }
+  mainWindow.webContents.session.clearCache(function(){});
 };

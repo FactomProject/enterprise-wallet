@@ -69,7 +69,7 @@ $(function() {
                         $mainContent.hide().load(href + " #guts", function() {
                             $mainContent.fadeIn(200, function() {
                                 $pageWrap.animate({
-                                    height: baseHeight + $mainContent.height() + "px"
+                                    height: "100%"
                                 });
                             });
                             $("#nav-list [class='active'").removeClass("active")
@@ -147,7 +147,7 @@ function ChangeNav(mainClass, activeWindow) {
         $("#settings-nav").addClass("active")
     }
     fixUp();
-    $(document).foundation();
+    $('#guts').foundation();
 }
 
 function loadScript(script) {

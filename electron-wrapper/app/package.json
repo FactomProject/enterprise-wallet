@@ -1,9 +1,10 @@
 {
-  "name": "enterprise-wallet",
-  "version": "1.0.0",
+  "name": "enterprisewallet",
+  "version": "0.1.1",
   "description": "Factom Enterprise Wallet",
   "main": "main.js",
   "scripts": {
+    "postinstall": "install-app-deps",
     "start": "electron ."
   },
   "repository": "https://github.com/FactomProject/enterprise-wallet",
@@ -14,6 +15,9 @@
     "Wallet",
     "GUI"
   ],
-  "author": "Steven Masley <steven@factom.org>",
-  "license": "MIT"
+  "author": "Factom.org",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.4.1"
+  }
 }
