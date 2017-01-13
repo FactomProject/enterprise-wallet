@@ -12,7 +12,6 @@
     "dist:linux:deb": "npm run predist:linux && build --linux deb",
     "dist:linux:zip": "npm run predist:linux && build --linux zip",
     "dist:all":"npm run dist:win && npm run dist:mac && npm run dist:linux:zip && npm run dist:linux:deb",
-    "help": "electron-packager --help"
   },
   "author": "Factom.org",
   "repository": "https://github.com/FactomProject/enterprise-wallet",

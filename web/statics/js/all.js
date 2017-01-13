@@ -1225,6 +1225,10 @@ $("#save-changes").on('click', function(){
 	importExport = $("#import-export").is(":checked")
 	fd = $("#factomd-location").val()
 
+	if(!$("#customFactomd").is(":checked")){
+		fd = "localhost:8088"
+	}
+
 	var SettingsStruct = {
     	Values:[],
     	FactomdLocation:""
@@ -1237,7 +1241,6 @@ $("#save-changes").on('click', function(){
 	SettingsStruct.FactomdLocation = fd
 
 	j = JSON.stringify(SettingsStruct)
-	console.log(j)
 	postRequest("adjust-settings", j, function(resp){
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {
@@ -1251,6 +1254,14 @@ $("#save-changes").on('click', function(){
 	    	SetGeneralError("Error: " + obj.Error)
 	    }
 	})
+})
+
+$("#customFactomd").on('click', function(){
+	if($("#customFactomd").is(":checked")){
+		$("#factomd-location-container").removeClass("hide")
+	} else {
+		$("#factomd-location-container").addClass("hide")
+	}
 })
 
 $("#export-seed").on('click', function(){

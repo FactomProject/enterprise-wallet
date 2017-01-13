@@ -26,13 +26,21 @@
                     <br>
                     <input type="checkbox" id="darkTheme" name="darkThme" value="true" {{if .Settings.DarkTheme}} checked{{end}}>
                     <label for="darkTheme">Enable dark theme</label>
+                    <br>
+                    <input type="checkbox" id="customFactomd" name="customFactomd" value="true" {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} {{else}} checked {{end}}>
+                    <label for="customFactomd">Custom Factomd Location</label>
                 </p>
+                <div id="factomd-location-container" class='row factomdInput {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} hide {{end}}''>
+                    <div class="small-12 medium-8 columns">
+                        <pre><input id="factomd-location" type="text" class="input-group-field" maxlength="30" placeholder="{{.Settings.FactomdLocation}}"></pre>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="columns">
-                <a id="save-changes" class="button">Save Changes</a>
-                <br><br>
+                <br>
+                <p><a id="save-changes" class="button">Save Changes</a></p>
             </div>
         </div>
         <div class="row">
