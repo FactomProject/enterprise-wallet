@@ -26,13 +26,21 @@
                     <br>
                     <input type="checkbox" id="darkTheme" name="darkThme" value="true" {{if .Settings.DarkTheme}} checked{{end}}>
                     <label for="darkTheme">Enable dark theme</label>
+                    <br>
+                    <input type="checkbox" id="customFactomd" name="customFactomd" value="true" checked="">
+                    <label for="customFactomd">Custom Factomd Location</label>
                 </p>
+                <div class="row factomdInput hide">
+                    <div class="small-12 medium-8 columns">
+                        <pre><input id="private-key-input" type="text" name="private-key" class="input-group-field" maxlength="30"></pre>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="columns">
-                <a id="save-changes" class="button">Save Changes</a>
-                <br><br>
+                <br>
+                <p><a id="save-changes" class="button">Save Changes</a></p>
             </div>
         </div>
         <div class="row">
