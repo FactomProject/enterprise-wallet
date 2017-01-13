@@ -1,4 +1,6 @@
 const electron = require('electron')
+var ps = require('ps-node');
+const {dialog} = require('electron')
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
@@ -33,6 +35,7 @@ function execWalletd() {
   if(!startOwn || WALLETD_UP){
     return
   }
+  console.log("Executing enterprise-wallet...")
 
   if(isWin){
     walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
@@ -57,12 +60,52 @@ function execWalletd() {
   }
 }
 
-function startApp() {
-  execWalletd()
-  WALLETD_UP = true
-  createWindow()
-  deleteChromeCache()
+// Before we launch, we need to check if we already have the app running, then check if
+// enterprise-wallet has been left hanging around
+function startApp(){
+  console.log("Checking for app already open...")
+  ps.lookup({
+    command: 'EnterpriseWallet'
+    }, function(err, resultList ) {
+    if(resultList.length > 1){
+      // App already running, we don't want to spawn two
+      dialog.showErrorBox("App Already Running", "EnterpriseWallet is already running, please close it before trying to open it again.")
+      app.quit()
+    } else {
+      // Look for hanging golang process and kill them
+      console.log("Checking for hanging enterprise-wallet process...")
+      ps.lookup({
+        command: 'enterprise-wallet'
+        }, function(err, resultList ) {
+        if (err) {
+          throw new Error( err );
+        }
+
+        resultList.forEach(function( process ){
+          if( process ){
+            if(process.command.endsWith("enterprise-wallet")) {
+              console.log( 'Killing PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
+              ps.kill(process.pid, function(err){
+                if (err) {
+                  console.log( "enterprise-wallet is running, and cannot be stopped: " + err );
+                }
+              });
+            }
+          }
+        });
+
+        // Now we can start our processes and app
+        console.log("Launching...")
+        execWalletd()
+        WALLETD_UP = true
+        // Clear cache always, makes updates easier
+        createWindow()
+        deleteChromeCache()
+      });
+    }
+  });
 }
+
 function createWindow () {
 
 
@@ -105,6 +148,13 @@ app.on('window-all-closed', function () {
       walletd.kill();
     }
     app.quit()
+  }
+})
+
+app.on('quit', function(){
+  if(WALLETD_UP) {
+    walletd.stdin.pause();
+    walletd.kill();
   }
 })
 

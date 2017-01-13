@@ -89,12 +89,12 @@ function checkSynced(){
     }
 
     eBlockPercent = obj.Content.EntryHeight / obj.Content.LeaderHeight
-    eBlockPercent = HelperFunctionForPercent(eBlockPercent, 50)
+    eBlockPercent = HelperFunctionForPercent(eBlockPercent, 100)
 
     fBlockPercent = obj.Content.FblockHeight / obj.Content.LeaderHeight
-    fBlockPercent = HelperFunctionForPercent(fBlockPercent, 50)
+    fBlockPercent = HelperFunctionForPercent(fBlockPercent, 100)
 
-    percent = eBlockPercent + fBlockPercent
+    percent = fBlockPercent
 
     if(percent > 98) {
       $("#sync-bar").removeClass("alert")

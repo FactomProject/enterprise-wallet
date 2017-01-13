@@ -62,7 +62,7 @@ func TestSendFactoids(t *testing.T) {
 		amtsStrs = append(amtsStrs, fmt.Sprintf("%d", a/1e8))
 	}
 
-	nameComp, err := TestWallet.CheckTransactionAndGetName(recs, amtsStrs)
+	nameComp, err := TestWallet.CheckTransactionAndGetName(recs, amtsStrs, "")
 	if err != nil {
 		t.Fatal(err)
 	} else if trans != nameComp {
@@ -143,7 +143,7 @@ func TestConvertToEC(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	nameComp, err := TestWallet.CheckTransactionAndGetName(recs, amtsStrs)
+	nameComp, err := TestWallet.CheckTransactionAndGetName(recs, amtsStrs, "")
 	if err != nil {
 		t.Fatal(err)
 	} else if trans != nameComp {

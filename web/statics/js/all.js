@@ -1223,17 +1223,21 @@ $("#save-changes").on('click', function(){
 	exportKeys = $("#export-keys").is(":checked")
 	coinControl = $("#coin-control").is(":checked")
 	importExport = $("#import-export").is(":checked")
+	fd = $("#factomd-location").val()
 
 	var SettingsStruct = {
-    	Values:[]
+    	Values:[],
+    	FactomdLocation:""
 	}
 
 	SettingsStruct.Values.push(theme)
 	SettingsStruct.Values.push(exportKeys)
 	SettingsStruct.Values.push(coinControl)
 	SettingsStruct.Values.push(importExport)
+	SettingsStruct.FactomdLocation = fd
 
 	j = JSON.stringify(SettingsStruct)
+	console.log(j)
 	postRequest("adjust-settings", j, function(resp){
 	    obj = JSON.parse(resp)
 	    if(obj.Error == "none") {

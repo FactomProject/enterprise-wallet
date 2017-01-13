@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"encoding/hex"
 	"fmt"
 	"testing"
 
@@ -8,6 +9,20 @@ import (
 )
 
 var _ = fmt.Sprintf("")
+
+func TestOldToNewUnmarshal(t *testing.T) {
+	s := new(SettingsStruct)
+
+	data, err := hex.DecodeString("66616c736566616c736566616c736566616c7365")
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	_, err = s.UnmarshalBinaryData(data)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+}
 
 func TestSettings(t *testing.T) {
 	s := new(SettingsStruct)
@@ -39,6 +54,15 @@ func TestSettings(t *testing.T) {
 	}
 
 	s.CoinControl = true
+	n, err = MarshalSettingAndGetNewUnmarshaled(s)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	if !n.IsSameAs(s) {
+		t.Fatal("Not the Same")
+	}
+
+	s.FactomdLocation = "Another type of string"
 	n, err = MarshalSettingAndGetNewUnmarshaled(s)
 	if err != nil {
 		t.Fatalf(err.Error())

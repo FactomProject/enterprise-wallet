@@ -241,7 +241,9 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonError("Error occurred"))
 	case "related-transactions":
 		if on, server := MasterWallet.FactomdOnline(); !on {
-			w.Write(jsonError(fmt.Sprintf("Unable to connect to factomd at %s. Factomd may be down.", server)))
+			errorMsg := fmt.Sprintf("Unable to connect to factomd instance. The wallet is at '%s' for it's factomd instance. If this is set locally "+
+				"you must download the latest factomd and run it until it is synced", server)
+			w.Write(jsonError(errorMsg))
 			return
 		}
 
@@ -655,7 +657,8 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonResp(tHash))
 	case "adjust-settings":
 		type SettingsToggle struct {
-			Bools []bool `json:"Values"` // A list of the boolean settings
+			Bools           []bool `json:"Values"` // A list of the boolean settings
+			FactomdLocation string `json:"FactomdLocation"`
 		}
 
 		st := new(SettingsToggle)
@@ -677,13 +680,24 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		MasterSettings.CoinControl = st.Bools[2]
 		MasterSettings.ImportExport = st.Bools[3]
 
+		fdChange := false
+		fmt.Println(st)
+		if len(st.FactomdLocation) > 0 && st.FactomdLocation != MasterSettings.FactomdLocation {
+			MasterSettings.FactomdLocation = st.FactomdLocation
+			MasterSettings.SetFactomdLocation(MasterSettings.FactomdLocation)
+			fdChange = true
+		}
+
 		err = SaveSettings()
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
 		}
-
-		w.Write(jsonResp("Settings updated"))
+		if fdChange {
+			w.Write(jsonResp(fmt.Sprintf("Settings updated and the location of factomd was changed to %s\n", MasterSettings.FactomdLocation)))
+		} else {
+			w.Write(jsonResp("Settings updated"))
+		}
 	case "get-seed":
 		seed, err := MasterWallet.ExportSeed()
 		if err != nil {

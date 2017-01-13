@@ -21,14 +21,17 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 	return e
 }
 
+const MAX_FACTOMDLOCATION_SIZE int = 30
+
 // Every Handle struct must have settings
 // This is used on every page
 type SettingsStruct struct {
 	// Marshaled
-	DarkTheme    bool
-	KeyExport    bool // Allow export of private key
-	CoinControl  bool
-	ImportExport bool //Transaction import/export
+	DarkTheme       bool
+	KeyExport       bool // Allow export of private key
+	CoinControl     bool
+	ImportExport    bool //Transaction import/export
+	FactomdLocation string
 
 	// Not marshaled
 	Theme            string // darkTheme or ""
@@ -88,7 +91,15 @@ func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
 		return false
 	}
 
+	if a.FactomdLocation != b.FactomdLocation {
+		return false
+	}
+
 	return true
+}
+
+func (s *SettingsStruct) SetFactomdLocation(factomdLocation string) {
+	factom.SetFactomdServer(factomdLocation)
 }
 
 func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
@@ -114,6 +125,10 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	}
 
 	buf.Write(b)
+
+	var n [MAX_FACTOMDLOCATION_SIZE]byte
+	copy(n[:MAX_FACTOMDLOCATION_SIZE], s.FactomdLocation)
+	buf.Write(n[:MAX_FACTOMDLOCATION_SIZE])
 
 	return buf.Next(buf.Len()), nil
 }
@@ -167,6 +182,15 @@ func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err e
 		return data, err
 	}
 	newData = newData[5:]
+
+	// Need to add a fix to unmarshal data of older databases.
+	if len(newData) == 0 { // Old database type
+		s.FactomdLocation = "localhost:8088" // Will be overwritten if changed anyhow
+	} else {
+		nameData := bytes.Trim(newData[:MAX_FACTOMDLOCATION_SIZE], "\x00")
+		s.FactomdLocation = fmt.Sprintf("%s", nameData)
+		newData = newData[MAX_FACTOMDLOCATION_SIZE:]
+	}
 
 	return
 }

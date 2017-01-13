@@ -82,6 +82,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		txDB = wallet.LDB
 	}
 
+	// Start Walletd
 	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", IntToStringDBType(walletDB), IntToStringDBType(guiDB), IntToStringDBType(txDB))
 
 	// Can adjust starting variables
@@ -107,11 +108,21 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings.Theme = "darkTheme"
 	} else {
 		MasterSettings = data.(*SettingsStruct)
+		// If we have a custom config file, or a custom flag, we will overwrite the settings.
+		// This is so we can still trump the settings in the GUI
+		if factomdLocation != "localhost:8088" {
+			MasterSettings.FactomdLocation = factomdLocation
+		}
+		// Here is the first override of the factomd location from the GUI settings.
+		// You can see abover, this value will be overwritten by any config or flag
+		factomdLocation = MasterSettings.FactomdLocation
+		MasterSettings.SetFactomdLocation(factomdLocation)
 	}
 
 	MasterSettings.ControlPanelPort = controlPanelPort
 	// We always need to load transactions, even if in database. So let's start as not synced
 	MasterSettings.Synced = false
+
 	// For Testing adds random addresses
 	if ADD_RANDOM_ADDRESSES {
 		addRandomAddresses()

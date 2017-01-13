@@ -17,7 +17,12 @@
   ],
   "author": "Factom.org",
   "license": "MIT",
+  "dependencies": {
+    "ps-kill": "^1.0.0",
+    "ps-node": "^0.1.4"
+  },
   "devDependencies": {
-    "electron": "^1.4.1"
+    "electron": "^1.4.1",
+    "ps-node": "^0.1.4"
   }
 }
