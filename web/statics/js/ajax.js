@@ -69,8 +69,14 @@ function FCTNormalize(fct) {
 // On most pages
 checkSynced()
 setInterval(checkSynced,3000);
+var CheckingSync = false
 function checkSynced(){
+  if(CheckingSync) {
+    return
+  }
+  CheckingSync = true
   getRequest("synced", function(resp){
+    CheckingSync = false
     obj = JSON.parse(resp)
     // Change progress
     switch (obj.Content.Stage) {

@@ -117,8 +117,7 @@ func doEvery(d time.Duration, f func(time.Time)) {
 
 // Redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-	// Updted "synced" and other prcesses run before page loads
-	MasterSettings.Refresh()
+	MasterSettings.Synced = false
 	request := strings.Split(r.RequestURI, "?")
 	var err error
 	switch request[0] {
@@ -153,6 +152,9 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		err = HandleNotFoundError(w, r)
 	}
+
+	// Update "synced" and other prcesses run before page loads
+	MasterSettings.Refresh()
 
 	if err != nil {
 		fmt.Printf("An error has occured")
@@ -202,6 +204,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	req := r.FormValue("request")
 	switch req {
 	case "synced":
+		fmt.Println("Getting Sync Request")
 		type SyncedStruct struct {
 			Synced       bool
 			LeaderHeight int64
@@ -211,13 +214,14 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		}
 		s := new(SyncedStruct)
 
+		fmt.Println("Running a Refresh")
 		lh, eh, fh := MasterSettings.Refresh()
 		s.Synced = MasterSettings.Synced
 		s.LeaderHeight = lh
 		s.EntryHeight = eh
 		s.FblockHeight = fh
 		s.Stage = MasterWallet.GetStage()
-
+		fmt.Println("Returning Sync Request")
 		w.Write(jsonResp(s))
 	case "addresses":
 		data, err := MasterWallet.GetGUIWalletJSON()
