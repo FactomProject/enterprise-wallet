@@ -10,6 +10,7 @@ const path = require('path')
 const url = require('url')
 
 var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 
 // Detect if windows
 var isWin = /^win/.test(process.platform);
@@ -38,12 +39,12 @@ function execWalletd() {
   console.log("Executing enterprise-wallet...")
 
   if(isWin){
-    walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
+   walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
       if (error !== null) {
 
       } else {
-        console.log("Running as Windows OS")
+        console.log("Running as Linux/Mac OS")
         mainWindow.loadURL('http://localhost:' + PORT_TO_SERVE + '/');
       }
     });
@@ -153,17 +154,18 @@ app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    app.quit()
+    console.log("closed")
+    cleanUp(function(){app.quit()})
+    WALLETD_UP = false
   }
 })
 
 // App close handler
-app.on('will-quit', function() {
+app.on('before-quit', function() {
   if(WALLETD_UP) {
     walletd.stdin.pause();
     walletd.kill();
   }
-  cleanUp(function(){console.log("Quitting...")})
 });
 
 app.on('quit', function(){
