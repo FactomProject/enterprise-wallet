@@ -1,6 +1,6 @@
 const electron = require('electron')
 var ps = require('ps-node');
-const {dialog} = require('electron')
+const {dialog} = require('electron').dialog
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
@@ -60,50 +60,61 @@ function execWalletd() {
   }
 }
 
+/* Single Instance Check */
+var iShouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+  }
+  return true;
+});
+if(iShouldQuit){app.quit();return;}
+
+function cleanUp(functionAfterCleanup) {
+  console.log("Killing enterprise-wallet processes")
+  var commandToKill = "enterprise-wallet"
+  if(isWin) {
+    commandToKill = "enterprise-wallet.exe"
+  }
+  ps.lookup({
+    command: commandToKill
+    }, function(err, resultList ) {
+    if (err) {
+      throw new Error( err );
+    }
+
+    resultList.forEach(function( process ){
+      if( process ){
+        if(process.command.endsWith(commandToKill)) {
+          console.log( 'Killing PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
+          ps.kill(process.pid, function(err){
+            if (err) {
+              console.log( "enterprise-wallet is running, and cannot be stopped: " + err );
+            }
+          });
+        }
+      }
+    });
+
+    functionAfterCleanup()
+  });
+}
+
 // Before we launch, we need to check if we already have the app running, then check if
 // enterprise-wallet has been left hanging around
 function startApp(){
-  console.log("Checking for app already open...")
-  ps.lookup({
-    command: 'EnterpriseWallet'
-    }, function(err, resultList ) {
-    if(resultList.length > 1){
-      // App already running, we don't want to spawn two
-      dialog.showErrorBox("App Already Running", "EnterpriseWallet is already running, please close it before trying to open it again.")
-      app.quit()
-    } else {
-      // Look for hanging golang process and kill them
-      console.log("Checking for hanging enterprise-wallet process...")
-      ps.lookup({
-        command: 'enterprise-wallet'
-        }, function(err, resultList ) {
-        if (err) {
-          throw new Error( err );
-        }
-
-        resultList.forEach(function( process ){
-          if( process ){
-            if(process.command.endsWith("enterprise-wallet")) {
-              console.log( 'Killing PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
-              ps.kill(process.pid, function(err){
-                if (err) {
-                  console.log( "enterprise-wallet is running, and cannot be stopped: " + err );
-                }
-              });
-            }
-          }
-        });
-
-        // Now we can start our processes and app
-        console.log("Launching...")
-        execWalletd()
-        WALLETD_UP = true
-        // Clear cache always, makes updates easier
-        createWindow()
-        deleteChromeCache()
-      });
-    }
-  });
+  // Look for hanging golang process and kill them
+  console.log("Checking for hanging enterprise-wallet process...")
+  cleanUp(function(){
+    // Now we can start our processes and app
+    console.log("Launching...")
+    execWalletd()
+    WALLETD_UP = true
+    // Clear cache always, makes updates easier
+    createWindow()
+    deleteChromeCache()
+  })
 }
 
 function createWindow () {
@@ -141,21 +152,21 @@ app.on('ready', startApp)
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-
   if (process.platform !== 'darwin') {
-    if(startOwn){
-      walletd.stdin.pause();
-      walletd.kill();
-    }
     app.quit()
   }
 })
 
-app.on('quit', function(){
+// App close handler
+app.on('will-quit', function() {
   if(WALLETD_UP) {
     walletd.stdin.pause();
     walletd.kill();
   }
+  cleanUp(function(){console.log("Quitting...")})
+});
+
+app.on('quit', function(){
 })
 
 app.on('activate', function () {

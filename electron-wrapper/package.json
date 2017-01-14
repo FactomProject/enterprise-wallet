@@ -31,7 +31,7 @@
     "rimraf": "~2.5.3"
   },
   "build": {
-    "appId": "com.factom.enterprisewallet",
+    "appId": "factom.enterprisewallet",
     "productName": "EnterpriseWallet",
     "mac": {
       "category": "your.app.category.type",

@@ -4,7 +4,6 @@
   "description": "Factom Enterprise Wallet",
   "main": "main.js",
   "scripts": {
-    "postinstall": "install-app-deps",
     "start": "electron ."
   },
   "repository": "https://github.com/FactomProject/enterprise-wallet",
@@ -18,7 +17,7 @@
   "author": "Factom.org",
   "license": "MIT",
   "dependencies": {
-    "ps-kill": "^1.0.0",
+    "electron-single-instance": "0.0.2",
     "ps-node": "^0.1.4"
   },
   "devDependencies": {
