@@ -688,7 +688,6 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		MasterSettings.ImportExport = st.Bools[3]
 
 		fdChange := false
-		fmt.Println(st)
 		if len(st.FactomdLocation) > 0 && st.FactomdLocation != MasterSettings.FactomdLocation {
 			MasterSettings.FactomdLocation = st.FactomdLocation
 			MasterSettings.SetFactomdLocation(MasterSettings.FactomdLocation)

@@ -55,20 +55,6 @@ $("#export-seed").on('click', function(){
 	})
 })
 
-function saveTextAsFile(text, filename) {
-    var textToWrite = text
-    var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' })
-    var fileNameToSaveAs = filename
-
-    var downloadLink = document.createElement("a");
-    downloadLink.download = fileNameToSaveAs;
-    window.URL = window.URL || window.webkitURL;
-    downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-}
-
 //selected = false
 // Import/Export
 $("#settings-import-file").on('click', function(e){

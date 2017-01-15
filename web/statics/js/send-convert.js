@@ -221,7 +221,18 @@ function MakeTransaction(sig) {
       ShowNewButtons()
       totalInput = obj.Content.Total / 1e8
       feeFact = obj.Content.Fee / 1e8
+      
       total = totalInput + feeFact 
+
+      if(transObject.FeeAddress != "") {
+        for(var i = 0; i < transObject.OutputAddresses.length; i++) {
+          if(transObject.OutputAddresses[i] == transObject.FeeAddress) {
+            total = totalInput - feeFact
+            break
+          }
+        }           
+      }
+
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
       if(importexport) {
@@ -241,8 +252,9 @@ function setExportDownload(json) {
   console.log(obj.params.transaction)
   fileExt = Date.now()
   $("#export-transaction").click(function() {
-    $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.params.transaction))
-    $(this).attr("download", "Exported-" + fileExt)
+    saveTextAsFile(obj.params.transaction, "Exported-" + fileExt)
+    // $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.params.transaction))
+    // $(this).attr("download", "Exported-" + fileExt)
   })
 }
 
@@ -349,7 +361,7 @@ function GetNeededInput() {
   }
 
   CurrentInput = 0
-  console.log(transObject)
+  // console.log(transObject)
   for(var i = 0; i < transObject.InputAmounts.length; i++) {
     if(transObject.InputAmounts[i] != undefined) {
       CurrentInput += Number(transObject.InputAmounts[i])
@@ -694,6 +706,8 @@ $("#broadcast-transaction").on('click', function(){
     obj = JSON.parse(resp)
     if(obj.Error == "none") {
       SetGeneralSuccess('Transaction Sent, transaction ID: ' + obj.Content )
+      $("#broadcast-transaction").addClass("disabled-input")
+      $("#broadcast-transaction").prop("disabled", true)
     } else {
       SetGeneralError(obj.Error)
     }
