@@ -1,7 +1,6 @@
 const electron = require('electron')
 var ps = require('ps-node');
 var request=require('request');
-const {dialog} = require('electron').dialog
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
@@ -10,16 +9,23 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
-var exec = require('child_process').exec;
+// var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 
 // Detect if windows
 var isWin = /^win/.test(process.platform);
 
-// For deployment
-const PATH_TO_BIN = "../app.asar.unpacked/bin/"
-// For local testing
-// const PATH_TO_BIN = "bin/"
+const isDev = require('electron-is-dev');
+
+// For production
+var PATH_TO_BIN = "../app.asar.unpacked/bin/"
+if (isDev) {
+  // Override for development
+  console.log('Running in development');
+  var PATH_TO_BIN = "bin/"
+} else {
+  console.log('Running in production');
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
