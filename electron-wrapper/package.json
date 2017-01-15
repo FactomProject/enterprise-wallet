@@ -35,7 +35,6 @@
     "appId": "factom.enterprisewallet",
     "productName": "EnterpriseWallet",
     "mac": {
-      "category": "your.app.category.type",
       "asarUnpack": "bin/*"
     },
     "dmg": {
@@ -64,6 +63,10 @@
     "win": {
       "iconUrl": "https://github.com/FactomProject/enterprise-wallet/blob/SOF-552/electron-wrapper/build/icon.ico?raw=true",
       "asarUnpack": "bin/*"
+    },
+    "nsis": {
+      "oneClick" : true,
+      "allowToChangeInstallationDirectory": false
     },
     "linux": {
       "maintainer": "Steven Masley <steven@factom.org>",

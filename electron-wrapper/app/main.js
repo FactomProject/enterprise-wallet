@@ -3,6 +3,8 @@ var ps = require('ps-node');
 var request=require('request');
 // Module to control application life.
 const app = electron.app
+// Module to create menu for copy/paste
+var Menu = electron.Menu
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
@@ -182,6 +184,55 @@ function loadMainWindow() {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  // Create the Application's main menu
+  var template = [{
+      label: "Application",
+      submenu: [
+          { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+          { type: "separator" },
+          { label: "Quit", accelerator: "CmdOrCtrl+Q", click: function() { app.quit(); }}
+      ]}, {
+      label: "Edit",
+      submenu: [
+          { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+          { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+          { type: "separator" },
+          { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+          { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+      ]}, {
+      label: "View",
+      submenu: [
+        { label: "Reload", accelerator: "CmdOrCtrl+R", role: "reload" },
+        { type: "separator" },
+        { label: "Reset Zoom", role: "resetzoom" },
+        { label: "Zoom In", accelerator: 'CmdOrCtrl+=', role: "zoomin" },
+        { label: "Zoom Out", accelerator: "CmdOrCtrl+-", role: "zoomout" },
+        { type: "separator" },
+        { label: "Toggle Full Screen", accelerator: "CmdOrCtrl+F", role: "togglefullscreen"}
+      ]},
+      {
+        role: 'window',
+        submenu: [
+          {
+            role: 'minimize'
+          },
+          {
+            role: 'close'
+          }
+        ]
+      }
+  ];
+
+  if(isWin) {
+    template[0].submenu = [
+          { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+      ]
+  }
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
 function createLoadingWindow() {
