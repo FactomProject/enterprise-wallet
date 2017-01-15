@@ -2,36 +2,68 @@
     LoadAddresses()
 });*/
 
-function LoadAddresses(){
-	resp = getRequest("addresses",function(resp){
+function LoadInitialAddresses(){
+	resp = getRequest("addresses-no-bal",function(resp){
 		obj = JSON.parse(resp)
-		//console.log(resp)
 		
 		if(obj.FactoidAddresses.List != null) {
 			obj.FactoidAddresses.List.forEach(function(address){
-				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid"));
+				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", true));
 			})
 		}
 		if(obj.EntryCreditAddresses.List != null) {
 			obj.EntryCreditAddresses.List.forEach(function(address){
-				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits"));
+				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", true));
 			})
 		}
 		if(obj.ExternalAddresses.List != null) {
 			obj.ExternalAddresses.List.forEach(function(address){
-				$('#external-addresses-table tbody').append(addressTableRow(address, "external"));
+				$('#external-addresses-table tbody').append(addressTableRow(address, "external", true));
 			})
 		}
 		sortNames(true)
  	})
 }
 
-function addressTableRow(address, type, star) {
+function LoadAddresses(){
+	LoadInitialAddresses()
+	resp = getRequest("addresses",function(resp){
+		obj = JSON.parse(resp)
+		//console.log(resp)
+		
+		if(obj.FactoidAddresses.List != null) {
+			$('#factoid-addresses-table tbody').html("")
+			obj.FactoidAddresses.List.forEach(function(address){
+				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", false));
+			})
+		}
+		if(obj.EntryCreditAddresses.List != null) {
+			$('#credit-addresses-table tbody').html("")
+			obj.EntryCreditAddresses.List.forEach(function(address){
+				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", false));
+			})
+		}
+		if(obj.ExternalAddresses.List != null) {
+			$('#external-addresses-table tbody').html("")
+			obj.ExternalAddresses.List.forEach(function(address){
+				$('#external-addresses-table tbody').append(addressTableRow(address, "external", false));
+			})
+		}
+		sortNames(true)
+ 	})
+}
+
+function addressTableRow(address, type, loading) {
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
 		address.Balance = Number(address.Balance.toFixed(4))
 	} else {
 		token = " EC"
+	}
+
+	if(loading) {
+		address.Balance = "..."
+		token = ""
 	}
 
 	star = '<small><span id="star" class="fa fa-star-o" aria-hidden="true" value="0"></span></small>'

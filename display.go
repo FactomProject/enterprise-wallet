@@ -32,7 +32,6 @@ func SaveSettings() error {
 }
 
 func ServeWallet(port int) {
-
 	// Templates
 	TemplateMutex.Lock()
 	// Put function into templates
@@ -153,9 +152,6 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleNotFoundError(w, r)
 	}
 
-	// Update "synced" and other prcesses run before page loads
-	MasterSettings.Refresh()
-
 	if err != nil {
 		fmt.Printf("An error has occured")
 	}
@@ -203,8 +199,9 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	}
 	req := r.FormValue("request")
 	switch req {
+	case "on":
+		w.Write(jsonResp(true))
 	case "synced":
-		fmt.Println("Getting Sync Request")
 		type SyncedStruct struct {
 			Synced       bool
 			LeaderHeight int64
@@ -214,17 +211,23 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		}
 		s := new(SyncedStruct)
 
-		fmt.Println("Running a Refresh")
 		lh, eh, fh := MasterSettings.Refresh()
 		s.Synced = MasterSettings.Synced
 		s.LeaderHeight = lh
 		s.EntryHeight = eh
 		s.FblockHeight = fh
 		s.Stage = MasterWallet.GetStage()
-		fmt.Println("Returning Sync Request")
 		w.Write(jsonResp(s))
+	case "addresses-no-bal":
+		data, err := MasterWallet.GetGUIWalletJSON(false)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(data)
 	case "addresses":
-		data, err := MasterWallet.GetGUIWalletJSON()
+		data, err := MasterWallet.GetGUIWalletJSON(true)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return

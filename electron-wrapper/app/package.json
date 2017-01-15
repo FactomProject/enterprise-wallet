@@ -18,7 +18,8 @@
   "license": "MIT",
   "dependencies": {
     "electron-single-instance": "0.0.2",
-    "ps-node": "^0.1.4"
+    "ps-node": "^0.1.4",
+    "request": "^2.79.0"
   },
   "devDependencies": {
     "electron": "^1.4.1",

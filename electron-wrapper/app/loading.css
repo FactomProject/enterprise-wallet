@@ -1,0 +1,19 @@
+.container {
+    position: absolute;
+    height: 98%;
+    width: 98%;
+    margin: 0 auto;
+    background-image:url('factom-foundation_horizontal.svg');
+    background-repeat: no-repeat;
+}
+
+body {
+    overflow:hidden;
+}
+
+/*body::-webkit-scrollbar { 
+    display: none; 
+}*/
+
+
+

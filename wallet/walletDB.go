@@ -606,8 +606,10 @@ func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, erro
 	return transList, nil
 }
 
-func (w *WalletDB) GetGUIWalletJSON() ([]byte, error) {
-	w.AddBalancesToAddresses()
+func (w *WalletDB) GetGUIWalletJSON(getBals bool) ([]byte, error) {
+	if getBals {
+		w.AddBalancesToAddresses()
+	}
 	return json.Marshal(w.guiWallet)
 }
 
