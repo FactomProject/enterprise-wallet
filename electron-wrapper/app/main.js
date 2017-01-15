@@ -95,7 +95,7 @@ var iShouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory)
   }
   return true;
 });
-if(iShouldQuit){app.quit();return;}
+if(iShouldQuit && (isWin || process.platform === 'darwin')){app.quit();return;}
 
 function cleanUp(functionAfterCleanup) {
   console.log("Killing enterprise-wallet processes")
