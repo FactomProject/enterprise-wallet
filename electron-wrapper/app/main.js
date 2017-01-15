@@ -62,7 +62,7 @@ function execWalletd() {
     });*/
     walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),['-port=' + PORT_TO_SERVE])
   }
-    
+
   runWhenWalletUp(function(){
     loadMainWindow()
     // Clear cache always, makes updates easier
@@ -101,16 +101,19 @@ function cleanUp(functionAfterCleanup) {
   if(isWin) {
     commandToKill = "enterprise-wallet.exe"
   }
+
+  console.log("Checkpoint1")
   ps.lookup({
     command: commandToKill
     }, function(err, resultList ) {
+      console.log("Checkpoint2")
     if (err) {
       console.log(err);
     }
-
     if(resultList.length == 0) {
       functionAfterCleanup()
     } else {
+      console.log("Checkpoint3")
       resultList.forEach(function( process ){
         if( process ){
           if(process.command.endsWith(commandToKill)) {
@@ -135,18 +138,23 @@ function startApp(){
   // Look for hanging golang process and kill them
   createLoadingWindow()
   console.log("Checking for hanging enterprise-wallet process...")
-  cleanUp(function(){
-    // Now we can start our processes and app
+  // Cleanup takes incredibly long on windows, so on bootup it makes things hang and be slow.
+  // It is a safeguard to do at launch, and not required. We cleanup on close, so if a user closes
+  // incorrectly, we will get a hanging process. They will have to launch, then close properly to
+  // clean up the haning processes
+  if(isWin) {
     execWalletd()
     WALLETD_UP = true
-  })
+  } else {
+    cleanUp(function(){
+      // Now we can start our processes and app
+      execWalletd()
+      WALLETD_UP = true
+    })
+  }
 }
 
 function loadMainWindow() {
-  if(loadingWindow !== null) {
-    loadingWindow.close()
-    loadingWindow === null
-  }
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1400, 
@@ -156,6 +164,13 @@ function loadMainWindow() {
     center: true,
     title: 'EnterpriseWallet'
   })
+
+  if(loadingWindow !== null) {
+    loadingWindow.close()
+    loadingWindow === null
+  }
+
+  console.log("Main window is now open, loading window is closed.")
 
   // Load loading window
   mainWindow.loadURL('http://localhost:' + PORT_TO_SERVE + '/');
@@ -216,6 +231,7 @@ app.on('window-all-closed', function () {
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     console.log("Properly exiting...")
+    walletd.kill();
     WALLETD_UP = false
     cleanUp(function(){app.quit()})
   }
