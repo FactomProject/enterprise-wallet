@@ -757,12 +757,15 @@ function MakeTransaction(sig) {
   })
 }
 
+
 function setExportDownload(json) {
   obj = JSON.parse(json)
   console.log(obj.params.transaction)
   fileExt = Date.now()
+  $("#export-transaction").attr("value", obj.params.transaction)
+  $("#export-transaction").attr("fileExt", fileExt)
   $("#export-transaction").click(function() {
-    saveTextAsFile(obj.params.transaction, "Exported-" + fileExt)
+    saveTextAsFile($(this).attr("value"), "Exported-" + $(this).attr("fileExt"))
     // $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.params.transaction))
     // $(this).attr("download", "Exported-" + fileExt)
   })

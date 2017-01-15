@@ -102,18 +102,15 @@ function cleanUp(functionAfterCleanup) {
     commandToKill = "enterprise-wallet.exe"
   }
 
-  console.log("Checkpoint1")
   ps.lookup({
     command: commandToKill
     }, function(err, resultList ) {
-      console.log("Checkpoint2")
     if (err) {
       console.log(err);
     }
     if(resultList.length == 0) {
       functionAfterCleanup()
     } else {
-      console.log("Checkpoint3")
       resultList.forEach(function( process ){
         if( process ){
           if(process.command.endsWith(commandToKill)) {
