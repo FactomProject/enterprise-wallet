@@ -933,7 +933,7 @@ $("#edit-transaction").on('click', function(){
 })
 
 function LoadAddressesSendConvert(){
-  resp = getRequest("addresses",function(resp){
+  resp = getRequest("addresses-no-bal",function(resp){
     obj = JSON.parse(resp)
 
     if(obj.FactoidAddresses.List  != null) {
@@ -1381,7 +1381,7 @@ $("#import-seed-reveal-confirm").on('click', function(){
 })
 // Load drop down if we were not directed with a specific link
 function LoadRecAddresses(){
-	resp = getRequest("addresses",function(resp){
+	resp = getRequest("addresses-no-bal",function(resp){
 		obj = JSON.parse(resp)
 		
 		if(obj.FactoidAddresses.List != null){

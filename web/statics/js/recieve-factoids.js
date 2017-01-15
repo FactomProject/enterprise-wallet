@@ -1,6 +1,6 @@
 // Load drop down if we were not directed with a specific link
 function LoadRecAddresses(){
-	resp = getRequest("addresses",function(resp){
+	resp = getRequest("addresses-no-bal",function(resp){
 		obj = JSON.parse(resp)
 		
 		if(obj.FactoidAddresses.List != null){

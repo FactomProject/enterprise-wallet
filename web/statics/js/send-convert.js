@@ -423,7 +423,7 @@ $("#edit-transaction").on('click', function(){
 })
 
 function LoadAddressesSendConvert(){
-  resp = getRequest("addresses",function(resp){
+  resp = getRequest("addresses-no-bal",function(resp){
     obj = JSON.parse(resp)
 
     if(obj.FactoidAddresses.List  != null) {
