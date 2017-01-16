@@ -38,6 +38,14 @@ func TestAddressNamePairMarshal(t *testing.T) {
 		t.Fatalf("Failed UnMarshal Binary: %s", err.Error())
 	}
 
+	data = data[:len(data)-5]
+	data = append(data, []byte{0x00, 0x00, 0x00, 0x00, 0x00}...)
+	d := new(AddressNamePair)
+	err = d.UnmarshalBinary(data)
+	if err == nil {
+		t.Fatal("Should fail here, but did not")
+	}
+
 	if !b.IsSameAs(a) {
 		t.Fatalf("Failed: Not same")
 	}
@@ -93,6 +101,7 @@ func TestNewAddressFails(t *testing.T) {
 
 func TestAddressList(t *testing.T) {
 	addList := NewAddressList()
+	var err error
 
 	for i := 0; i < 10; i++ {
 		anp, err := RandomAddressNamePair()
@@ -103,6 +112,12 @@ func TestAddressList(t *testing.T) {
 		if err != nil {
 			t.Fatalf(err.Error())
 		}
+	}
+
+	// Bad address
+	_, err = addList.AddSeeded("NewName", "FA3PfromSdwAQbkrXt7GH9PTHHELZqUut001U8nhyDbXdixXLPHn")
+	if err == nil {
+		t.Fatalf("Failed change address name accepts too long of a name")
 	}
 
 	// Marshal/Umarshal, add/remove
@@ -180,6 +195,8 @@ func TestAddressList(t *testing.T) {
 	if !addList6.IsSameAs(addList5) || addList5.Length != 0 {
 		t.Fatalf("Failed: Not same")
 	}
+
+	addList.ResetSeeded()
 }
 
 func TestAddressListFunctions(t *testing.T) {

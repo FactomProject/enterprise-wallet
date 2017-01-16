@@ -1,7 +1,6 @@
 package files_test
 
 import (
-	"fmt"
 	"testing"
 	"text/template"
 
@@ -28,10 +27,14 @@ func TestCustomParseFiles(t *testing.T) {
 		t.Fail()
 	}
 	for _, temps := range temp.Templates() {
-		fmt.Println(temps.Name())
 		if temps.Name() == "templateBottom" {
 			return // We pass, as it was parsed
 		}
+	}
+
+	_, err = CustomParseFile(temp, "this-do-no-exist")
+	if err == nil {
+		t.Fail()
 	}
 
 	t.Errorf("Template was not parsed")

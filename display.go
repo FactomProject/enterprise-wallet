@@ -31,8 +31,7 @@ func SaveSettings() error {
 	return err
 }
 
-func ServeWallet(port int) {
-	// Templates
+func InitTemplate() {
 	TemplateMutex.Lock()
 	// Put function into templates
 	funcMap := map[string]interface{}{"mkArray": mkArray, "compareInts": compareInts, "compareStrings": compareStrings}
@@ -47,6 +46,11 @@ func ServeWallet(port int) {
 	}
 	templates.Funcs(template.FuncMap(funcMap))
 	TemplateMutex.Unlock()
+}
+
+func ServeWallet(port int) {
+	// Templates
+	InitTemplate()
 
 	// Update the balances every 10 seconds to keep it updated. We can force
 	// an update if we send a transaction or something

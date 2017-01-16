@@ -91,19 +91,19 @@ func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 
 	var n [MaxNameLength]byte
 	copy(n[:MaxNameLength], anp.Name)
-	buf.Write(n[:MaxNameLength])
+	buf.Write(n[:MaxNameLength]) // 0:20
 
 	add := base58.Decode(anp.Address)
 	var a [38]byte
 	copy(a[:38], add[:])
-	buf.Write(a[:38])
+	buf.Write(a[:38]) // 20:58
 
 	var b []byte
 	b = strconv.AppendBool(b, anp.Seeded)
 	if anp.Seeded {
 		b = append(b, 0x00)
 	}
-	buf.Write(b)
+	buf.Write(b) // 58:63
 
 	return buf.Next(buf.Len()), nil
 }

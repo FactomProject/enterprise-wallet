@@ -289,6 +289,7 @@ app.on('window-all-closed', function () {
 app.on('before-quit', function() {
   if(WALLETD_UP) {
     walletd.kill();
+    cleanUp(function(){app.quit()})
   }
 });
 
