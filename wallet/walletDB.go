@@ -161,7 +161,7 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("Could not add transaction database to wallet:", err)
+		return nil, fmt.Errorf("Could not add transaction database to wallet: %s\n", err.Error())
 	}
 
 	w.Wallet.AddTXDB(txdb)

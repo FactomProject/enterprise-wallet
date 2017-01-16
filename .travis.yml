@@ -3,8 +3,8 @@ go:
         - 1.7.4
 before_install:
         - go get github.com/mattn/goveralls
-        - go get github.com/FactomProject/factomd
 install:
+        - go get github.com/FactomProject/factomd
         - go get -v github.com/Masterminds/glide
         - cd $GOPATH/src/github.com/Masterminds/glide && git checkout tags/v0.12.3 && go install && cd -
         - glide install
@@ -16,4 +16,4 @@ script:
         - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
         - go test -v $(glide nv)
         - killall factomd
-        - "$GOPATH/bin/goveralls -service=travis-ci"
+        - $GOPATH/bin/goveralls -service=travis-ci

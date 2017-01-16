@@ -533,7 +533,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		ecouts := trans.GetECOutputs()
 		for _, out := range ecouts {
 			transRet.ToAddresses = append(transRet.ToAddresses, MasterWallet.ECAddressToHumanReadable(out.GetAddress()))
-			transRet.ToAmounts = append(transRet.ToAmounts, fmt.Sprintf("%u", out.GetAmount()))
+			transRet.ToAmounts = append(transRet.ToAmounts, fmt.Sprintf("%d", out.GetAmount()))
 		}
 
 		err = trans.ValidateSignatures()
