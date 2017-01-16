@@ -9,5 +9,3 @@ install:
         - glide install
 script:
         - go build -v
-        - go test -v $(glide nv)
-        - $GOPATH/bin/goveralls -service=travis-ci -ignore=$(paste -sd, .coverignore)

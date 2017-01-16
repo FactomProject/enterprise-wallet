@@ -3,9 +3,14 @@ package wallet_test
 import (
 	"fmt"
 	"testing"
+	//"time"
 
 	"github.com/FactomProject/enterprise-wallet/TestHelper"
 	. "github.com/FactomProject/enterprise-wallet/wallet"
+	//"github.com/FactomProject/factomd/common/primitives"
+	//"github.com/FactomProject/factomd/state"
+	//"github.com/FactomProject/factomd/testHelper"
+	//"github.com/FactomProject/factomd/wsapi"
 )
 
 var _ = fmt.Sprint("")
@@ -15,7 +20,8 @@ var TestWallet *WalletDB
 func TestSendFactoids(t *testing.T) {
 	//fmt.Println(3)
 	var err error
-	err = LoadTestWallet(8077)
+	err = LoadTestWallet(8089)
+	defer StopTestWallet(true)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -93,7 +99,8 @@ func TestSendFactoids(t *testing.T) {
 }
 
 func TestConvertToEC(t *testing.T) {
-	LoadTestWallet(8076)
+	LoadTestWallet(8089)
+	defer StopTestWallet(true)
 	var err error
 
 	//FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
@@ -178,7 +185,15 @@ func TestConvertToEC(t *testing.T) {
 	_ = anp
 }
 
+//var STATE *state.State
+
+func StopTestWallet(both bool) {
+	TestHelper.Stop()
+}
+
 // do 8089
+var FACTOMD_UP bool = false
+
 func LoadTestWallet(port int) error {
 	if TestWallet != nil { // If already instantiated
 		return nil
@@ -194,5 +209,14 @@ func LoadTestWallet(port int) error {
 	}
 
 	TestWallet = wal
+	/* Need to launch factomd on your own
+	if !FACTOMD_UP {
+		state := testHelper.CreateAndPopulateTestState()
+		wsapi.Start(state)
+		STATE = state
+		FACTOMD_UP = true
+	}
+	*/
+
 	return nil
 }

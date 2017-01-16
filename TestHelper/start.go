@@ -8,6 +8,10 @@ import (
 	"github.com/FactomProject/factom/wallet/wsapi"
 )
 
+func Stop() {
+	wsapi.Stop()
+}
+
 func Start(port int) (*WalletDB, error) {
 	// Should read from config
 	factom.SetWalletServer(fmt.Sprintf("localhost:%d", port))
@@ -20,6 +24,5 @@ func Start(port int) (*WalletDB, error) {
 
 	// TODO: Adjust start of WSAPI
 	go wsapi.Start(wal.Wallet, fmt.Sprintf(":%d", port), *(factom.RpcConfig))
-
 	return wal, nil
 }
