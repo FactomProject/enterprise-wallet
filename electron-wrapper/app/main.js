@@ -110,7 +110,7 @@ function cleanUp(functionAfterCleanup) {
     if (err) {
       console.log(err);
     }
-    if(resultList.length == 0) {
+    if(resultList === undefined || resultList === null || resultList.length == 0) {
       functionAfterCleanup()
     } else {
       resultList.forEach(function( process ){
