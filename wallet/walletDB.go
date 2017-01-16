@@ -343,7 +343,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 
 	// Temporary
 	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
+		// recover from panic if one occurred. Set err to nil otherwise.
 		if recover() != nil {
 			err = fmt.Errorf("There was an issue trying to load the database. Please try again in a few seconds. If you keep encountering this error," +
 				"factomd might be having issues syncing with the network.")
@@ -397,7 +397,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 	totalTransactions := len(transactions)
 	var newTransactions []DisplayTransaction
-	// Sort throught new transactions for any related
+	// Sort through new transactions for any related
 	for i, trans := range transactions {
 		if totalTransactions > STEPS_TO_PRINT && i%STEPS_TO_PRINT == 0 {
 			fmt.Printf("Step 1/3 for Transactions %d / %d\n", i, totalTransactions)
@@ -542,7 +542,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 
 	// The edge case of no transactions. If you have no related transactions, we still need to signal we
-	// are completely loaded. So we will add a blank transaction with an "empty" txid, which is impossibe to get otherwise.
+	// are completely loaded. So we will add a blank transaction with an "empty" txid, which is impossible to get otherwise.
 	if len(w.cachedTransactions) == 0 {
 		empty := new(DisplayTransaction)
 		empty.TxID = "empty"

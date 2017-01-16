@@ -160,7 +160,7 @@ func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []stri
 }
 
 // If inputs already given, outputs given, and amounts
-// Amounts are pased into a float or uint64 depending on factoid/ec
+// Amounts are passed into a float or uint64 depending on factoid/ec
 func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string, toAmounts []string, fromAddresses []string, fromAmounts []string, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
@@ -344,7 +344,7 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 	if len(toAddresses) != len(amounts) {
 		return "", nil, fmt.Errorf("Lengths of address to amount does not match")
 	} else if len(toAddresses) == 0 {
-		return "", nil, fmt.Errorf("No recepient given")
+		return "", nil, fmt.Errorf("No recipient given")
 	}
 
 	trans := hashStringList(toAddresses)
@@ -466,12 +466,12 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 	return trans, r, nil
 }
 
-// A lot of parameters. This function is reused for EC and FCT transations. All it does it, if the last address input cannnot cover the fee
+// A lot of parameters. This function is reused for EC and FCT transactions. All it does it, if the last address input cannot cover the fee
 // this finds an address that can.
 //	Parameters:
 //		list = List of addresses
 //		transStruct = The transaction structure that can calculate a fee
-//		i = Last address in the list we have inputted into the transation
+//		i = Last address in the list we have inputted into the transaction
 //		rate = current fee rate
 func checkForAddressForFee(list []AddressBalancePair, transStruct *factoid.Transaction, i int, rate uint64) (indexToPay int, err error) {
 	if i >= len(list) { // Out of addresses? Sorry, no transaction

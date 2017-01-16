@@ -3,8 +3,10 @@ go:
         - 1.7.4
 before_install:
         - go get github.com/mattn/goveralls
-install:
+        - $GOPATH/bin/goveralls
+        - go install
         - go get github.com/FactomProject/factomd
+install:
         - go get -v github.com/Masterminds/glide
         - cd $GOPATH/src/github.com/Masterminds/glide && git checkout tags/v0.12.3 && go install && cd -
         - glide install

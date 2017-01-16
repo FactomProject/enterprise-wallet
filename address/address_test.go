@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/FactomProject/enterprise-wallet/address"
 	ed "github.com/FactomProject/ed25519"
+	. "github.com/FactomProject/enterprise-wallet/address"
 	"github.com/FactomProject/factom"
 )
 
@@ -258,7 +258,7 @@ func TestAddressListFunctions(t *testing.T) {
 
 	err = addList.Remove(anp.Address)
 	if err == nil {
-		t.Fatalf("Removed non-existant anp\n")
+		t.Fatalf("Removed non-existent anp\n")
 	}
 
 	anp2, err := RandomAddressNamePair()

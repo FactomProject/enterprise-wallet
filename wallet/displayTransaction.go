@@ -20,7 +20,7 @@ type DisplayTransaction struct {
 
 	TxID      string
 	Height    uint32
-	Action    [3]bool // Sent, recieved, converted
+	Action    [3]bool // Sent, received, converted
 	Date      string
 	Time      string
 	ExactTime time.Time
