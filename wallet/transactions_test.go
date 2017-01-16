@@ -210,14 +210,6 @@ func LoadTestWallet(port int) error {
 
 	TestWallet = wal
 	TestWallet.Wallet.TXDB().GetAllTXs()
-	/* Need to launch factomd on your own
-	if !FACTOMD_UP {
-		state := testHelper.CreateAndPopulateTestState()
-		wsapi.Start(state)
-		STATE = state
-		FACTOMD_UP = true
-	}
-	*/
 
 	return nil
 }
