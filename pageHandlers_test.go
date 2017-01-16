@@ -70,6 +70,8 @@ func TestSettings(t *testing.T) {
 	if !n.IsSameAs(s) {
 		t.Fatal("Not the Same")
 	}
+
+	s.SetFactomdLocation("random")
 }
 
 func MarshalSettingAndGetNewUnmarshaled(a *SettingsStruct) (*SettingsStruct, error) {

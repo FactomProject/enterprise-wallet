@@ -3,7 +3,7 @@ package wallet
 import (
 	//"bytes"
 	//"encoding/binary"
-	//"fmt"
+	// "fmt"
 	"time"
 	//"github.com/FactomProject/enterprise-wallet/address"
 	//"github.com/FactomProject/btcutil/base58"
@@ -138,6 +138,7 @@ func (a *TransactionAddressInfo) IsSameAs(b TransactionAddressInfo) bool {
 	if !a.IsSimilarTo(b) {
 		return false
 	}
+
 	if a.Name != b.Name {
 		return false
 	}
