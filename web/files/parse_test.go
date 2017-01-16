@@ -1,6 +1,7 @@
 package files_test
 
 import (
+	"fmt"
 	"testing"
 	"text/template"
 
@@ -9,9 +10,9 @@ import (
 
 func TestCustomParseGlob(t *testing.T) {
 	temp := template.New("TestTemplate")
-	temp = CustomParseGlob(temp, "templates/*")
+	temp = CustomParseGlob(temp, "templates/templateBottom.html")
 	for _, temps := range temp.Templates() {
-		if temps.Name() == "indexPage" {
+		if temps.Name() == "templateBottom" {
 			return // We pass, as it was parsed
 		}
 	}
@@ -22,12 +23,13 @@ func TestCustomParseGlob(t *testing.T) {
 func TestCustomParseFiles(t *testing.T) {
 	var err error
 	temp := template.New("TestTemplate")
-	temp, err = CustomParseFile(temp, "templates/index.html")
+	temp, err = CustomParseFile(temp, "templates/templateBottom.html")
 	if err != nil {
 		t.Fail()
 	}
 	for _, temps := range temp.Templates() {
-		if temps.Name() == "indexPage" {
+		fmt.Println(temps.Name())
+		if temps.Name() == "templateBottom" {
 			return // We pass, as it was parsed
 		}
 	}

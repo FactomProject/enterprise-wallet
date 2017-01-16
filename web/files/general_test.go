@@ -12,7 +12,7 @@ func TestOpen(t *testing.T) {
 		t.Errorf("Could not find and open a static file")
 	}
 
-	_, err = Open("templates/general/footer.html")
+	_, err = Open("templates/addressBook.html")
 	if err != nil {
 		t.Errorf("Could not find and open a template file")
 	}
@@ -24,7 +24,7 @@ func TestModTime(t *testing.T) {
 		t.Errorf("Could not find the static file")
 	}
 
-	mt = ModTime("templates/general/footer.html")
+	mt = ModTime("templates/addressBook.html")
 	if mt.IsZero() {
 		t.Errorf("Could not find the template file")
 	}
@@ -36,7 +36,7 @@ func TestHash(t *testing.T) {
 		t.Errorf("Could not find the static file")
 	}
 
-	hash = Hash("templates/general/footer.html")
+	hash = Hash("templates/addressBook.html")
 	if hash == "" {
 		t.Errorf("Could not find the template file")
 	}
@@ -48,7 +48,7 @@ func TestOpenGlob(t *testing.T) {
 		t.Errorf("Could not glob open stativs")
 	}
 
-	_, err = OpenGlob("templates/general/*")
+	_, err = OpenGlob("templates/*")
 	if err != nil {
 		t.Errorf("Could not glob open templates")
 	}
