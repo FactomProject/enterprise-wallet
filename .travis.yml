@@ -16,3 +16,4 @@ script:
         - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
         - go test -v $(glide nv)
         - killall factomd
+        - "$GOPATH/bin/goveralls -service=travis-ci"
