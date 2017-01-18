@@ -30,7 +30,7 @@ func close() {
 	fmt.Println("Complete shut down.")
 }
 
-// Initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
+// InitiateWalletAndWeb initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
 // and will be created if they are not found.
 func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, walletdPort int, v1Import bool, v1Path string, factomdLocFlag string) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
@@ -103,6 +103,8 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 			panic("Error in loading settings: " + err.Error())
 		}
 
+		MasterSettings.FactomdLocation = factomdLocation
+
 		// Default dark
 		MasterSettings.DarkTheme = true
 		MasterSettings.Theme = "darkTheme"
@@ -116,8 +118,9 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		// Here is the first override of the factomd location from the GUI settings.
 		// You can see abover, this value will be overwritten by any config or flag
 		factomdLocation = MasterSettings.FactomdLocation
-		MasterSettings.SetFactomdLocation(factomdLocation)
 	}
+
+	MasterSettings.SetFactomdLocation(factomdLocation)
 
 	MasterSettings.ControlPanelPort = controlPanelPort
 	// We always need to load transactions, even if in database. So let's start as not synced

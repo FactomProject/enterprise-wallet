@@ -54,7 +54,7 @@ function execWalletd() {
         console.log(error)
       }
     });*/
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),['-port=' + PORT_TO_SERVE])
+    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[' -port=' + PORT_TO_SERVE])
   } else {
     /*walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
@@ -62,7 +62,7 @@ function execWalletd() {
         console.log(error)
       } 
     });*/
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),['-port=' + PORT_TO_SERVE])
+    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),[' -port=' + PORT_TO_SERVE])
   }
 
   runWhenWalletUp(function(){
@@ -100,9 +100,7 @@ if(iShouldQuit && (isWin || process.platform === 'darwin')){app.quit();return;}
 function cleanUp(functionAfterCleanup) {
   console.log("Killing enterprise-wallet processes")
   var commandToKill = "enterprise-wallet"
-  if(isWin) {
-    commandToKill = "enterprise-wallet.exe"
-  }
+  var sep = "/"
 
   ps.lookup({
     command: commandToKill
@@ -115,7 +113,13 @@ function cleanUp(functionAfterCleanup) {
     } else {
       resultList.forEach(function( process ){
         if( process ){
-          if(process.command.endsWith(commandToKill)) {
+          // The command can come in the form of '/opt/EnterpriseWallet/enterprise-wallet -port=8091'
+          // We need to first strip all pathing: enterprise-wallet -port=8091
+          // Then test if we start with 'enterprise-wallet'
+          rawProcessCommand = process.command
+          cmds = rawProcessCommand.split(sep)
+          processCommand = cmds[cmds.length - 1]
+          if(processCommand.startsWith(commandToKill)) {
             console.log( 'Killing PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
             ps.kill(process.pid, function(err){
               if (err) {
@@ -279,6 +283,7 @@ app.on('window-all-closed', function () {
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     console.log("Properly exiting...")
+    walletd.stdin.pause();
     walletd.kill();
     WALLETD_UP = false
     cleanUp(function(){app.quit()})
@@ -288,6 +293,7 @@ app.on('window-all-closed', function () {
 // App close handler
 app.on('before-quit', function() {
   if(WALLETD_UP) {
+    walletd.stdin.pause();
     walletd.kill();
     cleanUp(function(){app.quit()})
   }

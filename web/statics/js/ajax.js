@@ -100,14 +100,19 @@ function checkSynced(){
     fBlockPercent = obj.Content.FblockHeight / obj.Content.LeaderHeight
     fBlockPercent = HelperFunctionForPercent(fBlockPercent, 100)
 
-    percent = fBlockPercent
-
-    if(percent > 98) {
-      $("#sync-bar").removeClass("alert")
+    percent = 0
+    // We are getting fblocks, but it is taking awhile.
+    if(fBlockPercent == 0 && eBlockPercent > 5) {
+      $("#load-percent").text("Syncing...")
     } else {
-      $("#sync-bar").addClass("alert")
+      percent = fBlockPercent
+      if(percent > 98) {
+        $("#sync-bar").removeClass("alert")
+      } else {
+        $("#sync-bar").addClass("alert")
+      }
+      $("#load-percent").text(percent.toFixed(2) + "%")
     }
-    $("#load-percent").text(percent.toFixed(2))
 
     // Remove error message
     if (obj.Content.Synced == true) {
@@ -117,7 +122,7 @@ function checkSynced(){
 }
 
 function HelperFunctionForPercent(percent, multiBy){
-  if(percent == undefined || percent == NaN) {
+  if(percent == undefined || isNaN(percent)) {
     percent = 0
   }
 
