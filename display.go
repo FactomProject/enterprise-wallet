@@ -77,17 +77,17 @@ func ServeWallet(port int) {
 	http.ListenAndServe(portStr, nil)
 }
 
-// Makes an array inside a template
+// mkArray makes an array inside a template
 func mkArray(args ...interface{}) []interface{} {
 	return args
 }
 
-// Used inside templates to compare ints
+// compareInts is used inside templates to compare ints
 func compareInts(a int, b int) bool {
 	return (a == b)
 }
 
-// Used inside templates to compare strings
+// compareStrings used inside templates to compare strings
 func compareStrings(a string, b string) bool {
 	return (a == b)
 }
@@ -103,7 +103,7 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// Update various elements. Faster load times for user if these
+// updateBalances updates various elements. Faster load times for user if these
 // are loaded when they are not asking
 func updateBalances(time.Time) {
 	MasterWallet.AddBalancesToAddresses()
@@ -111,6 +111,7 @@ func updateBalances(time.Time) {
 	MasterWallet.GetRelatedTransactions()
 }
 
+// doEvery
 // For go routines. Calls function once each duration.
 func doEvery(d time.Duration, f func(time.Time)) {
 	for x := range time.Tick(d) {
@@ -118,7 +119,7 @@ func doEvery(d time.Duration, f func(time.Time)) {
 	}
 }
 
-// Redirects all page requests to proper handlers
+// pageHandler redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
 	MasterSettings.Synced = false
 	request := strings.Split(r.RequestURI, "?")
@@ -161,7 +162,7 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Used for responding to Post/Get Requests
+// jsonResponse is used for responding to Post/Get Requests
 type jsonResponse struct {
 	Error   string      `json:"Error"`
 	Content interface{} `json:"Content"`
@@ -184,13 +185,13 @@ func (j *jsonResponse) Bytes() []byte {
 	return data
 }
 
-// If request is successful
+// jsonResp used if request is successful
 func jsonResp(content interface{}) []byte {
 	e := newJsonResponse("none", content)
 	return e.Bytes()
 }
 
-// If request has an error
+// jsonError used if request has an error
 func jsonError(err string) []byte {
 	e := newJsonResponse(err, "none")
 	return e.Bytes()
@@ -279,7 +280,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Transaction struct for sending transactions
+// SendTransStruct is a struct for sending transactions
 type SendTransStruct struct {
 	TransType   string   `json:"TransType"`
 	ToAddresses []string `json:"OutputAddresses"`

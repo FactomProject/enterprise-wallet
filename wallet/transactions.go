@@ -41,7 +41,7 @@ func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 	return slice[i]
 }
 
-// Doublechecks the transaction is the same (with amounts and addresses)
+// CheckTransactionAndGetName doublechecks the transaction is the same (with amounts and addresses)
 // This is to confirm an already constructed transaction
 func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []string, feeAddress string) (string, error) {
 	name := hashStringList(toAddresses)
@@ -99,8 +99,9 @@ type ReturnTransStruct struct {
 	Fee   uint64 `json:"Fee"`
 }
 
-// Assumed to be a float for a factoid and a uint64 for an entry credit
-// Will multiply by 1e8 for factoids so "1" is 1 factoid. Not 1 factoshi
+// StringAmountsToUin64Amounts assumes amounts to be a float for a factoid and a uint64 for an entry credit
+// Will multiply by 1e8 for factoids so "1" is 1 factoid. Not 1 factoshi. This is because this call usally
+// comes from input from the user
 func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64, error) {
 	var amts []uint64
 	if len(addresses) != len(amounts) {
@@ -128,7 +129,7 @@ func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64
 	return amts, nil
 }
 
-// Calculates how many factoids are needed to cover the outputs. Takes into consideration
+// CalculateNeededInput calculates how many factoids are needed to cover the outputs. Takes into consideration
 // the EC rate if EC is output
 func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []string) (uint64, error) {
 	var toAmts []uint64
@@ -159,8 +160,8 @@ func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []stri
 	return total, nil
 }
 
-// If inputs already given, outputs given, and amounts
-// Amounts are passed into a float or uint64 depending on factoid/ec
+// ConstructTransactionFromValuesStrings constructs a transaction if all inputs are already given
+// Amounts are parsed into a float or uint64 depending on factoid/ec
 func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string, toAmounts []string, fromAddresses []string, fromAmounts []string, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
@@ -184,7 +185,7 @@ func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string,
 	return wal.ConstructTransactionFromValues(toAddresses, toAmts, fromAddresses, fromAmts, feeAddress, sign)
 }
 
-// Constructs a transaction from given input and output values. An error might contain the amount of input needed aswell if it is incorrect
+// ConstructTransactionFromValues constructs a transaction from given input and output values. An error might contain the amount of input needed aswell if it is incorrect
 func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmounts []uint64, fromAddresses []string, fromAmounts []uint64, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
@@ -330,7 +331,7 @@ func (wal *WalletDB) DeleteTransaction(trans string) error {
 	return wal.Wallet.DeleteTransaction(trans)
 }
 
-// Constructs a transaction
+// ConstructTransaction
 // Transaction name is hash of all the addresses. More than 1 transaction to
 // an address(es) should not be open, but combined.
 // The output is determined by the output address for ECOutput or FCTOutput
@@ -466,8 +467,8 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 	return trans, r, nil
 }
 
-// A lot of parameters. This function is reused for EC and FCT transactions. All it does it, if the last address input cannot cover the fee
-// this finds an address that can.
+// checkForAddressForFee: A lot of parameters. This function is reused for EC and FCT transactions. All it does it,
+// if the last address input cannot cover the fee this finds an address that can.
 //	Parameters:
 //		list = List of addresses
 //		transStruct = The transaction structure that can calculate a fee

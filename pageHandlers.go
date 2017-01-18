@@ -23,6 +23,7 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 
 const MAX_FACTOMDLOCATION_SIZE int = 30
 
+// SettingsStruct
 // Every Handle struct must have settings
 // This is used on every page
 type SettingsStruct struct {
@@ -39,7 +40,7 @@ type SettingsStruct struct {
 	Synced           bool
 }
 
-// Refreshes the "synced" flag, and anything else that needs to be done
+// Refresh refreshes the "synced" flag, and anything else that needs to be done
 // before a page loads
 func (s *SettingsStruct) Refresh() (leaderHeight int64, entryHeight int64, fblockHeight uint32) {
 	var err error

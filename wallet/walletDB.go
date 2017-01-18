@@ -40,7 +40,7 @@ var (
 	STEPS_TO_PRINT int = 10000 // How many steps needed to alert user of progress
 )
 
-// Wallet interacting with LDB and factom/wallet
+// WalletDB interacting with LDB and factom/wallet
 //   The LDB doesn't need to be updated often, so we save after every add and only
 //   deal with cached version
 type WalletDB struct {
@@ -59,7 +59,7 @@ type WalletDB struct {
 	addrMap                  map[string]address.AddressNamePair // Find addresses quick, All addresses already searched for up to last FBlock
 }
 
-// For now is same as New
+// LoadWalletDB is the same as New
 func LoadWalletDB(v1Import bool) (*WalletDB, error) {
 	return NewWalletDB(v1Import)
 }
@@ -324,6 +324,7 @@ func (w *WalletDB) GetStage() int {
 	return t
 }
 
+// GetRelatedTransactions
 // This function grabs all transactions related to any address in the address book
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.
@@ -554,7 +555,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 }
 
-// Binary search
+// findTransactionIndex uses binary search
 func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
 	low := 0
 	high := len(w.cachedTransactions) - 1
@@ -576,6 +577,7 @@ func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
 	return low
 }
 
+// GetRelatedTransactionsNoCaching
 // No cache solution, not going to use it. It is too slow, but was used in early phases and kept
 // for testing comparisons as this should be all inclusive and correct
 func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, error) {
@@ -617,8 +619,8 @@ func (w *WalletDB) AddBalancesToAddresses() {
 	w.guiWallet.AddBalancesToAddresses()
 }
 
-// Grabs the list of addresses from the walletDB and updates our GUI
-// with any that are missing. All will be external
+// UpdateGUIDB grabs the list of addresses from the walletDB and updates our
+// GUI with any that are missing. All will be external
 func (w *WalletDB) UpdateGUIDB() error {
 	faAdds, ecAdds, err := w.Wallet.GetAllAddresses()
 	if err != nil {
@@ -929,7 +931,7 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 	return nil, fmt.Errorf("Not a valid private key")
 }
 
-// Only adds to GUI Database
+// addBatchGUIAddresses only adds to GUI Database
 func (w *WalletDB) addBatchGUIAddresses(names []string, addresses []string) error {
 	if len(names) != len(addresses) {
 		return fmt.Errorf("List length does not match")
@@ -946,7 +948,7 @@ func (w *WalletDB) addBatchGUIAddresses(names []string, addresses []string) erro
 	return w.Save()
 }
 
-// Only adds to GUI database
+// addGUIAddress only adds to GUI database
 func (w *WalletDB) addGUIAddress(name string, addressStr string, list int) (*address.AddressNamePair, error) {
 	var anp *address.AddressNamePair
 	var err error
@@ -976,15 +978,15 @@ func (w *WalletDB) addGUIAddress(name string, addressStr string, list int) (*add
 	return anp, nil
 }
 
-// Returns address with associated name
+// GetGUIAddress returns address with associated name
 // List is 0 for not found, 1 for Factoid address, 2 for EC Address, 3 for External
 func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, list int) {
 	anp, list, _ = w.guiWallet.GetAddress(address)
 	return
 }
 
-// Scrub all transactions before serving to front end. Changes the names to the current names of the addresses, as
-// user can change the name of their addresses.
+// ScrubDisplayTransactionsForNameChanges scrubs all transactions before serving to front end. Changes the names to
+// the current names of the addresses, as user can change the name of their addresses.
 func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
 	w.relatedTransactionLock.Lock()
 	for i := range list {

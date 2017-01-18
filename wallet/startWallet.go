@@ -8,9 +8,10 @@ import (
 	"github.com/FactomProject/factom/wallet/wsapi"
 )
 
+// StartWallet :
 // Must give the port for the factomd instance and wallet wsapi
 // will start wallet wsapi on selected port
-func StartWallet(walletPort int, factomdLocation string, guiDBType int, walletDBType int, txDBType int, v1Import bool) (*WalletDB, error) {
+func StartWallet(walletPort int, factomdLocation string, walletDBType int, guiDBType int, txDBType int, v1Import bool) (*WalletDB, error) {
 	// Set ports
 	factom.SetWalletServer("localhost:" + fmt.Sprintf("%d", walletPort))
 	factom.SetFactomdServer(factomdLocation) //"localhost:" + fmt.Sprintf("%d", factomdPort))

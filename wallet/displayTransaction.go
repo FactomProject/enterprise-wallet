@@ -1,15 +1,11 @@
 package wallet
 
 import (
-	//"bytes"
-	//"encoding/binary"
-	// "fmt"
 	"time"
-	//"github.com/FactomProject/enterprise-wallet/address"
-	//"github.com/FactomProject/btcutil/base58"
 )
 
-// Names are "" if not in wallet
+// DisplayTransaction is a struct to send transactions to the front end
+// Names are "" if not in wallet in TransactionAddressInfo
 type DisplayTransaction struct {
 	Inputs     []TransactionAddressInfo
 	TotalInput uint64
@@ -24,8 +20,6 @@ type DisplayTransaction struct {
 	Date      string
 	Time      string
 	ExactTime time.Time
-
-	//ITrans interfaces.ITransaction
 }
 
 func (a *DisplayTransaction) IsSameAs(b DisplayTransaction) bool {
@@ -42,7 +36,7 @@ func (a *DisplayTransaction) IsSameAs(b DisplayTransaction) bool {
 	return true
 }
 
-// Does not count actions
+// IsSimilarTo does not count actions when checking
 func (a *DisplayTransaction) IsSimilarTo(b DisplayTransaction) bool {
 	if len(a.Inputs) != len(b.Inputs) {
 		return false
