@@ -1,5 +1,5 @@
 hash: 4356f8b1b3b3b9462c7b3eac568b471b73e1011c5cb4e4fcf4684c3ef6b963fe
-updated: 2017-01-15T20:50:24.402587358-06:00
+updated: 2017-01-19T13:30:15.630169784-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -29,7 +29,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: aa4138ead5850777a160dfc8042eeebadc26275d
+  version: 1468a74125c1f969f60565aa960cb80b6389c7bf
   subpackages:
   - wallet
   - wallet/wsapi
@@ -38,7 +38,7 @@ imports:
   subpackages:
   - controlpanel
 - name: github.com/FactomProject/factomd
-  version: b659252c3710464ffddda14d686657c0b9d13285
+  version: d64a0f34aceecc21ec49095861a8db50d5eaecf2
   subpackages:
   - anchor
   - common/adminBlock
@@ -95,16 +95,16 @@ imports:
 - name: github.com/FactomProject/web
   version: 7daee1bf727fc2cd9142b9a73a797f98b3180756
 - name: golang.org/x/crypto
-  version: abc5fa7ad02123a41f02bf1391c9760f7586e608
+  version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
   subpackages:
   - pbkdf2
   - ripemd160
 - name: golang.org/x/net
-  version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
+  version: b7883d29650d340156352196ef5e434db117757b
   subpackages:
   - websocket
 - name: golang.org/x/sys
-  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
   - unix
 - name: gopkg.in/gcfg.v1

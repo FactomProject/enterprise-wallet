@@ -317,7 +317,6 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			w.Write(jsonError(err.Error()))
 			return
 		}
-
 		err = MasterWallet.ChangeAddressName(anc.Address, anc.ToName)
 		if err != nil {
 			w.Write(jsonError(err.Error()))

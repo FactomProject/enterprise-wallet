@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
@@ -504,12 +505,34 @@ func (wal *WalletDB) GetAddressBalance(address string) (uint64, error) {
 	return uint64(bal), err
 }
 
+type SendTransactionResp struct {
+	Message string `json:"message"`
+	Txid    string `json:"txid"`
+}
+
 func (wal *WalletDB) SendTransaction(trans string) (string, error) {
-	transObj, err := factom.SendTransaction(trans)
+	req, err := wal.Wallet.ComposeTransaction(trans)
 	if err != nil {
 		return "", err
 	}
-	return transObj.TxID, nil
+
+	respJson, err := factom.SendFactomdRequest(req)
+	if err != nil {
+		return "", err
+	}
+
+	resp := new(SendTransactionResp)
+	fmt.Println(respJson.String())
+	result, err := respJson.Result.MarshalJSON()
+	if err != nil {
+		return "", err
+	}
+
+	err = json.Unmarshal(result, resp)
+	if err != nil {
+		return "", err
+	}
+	return resp.Txid, nil
 }
 
 func (wal *WalletDB) FactoidAddressToHumanReadable(add interfaces.IAddress) string {

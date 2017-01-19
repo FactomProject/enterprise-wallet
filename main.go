@@ -32,14 +32,13 @@ func close() {
 
 // InitiateWalletAndWeb initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
 // and will be created if they are not found.
-func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, walletdPort int, v1Import bool, v1Path string, factomdLocFlag string) {
+func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, v1Import bool, v1Path string, factomdLocFlag string) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
 
 	filename := util.ConfigFilename() //file name and path to factomd.conf file
 	cfg := util.ReadConfig(filename)
 
 	// Ports
-	walletPort := walletdPort
 	factomdLocation := cfg.Walletd.FactomdLocation
 	if factomdLocFlag != "" {
 		factomdLocation = factomdLocFlag
@@ -87,7 +86,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 
 	// Can adjust starting variables
 	// This will also start wallet wsapi
-	wal, err := wallet.StartWallet(walletPort, factomdLocation, walletDB, guiDB, txDB, v1Import)
+	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import)
 	if err != nil {
 		panic("Error in starting wallet: " + err.Error())
 	}
