@@ -357,24 +357,36 @@ func TestDisplayGETandPOST(t *testing.T) {
 	}
 
 	// Full block, blk times are 1 second in travis
-	time.Sleep(10 * time.Second)
-	TestWallet.AddBalancesToAddresses()
-	time.Sleep(1 * time.Second)
+	fail := true
+	trys := 0
+	// try 3 times for correct ammount, sometimes it takes a little longer
+	for i := 0; i < 3; i++ {
+		time.Sleep(10 * time.Second)
+		TestWallet.AddBalancesToAddresses()
+		time.Sleep(1 * time.Second)
 
-	// Verify it worked
-	data, _ = handlePostRequestHelper("get-address", `{"Address":"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}`)
-	err = json.Unmarshal(data, respA)
-	if err != nil || respA.Error != "none" {
-		t.Error("Error occured getting address")
-	} else {
-		diff := (totalSent + currAmt) - respA.Content.Balance
-		if diff < 0 {
-			diff = -1 * diff
-		}
+		// Verify it worked
+		data, _ = handlePostRequestHelper("get-address", `{"Address":"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}`)
+		err = json.Unmarshal(data, respA)
+		if err != nil || respA.Error != "none" {
+			t.Error("Error occured getting address")
+		} else {
+			diff := (totalSent + currAmt) - respA.Content.Balance
+			if diff < 0 {
+				diff = -1 * diff
+			}
 
-		if diff > 1 {
-			t.Errorf("Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+			if diff > 1 {
+				trys++
+			} else {
+				fail = false
+				break
+			}
 		}
+	}
+
+	if fail {
+		t.Errorf("Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
 	}
 }
 
