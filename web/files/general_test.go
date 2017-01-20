@@ -52,4 +52,10 @@ func TestOpenGlob(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not glob open templates")
 	}
+
+	// Fail opens
+	_, err = OpenGlob("DoesNotExist/*")
+	if err == nil {
+		t.Error("This should fail as the assets do not exits")
+	}
 }

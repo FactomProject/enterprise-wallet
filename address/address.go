@@ -201,7 +201,11 @@ func (addList *AddressList) Add(name string, address string) (*AddressNamePair, 
 func (addList *AddressList) add(anp *AddressNamePair) (*AddressNamePair, error) {
 	// We check for valid factom address higher up, this is just a basic check
 	if len(anp.Name) == 0 {
-		return nil, errors.New("Nil AddressNamePair")
+		return nil, errors.New("Nil AddressNamePair or no name. Name is required to be at least 1 character")
+	}
+
+	if len(anp.Name) > MaxNameLength {
+		anp.Name = anp.Name[:MaxNameLength]
 	}
 
 	_, i := addList.Get(anp.Address)

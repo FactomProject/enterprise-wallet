@@ -12,6 +12,7 @@ import (
 	"github.com/FactomProject/enterprise-wallet/TestHelper"
 	"github.com/FactomProject/enterprise-wallet/address"
 	"github.com/FactomProject/enterprise-wallet/wallet"
+	"github.com/FactomProject/factomd/common/primitives/random"
 
 	. "github.com/FactomProject/enterprise-wallet"
 )
@@ -123,16 +124,39 @@ func TestDisplay(t *testing.T) {
 
 	resp := new(jsonANPResponse)
 	// Make 5 addresses and change their names
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 30; i++ {
+		name := randomString(i)
 		// Generate Address
 		var add string = ""
-		data, _ := handlePostRequestHelper("generate-new-address-factoid", `{"Name","OrigName"`)
+		data, _ := handlePostRequestHelper("generate-new-address-factoid", name)
 		err = json.Unmarshal(data, resp)
 		if err != nil {
-			t.Error(err)
+			if i == 0 || i > 20 {
+				// this is expected to error
+				break
+			} else {
+				t.Errorf("Name is %s, err is: %s\n", name, err)
+			}
 		} else if resp.Error == "none" {
+			if i == 0 || i > 20 {
+				t.Error("This should fail. The name is too long or too short")
+				break
+			}
 			add = resp.Content.Address
 		} else {
+			if i == 0 || i > 20 {
+				// this is expected to error
+				break
+			} else {
+				t.Error("Error response from request:", resp.Error)
+			}
+		}
+
+		data, _ = handlePostRequestHelper("generate-new-address-ec", name)
+		err = json.Unmarshal(data, resp)
+		if err != nil {
+			t.Errorf("Name is %s, err is: %s\n", name, err)
+		} else if resp.Error != "none" {
 			t.Error("Error response from request:", resp.Error)
 		}
 
@@ -203,7 +227,7 @@ func TestDisplay(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	} else if respA.Error == "none" {
-		add = resp.Content.Address
+		add = respA.Content.Address
 	} else {
 		t.Error("Error response from request:", respA.Error)
 	}
@@ -224,6 +248,60 @@ func TestDisplay(t *testing.T) {
 		}
 	}
 
+	// Seed checks
+	oldSeed := ""
+	newSeed := ""
+	respS := new(jsonResponseStrings)
+
+	data, _ = handlePostRequestHelper("get-seed", "")
+	err = json.Unmarshal(data, respS)
+	if err != nil {
+		t.Error(err)
+	} else if respS.Error != "none" {
+		t.Error(respS.Error)
+	} else {
+		oldSeed = respS.Content
+	}
+
+	respS = new(jsonResponseStrings)
+	data, _ = handlePostRequestHelper("import-seed", `{"Seed":"shield hotel tent walk candy final smooth zebra island loan key hundred"}`)
+	err = json.Unmarshal(data, respS)
+	if err != nil {
+		t.Error(err)
+	} else if respS.Error != "none" {
+		t.Error(respS.Error)
+	} else {
+		newSeed = respS.Content
+	}
+
+	if newSeed != "" {
+		respS = new(jsonResponseStrings)
+		data, _ = handlePostRequestHelper("get-seed", "")
+		err = json.Unmarshal(data, respS)
+		if err != nil {
+			t.Error(err)
+		} else {
+			if oldSeed == respS.Content {
+				t.Error("Seed was supposed to be changed.")
+			}
+
+			if newSeed != respS.Content {
+				t.Error("Seed is unexpected value")
+			}
+		}
+	} else {
+		t.Error("Could not check seed change, import-seed failed")
+	}
+}
+
+const StringAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
+
+func randomString(l int) string {
+	answer := []byte{}
+	for i := 0; i < l; i++ {
+		answer = append(answer, StringAlphabet[random.RandIntBetween(0, len(StringAlphabet)-1)])
+	}
+	return string(answer)
 }
 
 // handlePostRequestHelper returns the json result in bytes and a string
