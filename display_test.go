@@ -359,6 +359,7 @@ func TestDisplayGETandPOST(t *testing.T) {
 	// Full block, blk times are 1 second in travis
 	time.Sleep(10 * time.Second)
 	TestWallet.AddBalancesToAddresses()
+	time.Sleep(1 * time.Second)
 
 	// Verify it worked
 	data, _ = handlePostRequestHelper("get-address", `{"Address":"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}`)
@@ -372,7 +373,7 @@ func TestDisplayGETandPOST(t *testing.T) {
 		}
 
 		if diff > 1 {
-			t.Errorf("Balance is incorrect. Balance found is: %f, it should be %f", respA.Content.Balance, totalSent+currAmt)
+			t.Errorf("Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
 		}
 	}
 }
