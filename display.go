@@ -293,6 +293,13 @@ type SendTransStruct struct {
 	Signature bool `json:"Signature, omitempty"`
 }
 
+type ReturnTransStruct struct {
+	Name  string `json:"Name"`
+	Total uint64 `json:"Total"`
+	Fee   uint64 `json:"Fee"`
+	Json  string `json:"Json"`
+}
+
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	// Only handles POST
 	if r.Method != "POST" {
@@ -571,13 +578,6 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
-		}
-
-		type ReturnTransStruct struct {
-			Name  string `json:"Name"`
-			Total uint64 `json:"Total"`
-			Fee   uint64 `json:"Fee"`
-			Json  string `json:"Json"`
 		}
 
 		var r ReturnTransStruct

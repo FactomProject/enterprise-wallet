@@ -7,7 +7,9 @@ import (
 	"net/http/httptest"
 	"net/url"
 	//"strings"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/FactomProject/enterprise-wallet/TestHelper"
 	"github.com/FactomProject/enterprise-wallet/address"
@@ -39,7 +41,9 @@ func LoadTestWallet(port int) error {
 	return nil
 }
 
-func TestDisplay(t *testing.T) {
+// It is big... It kept growing. Many variables are shared
+// TODO: Break this up
+func TestDisplayGETandPOST(t *testing.T) {
 	var err error
 	LoadTestWallet(7089)
 	defer TestHelper.Stop()
@@ -121,7 +125,7 @@ func TestDisplay(t *testing.T) {
 			}
 		}
 	}
-
+	respG := new(jsonResponseGeneral)
 	resp := new(jsonANPResponse)
 	// Make 5 addresses and change their names
 	for i := 0; i < 30; i++ {
@@ -155,7 +159,7 @@ func TestDisplay(t *testing.T) {
 		}
 
 		// Change name
-		respG := new(jsonResponseGeneral)
+		respG = new(jsonResponseGeneral)
 		if add != "" {
 			data, _ := handlePostRequestHelper("address-name-change", `{"Name":"NewName", "Address":"`+add+`"}`)
 			err = json.Unmarshal(data, respG)
@@ -286,6 +290,91 @@ func TestDisplay(t *testing.T) {
 	} else {
 		t.Error("Could not check seed change, import-seed failed")
 	}
+
+	// Import addresses with factoids
+	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
+	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
+
+	// Fs2JQEA3DvhP7UFx7tCnrZZvfvnYkvD3eWwjs383PXuuHHXM8zph - Zero
+	// FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz
+	data, _ = handlePostRequestHelper("new-address", `{"Name":"Sand","Secret":"Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil {
+		t.Error("Failed importing address")
+	}
+
+	data, _ = handlePostRequestHelper("new-address", `{"Name":"Zero","Secret":"Fs2JQEA3DvhP7UFx7tCnrZZvfvnYkvD3eWwjs383PXuuHHXM8zph"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil {
+		t.Error("Failed importing address")
+	}
+
+	TestWallet.AddBalancesToAddresses()
+	var currAmt float64 = 0
+	data, _ = handlePostRequestHelper("get-address", `{"Address":"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil || respA.Error != "none" {
+		t.Error("Error occured getting address")
+	} else {
+		currAmt = respA.Content.Balance
+	}
+
+	var totalSent float64 = 0
+	for i := 0; i < 100; i++ {
+		type jsonResponseRTS struct {
+			Error   string            `json:"Error"`
+			Content ReturnTransStruct `json:"Content"`
+		}
+
+		respR := new(jsonResponseRTS)
+
+		sts := new(SendTransStruct)
+		sts.TransType = "factoid"
+		amt := rand.Float64() * 10
+		totalSent += amt
+		sts.ToAmounts = []string{fmt.Sprintf("%.8f", amt)}
+		sts.ToAddresses = []string{"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}
+
+		data, err = json.Marshal(sts)
+		if err != nil {
+			t.Error(err)
+		} else {
+			jsonToSend := string(data)
+			data, _ = handlePostRequestHelper("make-transaction", jsonToSend)
+			err = json.Unmarshal(data, respR)
+			if err != nil || respR.Error != "none" {
+				t.Error("Error occured making transaction")
+			} else {
+				// lets send it
+				data, _ = handlePostRequestHelper("send-transaction", jsonToSend)
+				err = json.Unmarshal(data, respG)
+				if err != nil || respG.Error != "none" {
+					t.Error("Error occured sending transaction")
+				} else {
+				}
+			}
+		}
+	}
+
+	// Full block, blk times are 1 second in travis
+	time.Sleep(5 * time.Second)
+	TestWallet.AddBalancesToAddresses()
+
+	// Verify it worked
+	data, _ = handlePostRequestHelper("get-address", `{"Address":"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil || respA.Error != "none" {
+		t.Error("Error occured getting address")
+	} else {
+		diff := (totalSent + currAmt) - respA.Content.Balance
+		if diff < 0 {
+			diff = -1 * diff
+		}
+
+		if diff > 1 {
+			t.Errorf("Balance is incorrect. Balance found is: %f, it should be %f", respA.Content.Balance, totalSent+currAmt)
+		}
+	}
 }
 
 const StringAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
@@ -308,6 +397,19 @@ func handlePostRequestHelper(request string, json string) ([]byte, string) {
 	r.Form = form
 
 	HandlePOSTRequests(w, r)
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(w.Result().Body)
+	return buf.Bytes(), buf.String()
+}
+
+func handleGETRequestHelper(request string) ([]byte, string) {
+	form := url.Values{}
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("GET", "localhost:8091/?request="+request, nil)
+	r.Form = form
+
+	HandleGETRequests(w, r)
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(w.Result().Body)

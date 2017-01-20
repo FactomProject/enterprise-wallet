@@ -522,7 +522,6 @@ func (wal *WalletDB) SendTransaction(trans string) (string, error) {
 	}
 
 	resp := new(SendTransactionResp)
-	fmt.Println(respJson.String())
 	result, err := respJson.Result.MarshalJSON()
 	if err != nil {
 		return "", err
