@@ -357,7 +357,7 @@ func TestDisplayGETandPOST(t *testing.T) {
 	}
 
 	// Full block, blk times are 1 second in travis
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 	TestWallet.AddBalancesToAddresses()
 
 	// Verify it worked
