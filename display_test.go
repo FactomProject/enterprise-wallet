@@ -132,24 +132,18 @@ func TestDisplay(t *testing.T) {
 		err = json.Unmarshal(data, resp)
 		if err != nil {
 			if i == 0 || i > 20 {
-				// this is expected to error
-				break
-			} else {
-				t.Errorf("Name is %s, err is: %s\n", name, err)
+				// should not failt
+				continue
 			}
+			t.Errorf("Name is %s, err is: %s\n", name, err)
 		} else if resp.Error == "none" {
 			if i == 0 || i > 20 {
 				t.Error("This should fail. The name is too long or too short")
-				break
+				continue
 			}
 			add = resp.Content.Address
 		} else {
-			if i == 0 || i > 20 {
-				// this is expected to error
-				break
-			} else {
-				t.Error("Error response from request:", resp.Error)
-			}
+			t.Error("Error response from request:", resp.Error)
 		}
 
 		data, _ = handlePostRequestHelper("generate-new-address-ec", name)
