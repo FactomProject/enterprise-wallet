@@ -188,7 +188,9 @@ func TestConvertToEC(t *testing.T) {
 //var STATE *state.State
 
 func StopTestWallet(both bool) {
-	TestHelper.Stop()
+	if TestWallet != nil {
+		TestWallet.Close()
+	}
 }
 
 // do 8089
@@ -203,7 +205,7 @@ func LoadTestWallet(port int) error {
 	WALLET_DB = MAP
 	TX_DB = MAP
 
-	wal, err := TestHelper.Start(port)
+	wal, err := TestHelper.Start()
 	if err != nil {
 		return err
 	}

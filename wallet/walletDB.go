@@ -855,7 +855,7 @@ func (w *WalletDB) ImportSeed(seed string) error {
 }
 
 func (w *WalletDB) ImportKoinify(name string, koinify string) (*address.AddressNamePair, error) {
-	add, err := factom.ImportKoinify(koinify)
+	add, err := factom.MakeFactoidAddressFromKoinify(koinify)
 	if err != nil {
 		return nil, err
 	}

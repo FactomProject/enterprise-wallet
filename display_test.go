@@ -31,7 +31,7 @@ func LoadTestWallet(port int) error {
 	wallet.WALLET_DB = wallet.MAP
 	wallet.TX_DB = wallet.MAP
 
-	wal, err := TestHelper.Start(port)
+	wal, err := TestHelper.Start()
 	if err != nil {
 		return err
 	}
@@ -41,12 +41,27 @@ func LoadTestWallet(port int) error {
 	return nil
 }
 
+type jsonResponseGeneral struct {
+	Error   string      `json:"Error"`
+	Content interface{} `json:"Content"`
+}
+
+type jsonResponseStrings struct {
+	Error   string `json:"Error"`
+	Content string `json:"Content"`
+}
+
+// POST Requests
+type jsonANPResponse struct {
+	Error   string                   `json:"Error"`
+	Content *address.AddressNamePair `json:"Content"`
+}
+
 // It is big... It kept growing. Many variables are shared
 // TODO: Break this up
 func TestDisplayGETandPOST(t *testing.T) {
 	var err error
 	LoadTestWallet(7089)
-	defer TestHelper.Stop()
 
 	MasterWallet = TestWallet
 	MasterSettings = new(SettingsStruct)
@@ -84,21 +99,7 @@ func TestDisplayGETandPOST(t *testing.T) {
 	HandleGETRequests(w, r)
 	w = httptest.NewRecorder()
 
-	type jsonResponseGeneral struct {
-		Error   string      `json:"Error"`
-		Content interface{} `json:"Content"`
-	}
-
-	type jsonResponseStrings struct {
-		Error   string `json:"Error"`
-		Content string `json:"Content"`
-	}
-
 	// POST Requests
-	type jsonANPResponse struct {
-		Error   string                   `json:"Error"`
-		Content *address.AddressNamePair `json:"Content"`
-	}
 
 	type SettingsToggle struct {
 		Bools           []bool `json:"Values"` // A list of the boolean settings
@@ -136,7 +137,7 @@ func TestDisplayGETandPOST(t *testing.T) {
 		err = json.Unmarshal(data, resp)
 		if err != nil {
 			if i == 0 || i > 20 {
-				// should not failt
+				// Expected
 				continue
 			}
 			t.Errorf("Name is %s, err is: %s\n", name, err)
@@ -150,12 +151,15 @@ func TestDisplayGETandPOST(t *testing.T) {
 			t.Error("Error response from request:", resp.Error)
 		}
 
+		ecAdd := ""
 		data, _ = handlePostRequestHelper("generate-new-address-ec", name)
 		err = json.Unmarshal(data, resp)
 		if err != nil {
 			t.Errorf("Name is %s, err is: %s\n", name, err)
 		} else if resp.Error != "none" {
 			t.Error("Error response from request:", resp.Error)
+		} else {
+			ecAdd = resp.Content.Address
 		}
 
 		// Change name
@@ -193,7 +197,11 @@ func TestDisplayGETandPOST(t *testing.T) {
 		}
 
 		// Get a private key
-		data, _ = handlePostRequestHelper("display-private-key", `{"Address":"`+add+`"}`)
+		if i%2 == 0 {
+			data, _ = handlePostRequestHelper("display-private-key", `{"Address":"`+add+`"}`)
+		} else {
+			data, _ = handlePostRequestHelper("display-private-key", `{"Address":"`+ecAdd+`"}`)
+		}
 		respS := new(jsonResponseStrings)
 		err = json.Unmarshal(data, respS)
 		if err != nil {
@@ -290,20 +298,238 @@ func TestDisplayGETandPOST(t *testing.T) {
 	} else {
 		t.Error("Could not check seed change, import-seed failed")
 	}
+}
 
+// Only add if not there
+func importSandAddress() {
+	_, _ = handlePostRequestHelper("new-address", `{"Name":"Sand","Secret":"Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK"}`)
+}
+
+func TestSendEntryCreditsTransaction(t *testing.T) {
+	// Import addresses with factoids
+	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
+	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
+
+	// Es4CfH3dhjydTcUA5kD7maNWdDopi5kJBc3RkoVVPVv2HRAoLhC5
+	// EC3JFMMpSpDEZFf7hBeSrcx25s6jkkoCV1F654J1uruBxNZRKCvF
+
+	respA := new(jsonANPResponse)
+	respG := new(jsonResponseGeneral)
+	var err error
+	importSandAddress()
+
+	data, _ := handlePostRequestHelper("new-address", `{"Name":"Zero","Secret":"Es4CfH3dhjydTcUA5kD7maNWdDopi5kJBc3RkoVVPVv2HRAoLhC5"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil {
+		t.Error("Failed importing address")
+	}
+
+	TestWallet.AddBalancesToAddresses()
+	var currAmt int = 0
+	data, _ = handlePostRequestHelper("get-address", `{"Address":"EC3JFMMpSpDEZFf7hBeSrcx25s6jkkoCV1F654J1uruBxNZRKCvF"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil || respA.Error != "none" {
+		t.Error("Error occured getting address")
+	} else {
+		currAmt = int(respA.Content.Balance)
+	}
+
+	var totalSent int = 0
+	for i := 0; i < 100; i++ {
+		type jsonResponseRTS struct {
+			Error   string            `json:"Error"`
+			Content ReturnTransStruct `json:"Content"`
+		}
+
+		respR := new(jsonResponseRTS)
+
+		sts := new(SendTransStruct)
+		sts.TransType = "factoid"
+		amt := random.RandIntBetween(5, 250)
+		totalSent += amt
+		sts.ToAmounts = []string{fmt.Sprintf("%d", amt)}
+		sts.ToAddresses = []string{"EC3JFMMpSpDEZFf7hBeSrcx25s6jkkoCV1F654J1uruBxNZRKCvF"}
+
+		data, err = json.Marshal(sts)
+		if err != nil {
+			t.Error(err)
+		} else {
+			jsonToSend := string(data)
+			data, _ = handlePostRequestHelper("make-transaction", jsonToSend)
+			err = json.Unmarshal(data, respR)
+			if err != nil || respR.Error != "none" {
+
+				t.Errorf("Error occured making transaction, %s", respR)
+			} else {
+				// lets send it
+				data, _ = handlePostRequestHelper("send-transaction", jsonToSend)
+				err = json.Unmarshal(data, respG)
+				if err != nil || respG.Error != "none" {
+					t.Error("Error occured sending transaction")
+				} else {
+				}
+			}
+		}
+	}
+
+	// Full block, blk times are 1 second in travis
+	fail := true
+	trys := 0
+	// try 3 times for correct ammount, sometimes it takes a little longer
+	for i := 0; i < 3; i++ {
+		time.Sleep(10 * time.Second)
+		TestWallet.AddBalancesToAddresses()
+		time.Sleep(1 * time.Second)
+
+		// Verify it worked
+		data, _ = handlePostRequestHelper("get-address", `{"Address":"EC3JFMMpSpDEZFf7hBeSrcx25s6jkkoCV1F654J1uruBxNZRKCvF"}`)
+		err = json.Unmarshal(data, respA)
+		if err != nil || respA.Error != "none" {
+			t.Error("Error occured getting address")
+		} else {
+			diff := (totalSent + currAmt) - int(respA.Content.Balance)
+			if diff < 0 {
+				diff = -1 * diff
+			}
+
+			if diff > 1 {
+				trys++
+			} else {
+				fail = false
+				break
+			}
+		}
+	}
+
+	if fail {
+		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+	}
+}
+
+func TestConstructTransaction(t *testing.T) {
+	// Import addresses with factoids
+	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
+	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
+
+	// Fs25tDRiPrT9nmKpADm54ootJ5dk8yFmNAhmANsagVX85CFVg2GD - Zero
+	// FA3WQuQigkTUH8jaA9EqtWd79pfULedXsje8qvF2ySZwLfNPQ8Ae
+	respA := new(jsonANPResponse)
+	respG := new(jsonResponseGeneral)
+	var err error
+	importSandAddress()
+
+	data, _ := handlePostRequestHelper("new-address", `{"Name":"Zero","Secret":"Fs25tDRiPrT9nmKpADm54ootJ5dk8yFmNAhmANsagVX85CFVg2GD"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil {
+		t.Error("Failed importing address")
+	}
+
+	TestWallet.AddBalancesToAddresses()
+	var currAmt float64 = 0
+	data, _ = handlePostRequestHelper("get-address", `{"Address":"FA3WQuQigkTUH8jaA9EqtWd79pfULedXsje8qvF2ySZwLfNPQ8Ae"}`)
+	err = json.Unmarshal(data, respA)
+	if err != nil || respA.Error != "none" {
+		t.Error("Error occured getting address")
+	} else {
+		currAmt = respA.Content.Balance
+	}
+
+	var totalSent float64 = 0
+	for i := 0; i < 2; i++ {
+		type jsonResponseRTS struct {
+			Error   string            `json:"Error"`
+			Content ReturnTransStruct `json:"Content"`
+		}
+
+		respR := new(jsonResponseRTS)
+
+		sts := new(SendTransStruct)
+		sts.TransType = "custom"
+		if i == 1 {
+			sts.TransType = "nosig"
+		}
+		amt := rand.Float64() * 10
+		sts.ToAmounts = []string{fmt.Sprintf("%.8f", amt)}
+		sts.ToAddresses = []string{"FA3WQuQigkTUH8jaA9EqtWd79pfULedXsje8qvF2ySZwLfNPQ8Ae"}
+
+		sts.FromAddresses = []string{"FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q"}
+		sts.FromAmounts = []string{fmt.Sprintf("%.8f", amt)}
+		sts.FeeAddress = "FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q"
+
+		sts.Signature = false
+
+		data, err = json.Marshal(sts)
+		if err != nil {
+			t.Error(err)
+		} else {
+			jsonToSend := string(data)
+			data, _ = handlePostRequestHelper("make-transaction", jsonToSend)
+			err = json.Unmarshal(data, respR)
+			if err != nil || respR.Error != "none" {
+				t.Errorf("Error occured making transaction, %s", respR)
+			} else {
+				if sts.TransType == "nosig" {
+					continue
+				}
+				totalSent += amt
+				// lets send it
+				data, _ = handlePostRequestHelper("send-transaction", jsonToSend)
+				err = json.Unmarshal(data, respG)
+				if err != nil || respG.Error != "none" {
+					t.Errorf("Error occured sending transaction, %s", respG)
+				} else {
+				}
+			}
+		}
+	}
+
+	// Full block, blk times are 1 second in travis
+	fail := true
+	trys := 0
+	// try 3 times for correct ammount, sometimes it takes a little longer
+	for i := 0; i < 3; i++ {
+		time.Sleep(10 * time.Second)
+		TestWallet.AddBalancesToAddresses()
+		time.Sleep(1 * time.Second)
+
+		// Verify it worked
+		data, _ = handlePostRequestHelper("get-address", `{"Address":"FA3WQuQigkTUH8jaA9EqtWd79pfULedXsje8qvF2ySZwLfNPQ8Ae"}`)
+		err = json.Unmarshal(data, respA)
+		if err != nil || respA.Error != "none" {
+			t.Error("Error occured getting address")
+		} else {
+			diff := (totalSent + currAmt) - respA.Content.Balance
+			if diff < 0 {
+				diff = -1 * diff
+			}
+
+			if diff > 1 {
+				trys++
+			} else {
+				fail = false
+				break
+			}
+		}
+	}
+
+	if fail {
+		t.Errorf("Construct:Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+	}
+}
+
+func TestSendFactoidsTransaction(t *testing.T) {
 	// Import addresses with factoids
 	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
 	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
 
 	// Fs2JQEA3DvhP7UFx7tCnrZZvfvnYkvD3eWwjs383PXuuHHXM8zph - Zero
 	// FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz
-	data, _ = handlePostRequestHelper("new-address", `{"Name":"Sand","Secret":"Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK"}`)
-	err = json.Unmarshal(data, respA)
-	if err != nil {
-		t.Error("Failed importing address")
-	}
+	respA := new(jsonANPResponse)
+	respG := new(jsonResponseGeneral)
+	var err error
+	importSandAddress()
 
-	data, _ = handlePostRequestHelper("new-address", `{"Name":"Zero","Secret":"Fs2JQEA3DvhP7UFx7tCnrZZvfvnYkvD3eWwjs383PXuuHHXM8zph"}`)
+	data, _ := handlePostRequestHelper("new-address", `{"Name":"Zero","Secret":"Fs2JQEA3DvhP7UFx7tCnrZZvfvnYkvD3eWwjs383PXuuHHXM8zph"}`)
 	err = json.Unmarshal(data, respA)
 	if err != nil {
 		t.Error("Failed importing address")
@@ -330,7 +556,7 @@ func TestDisplayGETandPOST(t *testing.T) {
 
 		sts := new(SendTransStruct)
 		sts.TransType = "factoid"
-		amt := rand.Float64() * 10
+		amt := rand.Float64() * 5
 		totalSent += amt
 		sts.ToAmounts = []string{fmt.Sprintf("%.8f", amt)}
 		sts.ToAddresses = []string{"FA2LsiAQTYKdYYxHLaBEhHsHDsnmpwayTyDzGRqQ8nAmsGwyLjRz"}
@@ -386,7 +612,69 @@ func TestDisplayGETandPOST(t *testing.T) {
 	}
 
 	if fail {
-		t.Errorf("Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+		t.Errorf("FactoidSubmit:Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+	}
+}
+
+func TestValidAddresses(t *testing.T) {
+	respS := new(jsonResponseGeneral)
+	vectorValid := []string{
+		"Fs1RM4pMUYV98mTZ2N2jKfT731bNSiNtiGdLaVZ7QhCYLuXZaGv4",
+		"FA2Ax443J2xK63E38znfxrZ6kaVFmcfV7Hfy1Uj9dYV8LPB8m3Zf",
+		"Fs1vPd2udNFy4c9zEpQHKu8pVpoQ7qFsGBHgxNgExVeynzoFXuFw",
+		"FA1zs7rGN89Qf9CdjvMQT8sGChejobwvE97fr33VbhLDRFoHbXam",
+		"Es4CfH3dhjydTcUA5kD7maNWdDopi5kJBc3RkoVVPVv2HRAoLhC5",
+		"EC3JFMMpSpDEZFf7hBeSrcx25s6jkkoCV1F654J1uruBxNZRKCvF",
+	}
+
+	vectorInvalid := []string{
+		"FA1RM4pMUYV98mTZ2N2jKfT731bNSiNtiGdLaVZ7QhCYLuXZaGv4",
+		"FA3Ax443J2xK63E38znfxrZ6kaVFmcfV7Hfy1Uj9dYV8LPB8m3Zf",
+		"Fs1vPd2udNFy4c9zEpQHKu8pVpoQ7qFsGBHgxNgExVeynzoFXuaw",
+		"FA1zs7rGN89Qf9CdjvMQT8sGChejobwvE97fr33VbhLDRFHbXam",
+		"EB4CfH3dhjydTcUA5kD7maNWdDopi5kJBc3RkoVVPVv2HRAoLhC5",
+		"3JFMMpSpDEZFf7hBeSrcx25s6jkkoCV1F654J1uruBxNZRKCvF",
+	}
+
+	for _, a := range vectorValid {
+		data, _ := handlePostRequestHelper("is-valid-address", a)
+		err := json.Unmarshal(data, respS)
+		if err != nil || respS.Error != "none" {
+			t.Error("Failed on is-valid-address. Said a valid address is invalid")
+		}
+	}
+
+	for _, a := range vectorInvalid {
+		data, _ := handlePostRequestHelper("is-valid-address", a)
+		err := json.Unmarshal(data, respS)
+		if err != nil || respS.Content != "false" {
+			t.Error("Failed on is-valid-address. Said an invalid address is valid")
+		}
+	}
+
+	for i := 0; i < 100; i++ {
+		data, _ := handlePostRequestHelper("is-valid-address", randomString(i))
+		err := json.Unmarshal(data, respS)
+		if err != nil || respS.Content != "false" {
+			t.Error("Failed on is-valid-address. Said an invalid address is valid")
+		}
+	}
+
+}
+
+// 'yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow'
+// FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1
+func TestImportKoinify(t *testing.T) {
+	respA := new(jsonANPResponse)
+	k := "yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow"
+	data, _ := handlePostRequestHelper("import-koinify", `{"Name":"Random","Koinify":"`+k+`"}`)
+	err := json.Unmarshal(data, respA)
+	if err != nil {
+		t.Error(err)
+	} else {
+		if respA.Content.Address != "FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1" {
+			t.Errorf("Koinify import failed. Expected FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1, got %s", respA.Content.Address)
+		}
 	}
 }
 

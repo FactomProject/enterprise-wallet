@@ -261,7 +261,6 @@ func TestDBInteraction(t *testing.T) {
 	fmt.Println("TestDBInteraction")
 	//fmt.Println(2)
 	err := LoadTestWallet(8089)
-	defer StopTestWallet(true)
 	if err != nil {
 		t.Fatal("--1--", err.Error())
 	}
