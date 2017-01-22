@@ -57,14 +57,14 @@ func (s *SettingsStruct) Refresh() (leaderHeight int64, entryHeight int64, fbloc
 	leaderHeight = h.LeaderHeight
 	entryHeight = h.EntryHeight
 
-	fblockHeight, err = MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
-	if err != nil {
-		s.Synced = false
-		return
-	}
-
 	// 1 block grace period
 	if h != nil && (h.EntryHeight >= (h.LeaderHeight - 1)) {
+		fblockHeight, err = MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
+		if err != nil {
+			s.Synced = false
+			return
+		}
+
 		if fblockHeight >= uint32(h.EntryHeight) {
 			s.Synced = true
 			return
