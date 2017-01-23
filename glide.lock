@@ -1,5 +1,5 @@
 hash: 4356f8b1b3b3b9462c7b3eac568b471b73e1011c5cb4e4fcf4684c3ef6b963fe
-updated: 2017-01-19T13:30:15.630169784-06:00
+updated: 2017-01-22T21:53:37.87435182-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -13,7 +13,6 @@ imports:
   version: 43986820ccd50b2b02b83e575cb3a39c87457482
   subpackages:
   - base58
-  - certs
 - name: github.com/FactomProject/btcutilecc
   version: d3a63a5752ecf3fbc06bd97365da752111c263df
 - name: github.com/FactomProject/ed25519
@@ -92,19 +91,13 @@ imports:
   version: fff4c573c694b1e2d5c7a9b2b72dbe947b6a4c8e
   subpackages:
   - snappy
-- name: github.com/FactomProject/web
-  version: 7daee1bf727fc2cd9142b9a73a797f98b3180756
 - name: golang.org/x/crypto
   version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
   subpackages:
   - pbkdf2
   - ripemd160
-- name: golang.org/x/net
-  version: b7883d29650d340156352196ef5e434db117757b
-  subpackages:
-  - websocket
 - name: golang.org/x/sys
-  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
   subpackages:
   - unix
 - name: gopkg.in/gcfg.v1
