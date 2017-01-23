@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
@@ -41,7 +42,7 @@ func (slice AddressBalancePairs) Index(i int) AddressBalancePair {
 	return slice[i]
 }
 
-// Doublechecks the transaction is the same (with amounts and addresses)
+// CheckTransactionAndGetName doublechecks the transaction is the same (with amounts and addresses)
 // This is to confirm an already constructed transaction
 func (wal *WalletDB) CheckTransactionAndGetName(toAddresses []string, amounts []string, feeAddress string) (string, error) {
 	name := hashStringList(toAddresses)
@@ -99,8 +100,9 @@ type ReturnTransStruct struct {
 	Fee   uint64 `json:"Fee"`
 }
 
-// Assumed to be a float for a factoid and a uint64 for an entry credit
-// Will multiply by 1e8 for factoids so "1" is 1 factoid. Not 1 factoshi
+// StringAmountsToUin64Amounts assumes amounts to be a float for a factoid and a uint64 for an entry credit
+// Will multiply by 1e8 for factoids so "1" is 1 factoid. Not 1 factoshi. This is because this call usally
+// comes from input from the user
 func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64, error) {
 	var amts []uint64
 	if len(addresses) != len(amounts) {
@@ -128,7 +130,7 @@ func StringAmountsToUin64Amounts(addresses []string, amounts []string) ([]uint64
 	return amts, nil
 }
 
-// Calculates how many factoids are needed to cover the outputs. Takes into consideration
+// CalculateNeededInput calculates how many factoids are needed to cover the outputs. Takes into consideration
 // the EC rate if EC is output
 func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []string) (uint64, error) {
 	var toAmts []uint64
@@ -159,8 +161,8 @@ func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []stri
 	return total, nil
 }
 
-// If inputs already given, outputs given, and amounts
-// Amounts are pased into a float or uint64 depending on factoid/ec
+// ConstructTransactionFromValuesStrings constructs a transaction if all inputs are already given
+// Amounts are parsed into a float or uint64 depending on factoid/ec
 func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string, toAmounts []string, fromAddresses []string, fromAmounts []string, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
@@ -184,7 +186,7 @@ func (wal *WalletDB) ConstructTransactionFromValuesStrings(toAddresses []string,
 	return wal.ConstructTransactionFromValues(toAddresses, toAmts, fromAddresses, fromAmts, feeAddress, sign)
 }
 
-// Constructs a transaction from given input and output values. An error might contain the amount of input needed aswell if it is incorrect
+// ConstructTransactionFromValues constructs a transaction from given input and output values. An error might contain the amount of input needed aswell if it is incorrect
 func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmounts []uint64, fromAddresses []string, fromAmounts []uint64, feeAddress string, sign bool) (string, *ReturnTransStruct, error) {
 	if len(toAddresses) != len(toAmounts) {
 		return "", nil, fmt.Errorf("Lengths of output addresses to amounts does not match")
@@ -330,7 +332,7 @@ func (wal *WalletDB) DeleteTransaction(trans string) error {
 	return wal.Wallet.DeleteTransaction(trans)
 }
 
-// Constructs a transaction
+// ConstructTransaction
 // Transaction name is hash of all the addresses. More than 1 transaction to
 // an address(es) should not be open, but combined.
 // The output is determined by the output address for ECOutput or FCTOutput
@@ -344,7 +346,7 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 	if len(toAddresses) != len(amounts) {
 		return "", nil, fmt.Errorf("Lengths of address to amount does not match")
 	} else if len(toAddresses) == 0 {
-		return "", nil, fmt.Errorf("No recepient given")
+		return "", nil, fmt.Errorf("No recipient given")
 	}
 
 	trans := hashStringList(toAddresses)
@@ -466,12 +468,12 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 	return trans, r, nil
 }
 
-// A lot of parameters. This function is reused for EC and FCT transations. All it does it, if the last address input cannnot cover the fee
-// this finds an address that can.
+// checkForAddressForFee: A lot of parameters. This function is reused for EC and FCT transactions. All it does it,
+// if the last address input cannot cover the fee this finds an address that can.
 //	Parameters:
 //		list = List of addresses
 //		transStruct = The transaction structure that can calculate a fee
-//		i = Last address in the list we have inputted into the transation
+//		i = Last address in the list we have inputted into the transaction
 //		rate = current fee rate
 func checkForAddressForFee(list []AddressBalancePair, transStruct *factoid.Transaction, i int, rate uint64) (indexToPay int, err error) {
 	if i >= len(list) { // Out of addresses? Sorry, no transaction
@@ -503,12 +505,33 @@ func (wal *WalletDB) GetAddressBalance(address string) (uint64, error) {
 	return uint64(bal), err
 }
 
+type SendTransactionResp struct {
+	Message string `json:"message"`
+	Txid    string `json:"txid"`
+}
+
 func (wal *WalletDB) SendTransaction(trans string) (string, error) {
-	transObj, err := factom.SendTransaction(trans)
+	req, err := wal.Wallet.ComposeTransaction(trans)
 	if err != nil {
 		return "", err
 	}
-	return transObj.TxID, nil
+
+	respJson, err := factom.SendFactomdRequest(req)
+	if err != nil {
+		return "", err
+	}
+
+	resp := new(SendTransactionResp)
+	result, err := respJson.Result.MarshalJSON()
+	if err != nil {
+		return "", err
+	}
+
+	err = json.Unmarshal(result, resp)
+	if err != nil {
+		return "", err
+	}
+	return resp.Txid, nil
 }
 
 func (wal *WalletDB) FactoidAddressToHumanReadable(add interfaces.IAddress) string {

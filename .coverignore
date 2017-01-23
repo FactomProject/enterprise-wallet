@@ -1,0 +1,4 @@
+web/files/statics/*
+web/files/templates/*
+main.go
+cliMain.go

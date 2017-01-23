@@ -10,7 +10,7 @@ import (
 	"github.com/FactomProject/factom"
 )
 
-// Wallet use outside DB
+// WalletStruct used outside DB
 type WalletStruct struct {
 	FactoidAddresses     *address.AddressList
 	EntryCreditAddresses *address.AddressList
@@ -114,7 +114,12 @@ func (w *WalletStruct) GetTotalAddressCount() uint64 {
 	return w.FactoidAddresses.Length + w.EntryCreditAddresses.Length + w.ExternalAddresses.Length
 }
 
-// List is -1 for not found, 1 for FactoidAddressList, 2 for EntryCreditList, 3 for External
+// GetAddress :
+// 		Returns:
+//			list:	-1 for not found,
+//				 	1 for FactoidAddressList,
+//					2 for EntryCreditList,
+//					3 for External
 func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair, list int, index int) {
 	w.RLock()
 	defer w.RUnlock()
@@ -350,7 +355,7 @@ func (w *WalletStruct) RemoveAddress(address string, list int) (string, error) {
 	return "", fmt.Errorf("Impossible to reach.")
 }
 
-// Adds balances to addresses so the GUI can display
+// AddBalancesToAddresses adds balances to addresses so the GUI can display
 func (w *WalletStruct) AddBalancesToAddresses() {
 	w.Lock()
 	defer w.Unlock()

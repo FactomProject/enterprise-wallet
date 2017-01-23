@@ -17,6 +17,16 @@ import (
 )
 
 func NewOrOpenLevelDBWallet(ldbpath string) (interfaces.IDatabase, error) {
+	// check if the file exists or if it is a directory
+	_, err := os.Stat(ldbpath)
+
+	// create the wallet directory if it doesn't already exist
+	if os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(ldbpath), 0700); err != nil {
+			fmt.Printf("database error %s\n", err)
+		}
+	}
+
 	db, err := hybridDB.NewLevelMapHybridDB(ldbpath, false)
 	if err != nil {
 		fmt.Printf("err opening db: %v\n", err)

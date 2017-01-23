@@ -20,7 +20,7 @@ When backing up, backing up #1 is most important. #2 is good to have if you plan
 
 ## To Launch for testing
  - Run 'factomd'
- - Run 'EnterpriseWaller'
+ - Run 'enterprise-wallet'
  - Default, open localhost:8091 in any browser
 
 

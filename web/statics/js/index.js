@@ -1,6 +1,6 @@
-$(window).load(function() {
+/*$(window).load(function() {
     LoadTransactions()
-});
+});*/
 
 CurrentCount = 0
 ContentLen = 0

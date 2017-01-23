@@ -1,5 +1,5 @@
-hash: c3239a532055169e0fa6df54ddb2501608bcb410041abc0575a44ca38e50b74a
-updated: 2017-01-08T11:56:01.269904293-06:00
+hash: 4356f8b1b3b3b9462c7b3eac568b471b73e1011c5cb4e4fcf4684c3ef6b963fe
+updated: 2017-01-22T21:53:37.87435182-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -13,7 +13,6 @@ imports:
   version: 43986820ccd50b2b02b83e575cb3a39c87457482
   subpackages:
   - base58
-  - certs
 - name: github.com/FactomProject/btcutilecc
   version: d3a63a5752ecf3fbc06bd97365da752111c263df
 - name: github.com/FactomProject/ed25519
@@ -29,7 +28,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: aa4138ead5850777a160dfc8042eeebadc26275d
+  version: 1468a74125c1f969f60565aa960cb80b6389c7bf
   subpackages:
   - wallet
   - wallet/wsapi
@@ -38,7 +37,7 @@ imports:
   subpackages:
   - controlpanel
 - name: github.com/FactomProject/factomd
-  version: 5ea4f88d9019885aa89d933f4b8987fccbae1987
+  version: d64a0f34aceecc21ec49095861a8db50d5eaecf2
   subpackages:
   - anchor
   - common/adminBlock
@@ -50,6 +49,7 @@ imports:
   - common/factoid
   - common/interfaces
   - common/primitives
+  - common/primitives/random
   - database/blockExtractor
   - database/boltdb
   - database/databaseOverlay
@@ -91,17 +91,11 @@ imports:
   version: fff4c573c694b1e2d5c7a9b2b72dbe947b6a4c8e
   subpackages:
   - snappy
-- name: github.com/FactomProject/web
-  version: 7daee1bf727fc2cd9142b9a73a797f98b3180756
 - name: golang.org/x/crypto
   version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
   subpackages:
   - pbkdf2
   - ripemd160
-- name: golang.org/x/net
-  version: da2b4fa28524a3baf148c1b94df4440267063c88
-  subpackages:
-  - websocket
 - name: golang.org/x/sys
   version: d75a52659825e75fff6158388dddc6a5b04f9ba5
   subpackages:
