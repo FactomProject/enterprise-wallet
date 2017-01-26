@@ -216,8 +216,6 @@ function loadMainWindow() {
         { label: "Reset Zoom", role: "resetzoom" },
         { label: "Zoom In", accelerator: 'CmdOrCtrl+=', role: "zoomin" },
         { label: "Zoom Out", accelerator: "CmdOrCtrl+-", role: "zoomout" },
-        { type: "separator" },
-        { label: "Toggle Full Screen", accelerator: "CmdOrCtrl+F", role: "togglefullscreen"}
       ]},
       {
         role: 'window',
