@@ -54,7 +54,8 @@ function execWalletd() {
         console.log(error)
       }
     });*/
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[' -port=' + PORT_TO_SERVE])
+    console.log("Running as Windows")
+    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),['-txDB=LDB'])
   } else {
     /*walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
@@ -62,7 +63,8 @@ function execWalletd() {
         console.log(error)
       } 
     });*/
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),[' -port=' + PORT_TO_SERVE])
+    console.log("Running as Mac/Linux")
+    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),[])
   }
 
   runWhenWalletUp(function(){
