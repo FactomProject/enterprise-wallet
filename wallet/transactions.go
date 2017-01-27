@@ -241,6 +241,8 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 		totalIn += a
 	}
 
+	var feeAddIndex int = -1
+	var feeAddBal uint64 = 0
 	for i, address := range fromAddresses {
 		addBal, err := wal.GetAddressBalance(address)
 		if err != nil {
@@ -248,11 +250,17 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 		}
 
 		if fromAmounts[i] > addBal {
-			return trans, nil, fmt.Errorf("%s only has %s factoids, and cannot cover the %s input."+
+			return trans, nil, fmt.Errorf("%s only has %s FCT, and cannot cover the %s FCT input."+
 				" If you are sure this balance is incorrect, make sure factomd is synced.",
 				address,
 				strconv.FormatFloat(float64(addBal)/1e8, 'f', -1, 64),
 				strconv.FormatFloat(float64(fromAmounts[i])/1e8, 'f', -1, 64))
+		}
+
+		// for later use
+		if fromAddresses[i] == feeAddress {
+			feeAddIndex = i
+			feeAddBal = addBal
 		}
 
 		err = wal.Wallet.AddInput(trans, address, fromAmounts[i])
@@ -281,13 +289,30 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 	for _, add := range toAddresses {
 		if add[:2] == "FA" {
 			if add == feeAddress {
-				wal.Wallet.SubFee(trans, add, rate)
+				err := wal.Wallet.SubFee(trans, add, rate)
+				if err != nil {
+					return trans, nil, err
+				}
 				feeTakenCareOf = true
 				break
 			}
 		}
 	}
+
 	if !feeTakenCareOf {
+		if feeAddIndex == -1 {
+			return trans, nil, fmt.Errorf("An error occured while adding the fee")
+		}
+
+		if fee+fromAmounts[feeAddIndex] > feeAddBal {
+			return trans, nil, fmt.Errorf("The inputs can cover the outputs, but the fee address selected "+
+				"cannot cover the fee. The total input from %s is %s FCT, but it only has %s FCT. Choose another "+
+				"input to cover the fee, or choose an output to cover the fee.",
+				fromAddresses[feeAddIndex],
+				strconv.FormatFloat(float64(feeAddBal)/1e8, 'f', -1, 64),
+				strconv.FormatFloat(float64(fromAmounts[feeAddIndex])/1e8, 'f', -1, 64))
+		}
+
 		err = wal.Wallet.AddFee(trans, feeAddress, rate)
 		if err != nil {
 			return trans, nil, err
