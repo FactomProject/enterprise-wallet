@@ -242,6 +242,19 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 	}
 
 	for i, address := range fromAddresses {
+		addBal, err := wal.GetAddressBalance(address)
+		if err != nil {
+			return trans, nil, err
+		}
+
+		if fromAmounts[i] > addBal {
+			return trans, nil, fmt.Errorf("%s only has %s factoids, and cannot cover the %s input."+
+				" If you are sure this balance is incorrect, make sure factomd is synced.",
+				address,
+				strconv.FormatFloat(float64(addBal)/1e8, 'f', -1, 64),
+				strconv.FormatFloat(float64(fromAmounts[i])/1e8, 'f', -1, 64))
+		}
+
 		err = wal.Wallet.AddInput(trans, address, fromAmounts[i])
 		if err != nil {
 			return trans, nil, err

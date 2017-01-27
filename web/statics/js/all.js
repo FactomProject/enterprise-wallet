@@ -979,8 +979,9 @@ function LoadAddressesSendConvert(){
 
 function factoidAddressRadio(address, name){
 return '<pre>' +
-'  <input type="radio" name="' + name + '" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
-'</pre><br />'
+  '  <input type="radio" name="' + name + '" id="address" value="' + address.Address + 
+  '"> <span for="' + address.Address + '" id="address-name" name="(' + address.Balance  + " FCT) "  + address.Name + '">(' + + address.Balance  + " FCT) " + address.Name + '</span>' +
+  '</pre><br />'
 }
 
 $('#addresses-reveal').on("mouseover", "#address-name", function(){
@@ -989,6 +990,16 @@ $('#addresses-reveal').on("mouseover", "#address-name", function(){
 })
 
 $('#addresses-reveal').on("mouseout", "#address-name", function(){
+  $(this).text($(this).attr("name"));
+  $(this).css("font-size", "100%")
+})
+
+$('#fee-addresses-reveal').on("mouseover", "#address-name", function(){
+  $(this).css("font-size", "90%")
+  $(this).text($(this).parent().find("#address").val());
+})
+
+$('#fee-addresses-reveal').on("mouseout", "#address-name", function(){
   $(this).text($(this).attr("name"));
   $(this).css("font-size", "100%")
 })
@@ -998,16 +1009,6 @@ function factoidECRadio(address, type){
   '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
   '</pre> <br />'
 }
-
-$('#addresses-reveal').on("mouseover", "#address-name", function(){
-  $(this).css("font-size", "90%")
-  $(this).text($(this).parent().find("#address").val());
-})
-
-$('#addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).attr("name"));
-  $(this).css("font-size", "100%")
-})
 
 done = false
 
