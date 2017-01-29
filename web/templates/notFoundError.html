@@ -6,8 +6,8 @@
 {{$activeNav := 1}}
 {{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 {{template "templateTop" $info}}
-
+<div id="guts">
 Nothing Found
-
-{{template "templateBottom"}}
+</div>
+{{template "templateBottom" ""}}
 {{end}}

@@ -7,64 +7,72 @@
 {{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 
 {{template "templateTop" $info}}
-
-<h1>Advanced Features</h1>
-<form>
-    <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
-    <div id="success-zone" class="callout success text-center" {{if .Success}} {{else}} style="display:none" {{end}}>Settings Saved</div>
-    <div class="row">
-        <div class="columns">
-            <p>
-                <input type="checkbox" id="coin-control" name="coin-control" value="true" {{if .Settings.CoinControl}} checked{{end}}>
-                <label for="coin-control">Enable coin-control (specific or multiple input addresses for new transaction)</label>
-                <br>
-                <input type="checkbox" id="import-export" name="import-export" value="true" {{if .Settings.ImportExport}} checked{{end}}>
-                <label for="import-export">Enable ability to import/export transactions</label>
-                <br>
-                <input type="checkbox" id="export-keys" name="export-keys" value="true" {{if .Settings.KeyExport}} checked{{end}}>
-                <label for="export-keys">Enable ability to export private keys</label>
-                <br>
-                <input type="checkbox" id="darkTheme" name="darkThme" value="true" {{if .Settings.DarkTheme}} checked{{end}}>
-                <label for="darkTheme">Enable dark theme</label>
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="columns">
-            <a id="save-changes" class="button">Save Changes</a>
-            <br><br>
-        </div>
-    </div>
-    <div class="row">
-    	<div class="columns">
-    		<div class="callout warning">
-				<p>Backing up your wallet can protect you from loss of Factoids and Entry Credits. Exporting your seed will back up any addresses generated from this wallet seed, however will not back up any address that were NOT generated from the seed. If you have any balances on addresses not generated from your wallet seed, you may want to move them to an address generated from your seed.</p>
-				<p>Caution: Importing will replace your current seed but will retain all addresses in your wallet (which will then be shown as addresses not generated from your seed).</p>
-				<p><a id="export-seed" class="button secondary">Export Seed to file</a> 
-					<input id="uploaded-file" type='file' name='userFile' class="input-group-field hide">
-                    <a id="data-expand" data-toggle="import-seed-reveal" class="hide"></a>
-					<!-- <input type='submit' name='upload_btn' value='upload' class="input-group-field"> -->
-					<a id="import-file" class="button secondary">Import from file</a></p>
-    		</div>
-    	</div>
-    </div>
-</form>
-
-<div class="reveal" id="import-seed-reveal" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
-    <h1>Confirm Import</h1>
+<div id="guts">
+    <h1>Advanced Features</h1>
     <form>
-        <p>Clicking 'Import Seed' will overwrite your current seed. This will make all seeded addresses unabled to be backed up, so make sure you back up your old seed before continuing.</p>
-        <p>
-        <b>New Seed:</b> 
-        <i id="import-seed-reveal-text"></i>
-        </p>
-        <div data-toggle="import-seed-reveal" class="button warning" id="import-seed-reveal-confirm">Import Seed</div>
-        <div data-toggle="import-seed-reveal" class="button alert" id="import-seed-reveal-cancel">Cancel</div>
+        <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
+        <div id="success-zone" class="callout success text-center" {{if .Success}} {{else}} style="display:none" {{end}}>Settings Saved</div>
+        <div class="row">
+            <div class="columns">
+                <p>
+                    <input type="checkbox" id="coin-control" name="coin-control" value="true" {{if .Settings.CoinControl}} checked{{end}}>
+                    <label for="coin-control">Enable coin-control (specific or multiple input addresses for new transaction)</label>
+                    <br>
+                    <input type="checkbox" id="import-export" name="import-export" value="true" {{if .Settings.ImportExport}} checked{{end}}>
+                    <label for="import-export">Enable ability to import/export transactions</label>
+                    <br>
+                    <input type="checkbox" id="export-keys" name="export-keys" value="true" {{if .Settings.KeyExport}} checked{{end}}>
+                    <label for="export-keys">Enable ability to export private keys</label>
+                    <br>
+                    <input type="checkbox" id="darkTheme" name="darkThme" value="true" {{if .Settings.DarkTheme}} checked{{end}}>
+                    <label for="darkTheme">Enable dark theme</label>
+                    <br>
+                    <input type="checkbox" id="customFactomd" name="customFactomd" value="true" {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} {{else}} checked {{end}}>
+                    <label for="customFactomd">Custom Factomd Location</label>
+                </p>
+                <div id="factomd-location-container" class='row factomdInput {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} hide {{end}}''>
+                    <div class="small-12 medium-8 columns">
+                        <pre><input id="factomd-location" type="text" class="input-group-field" maxlength="30" placeholder="{{.Settings.FactomdLocation}}"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="columns">
+                <br>
+                <p><a id="save-changes" class="button">Save Changes</a></p>
+            </div>
+        </div>
+        <div class="row">
+        	<div class="columns">
+        		<div class="callout warning">
+    				<p>Backing up your wallet can protect you from loss of Factoids and Entry Credits. Exporting your seed will back up any addresses generated from this wallet seed, however will not back up any address that were NOT generated from the seed. If you have any balances on addresses not generated from your wallet seed, you may want to move them to an address generated from your seed.</p>
+    				<p>Caution: Importing will replace your current seed but will retain all addresses in your wallet (which will then be shown as addresses not generated from your seed).</p>
+    				<p><a id="export-seed" class="button secondary">Export Seed to file</a> 
+    					<input id="settings-uploaded-file" type='file' name='userFile' class="input-group-field hide">
+                        <a id="data-expand" data-toggle="import-seed-reveal" class="hide"></a>
+    					<!-- <input type='submit' name='upload_btn' value='upload' class="input-group-field"> -->
+    					<a id="settings-import-file" class="button secondary">Import from file</a></p>
+        		</div>
+        	</div>
+        </div>
     </form>
-    <button class="close-button" data-close aria-label="Close reveal" type="button">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
 
-{{template "templateBottom" "settings"}}
+    <div class="reveal" id="import-seed-reveal" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
+        <h1>Confirm Import</h1>
+        <form>
+            <p>Clicking 'Import Seed' will overwrite your current seed. This will make all seeded addresses unabled to be backed up, so make sure you back up your old seed before continuing.</p>
+            <p>
+            <b>New Seed:</b> 
+            <i id="import-seed-reveal-text"></i>
+            </p>
+            <div data-toggle="import-seed-reveal" class="button warning" id="import-seed-reveal-confirm">Import Seed</div>
+            <div data-toggle="import-seed-reveal" class="button alert" id="import-seed-reveal-cancel">Cancel</div>
+        </form>
+        <button class="close-button" data-close aria-label="Close reveal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+{{template "templateBottom" ""}}
 {{end}}

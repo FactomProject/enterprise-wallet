@@ -21,14 +21,18 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 	return e
 }
 
+const MAX_FACTOMDLOCATION_SIZE int = 30
+
+// SettingsStruct
 // Every Handle struct must have settings
 // This is used on every page
 type SettingsStruct struct {
 	// Marshaled
-	DarkTheme    bool
-	KeyExport    bool // Allow export of private key
-	CoinControl  bool
-	ImportExport bool //Transaction import/export
+	DarkTheme       bool
+	KeyExport       bool // Allow export of private key
+	CoinControl     bool
+	ImportExport    bool //Transaction import/export
+	FactomdLocation string
 
 	// Not marshaled
 	Theme            string // darkTheme or ""
@@ -36,27 +40,38 @@ type SettingsStruct struct {
 	Synced           bool
 }
 
-// Refreshes the "synced" flag, and anything else that needs to be done
+// Refresh refreshes the "synced" flag, and anything else that needs to be done
 // before a page loads
-func (s *SettingsStruct) Refresh() {
+func (s *SettingsStruct) Refresh() (leaderHeight int64, entryHeight int64, fblockHeight uint32) {
+	var err error
+	leaderHeight = 0
+	entryHeight = 0
+	fblockHeight = 0
+
 	h, err := factom.GetHeights()
 	if err != nil || h == nil {
 		s.Synced = false
 		return
 	}
+
+	leaderHeight = h.LeaderHeight
+	entryHeight = h.EntryHeight
+
 	// 1 block grace period
-	if (h.EntryHeight >= (h.LeaderHeight - 1)) {
-		fBlockHeight, err := MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
+	if h != nil && (h.EntryHeight >= (h.LeaderHeight - 1)) {
+		fblockHeight, err = MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
 		if err != nil {
 			s.Synced = false
 			return
 		}
-		if fBlockHeight >= uint32(h.EntryHeight) {
+
+		if fblockHeight >= uint32(h.EntryHeight) {
 			s.Synced = true
 			return
 		}
 	}
 	s.Synced = false
+	return
 }
 
 func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
@@ -77,7 +92,15 @@ func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
 		return false
 	}
 
+	if a.FactomdLocation != b.FactomdLocation {
+		return false
+	}
+
 	return true
+}
+
+func (s *SettingsStruct) SetFactomdLocation(factomdLocation string) {
+	factom.SetFactomdServer(factomdLocation)
 }
 
 func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
@@ -103,6 +126,10 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	}
 
 	buf.Write(b)
+
+	var n [MAX_FACTOMDLOCATION_SIZE]byte
+	copy(n[:MAX_FACTOMDLOCATION_SIZE], s.FactomdLocation)
+	buf.Write(n[:MAX_FACTOMDLOCATION_SIZE])
 
 	return buf.Next(buf.Len()), nil
 }
@@ -156,6 +183,15 @@ func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err e
 		return data, err
 	}
 	newData = newData[5:]
+
+	// Need to add a fix to unmarshal data of older databases.
+	if len(newData) == 0 { // Old database type
+		s.FactomdLocation = "localhost:8088" // Will be overwritten if changed anyhow
+	} else {
+		nameData := bytes.Trim(newData[:MAX_FACTOMDLOCATION_SIZE], "\x00")
+		s.FactomdLocation = fmt.Sprintf("%s", nameData)
+		newData = newData[MAX_FACTOMDLOCATION_SIZE:]
+	}
 
 	return
 }
