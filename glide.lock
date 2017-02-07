@@ -1,5 +1,5 @@
 hash: 4356f8b1b3b3b9462c7b3eac568b471b73e1011c5cb4e4fcf4684c3ef6b963fe
-updated: 2017-01-22T21:53:37.87435182-06:00
+updated: 2017-02-07T16:43:02.864664816-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -8,7 +8,7 @@ imports:
 - name: github.com/FactomProject/basen
   version: fe3947df716ebfda9847eb1b9a48f9592e06478c
 - name: github.com/FactomProject/bolt
-  version: 7d662c5bb27d9defa01fa0563959594bb77ee62b
+  version: 952a1b4e9a55f458d536cf703bce25a4e9c99841
 - name: github.com/FactomProject/btcutil
   version: 43986820ccd50b2b02b83e575cb3a39c87457482
   subpackages:
@@ -28,7 +28,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: 1468a74125c1f969f60565aa960cb80b6389c7bf
+  version: ee66cae73edad91fd38befa0d7755c2572f9993a
   subpackages:
   - wallet
   - wallet/wsapi
@@ -37,7 +37,7 @@ imports:
   subpackages:
   - controlpanel
 - name: github.com/FactomProject/factomd
-  version: d64a0f34aceecc21ec49095861a8db50d5eaecf2
+  version: 884c281531b4366628dfb693f5ccd4b0dd5f4b7c
   subpackages:
   - anchor
   - common/adminBlock
@@ -71,7 +71,7 @@ imports:
   subpackages:
   - spew
 - name: github.com/FactomProject/goleveldb
-  version: b882f9c7069c9730b1e7f8dd17250dabcaefa5ba
+  version: 9d147f2b8f767adca2a29f9728658681081b03a8
   subpackages:
   - leveldb
   - leveldb/cache
@@ -88,16 +88,16 @@ imports:
 - name: github.com/FactomProject/netki-go-partner-client
   version: 426acb535e66cc2f9e6226ae254555e3572fd142
 - name: github.com/FactomProject/snappy-go
-  version: fff4c573c694b1e2d5c7a9b2b72dbe947b6a4c8e
+  version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
   subpackages:
   - snappy
 - name: golang.org/x/crypto
-  version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
+  version: 59a182cab66ead4fe21e6472267504ac035edee2
   subpackages:
   - pbkdf2
   - ripemd160
 - name: golang.org/x/sys
-  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
+  version: 7a6e5648d140666db5d920909e082ca00a87ba2c
   subpackages:
   - unix
 - name: gopkg.in/gcfg.v1
