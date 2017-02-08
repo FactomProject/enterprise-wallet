@@ -97,16 +97,17 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	MasterSettings = new(SettingsStruct)
 	data, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 	if err != nil || data == nil {
-		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
-		if err != nil {
-			panic("Error in loading settings: " + err.Error())
-		}
+		// Settings are not saved, AKA fresh start
 
 		MasterSettings.FactomdLocation = factomdLocation
 
 		// Default dark
 		MasterSettings.DarkTheme = true
 		MasterSettings.Theme = "darkTheme"
+		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+		if err != nil {
+			panic("Error in loading settings: " + err.Error())
+		}
 	} else {
 		MasterSettings = data.(*SettingsStruct)
 		// If we have a custom config file, or a custom flag, we will overwrite the settings.
