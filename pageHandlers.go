@@ -127,9 +127,11 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 
 	buf.Write(b)
 
-	var n [MAX_FACTOMDLOCATION_SIZE]byte
-	copy(n[:MAX_FACTOMDLOCATION_SIZE], s.FactomdLocation)
-	buf.Write(n[:MAX_FACTOMDLOCATION_SIZE])
+	data, err := MarshalStringToBytes(s.FactomdLocation, MAX_FACTOMDLOCATION_SIZE)
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
 
 	return buf.Next(buf.Len()), nil
 }
@@ -184,13 +186,24 @@ func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err e
 	}
 	newData = newData[5:]
 
-	// Need to add a fix to unmarshal data of older databases.
-	if len(newData) == 0 { // Old database type
+	switch {
+	case len(newData) == 0: // v1 : No settings
 		s.FactomdLocation = "localhost:8088" // Will be overwritten if changed anyhow
-	} else {
-		nameData := bytes.Trim(newData[:MAX_FACTOMDLOCATION_SIZE], "\x00")
+	case len(newData) == 30 && bytes.Compare(newData[28:30], []byte{0x00, 0x00}) == 0: // v2 : Settings at length 30
+		//end := MAX_FACTOMDLOCATION_SIZE
+		nameData := bytes.Trim(newData[:30], "\x00")
 		s.FactomdLocation = fmt.Sprintf("%s", nameData)
-		newData = newData[MAX_FACTOMDLOCATION_SIZE:]
+		if s.FactomdLocation == "" {
+			s.FactomdLocation = "localhost:8088"
+		}
+		newData = newData[30:]
+	default: // current
+		var loc string
+		loc, newData, err = UnmarshalStringFromBytesData(newData, MAX_FACTOMDLOCATION_SIZE)
+		if err != nil {
+			return data, err
+		}
+		s.FactomdLocation = loc
 	}
 
 	return

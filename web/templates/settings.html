@@ -32,7 +32,7 @@
                 </p>
                 <div id="factomd-location-container" class='row factomdInput {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} hide {{end}}''>
                     <div class="small-12 medium-8 columns">
-                        <pre><input id="factomd-location" type="text" class="input-group-field" maxlength="30" placeholder="{{.Settings.FactomdLocation}}"></pre>
+                        <pre><input id="factomd-location" type="text" class="input-group-field" maxlength="100" value="{{.Settings.FactomdLocation}}"></pre>
                     </div>
                 </div>
             </div>

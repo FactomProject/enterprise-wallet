@@ -55,7 +55,7 @@ function execWalletd() {
       }
     });*/
     console.log("Running as Windows")
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),['-txDB=LDB'])
+    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[])
   } else {
     /*walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
