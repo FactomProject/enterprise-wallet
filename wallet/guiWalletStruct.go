@@ -373,7 +373,9 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 				w.FactoidTotal += bal
 			}
 		}
+	}
 
+	if w.EntryCreditAddresses.Length > 0 {
 		for i, ec := range w.EntryCreditAddresses.List {
 			bal, err := factom.GetECBalance(ec.Address)
 			if err != nil {
@@ -383,7 +385,9 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 				w.ECTotal += bal
 			}
 		}
+	}
 
+	if w.ExternalAddresses.Length > 0 {
 		for i, a := range w.ExternalAddresses.List {
 			if a.Address[:2] == "FA" {
 				bal, err := factom.GetFactoidBalance(a.Address)
