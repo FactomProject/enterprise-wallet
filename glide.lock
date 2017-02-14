@@ -1,5 +1,5 @@
-hash: b6ab7329dba77e990751520bbb6f0b60919fb8aad8b0c92a33ed4aa225055597
-updated: 2017-02-14T10:18:19.48302273-06:00
+hash: 885ea297bc7c34b8c17f1b8e3e16e454bf5e3856cce705b7e61705364684e17b
+updated: 2017-02-14T10:31:38.835801205-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -71,7 +71,7 @@ imports:
   subpackages:
   - spew
 - name: github.com/FactomProject/goleveldb
-  version: b882f9c7069c9730b1e7f8dd17250dabcaefa5ba
+  version: 9d147f2b8f767adca2a29f9728658681081b03a8
   subpackages:
   - leveldb
   - leveldb/cache
@@ -89,8 +89,6 @@ imports:
   version: 426acb535e66cc2f9e6226ae254555e3572fd142
 - name: github.com/FactomProject/snappy-go
   version: fff4c573c694b1e2d5c7a9b2b72dbe947b6a4c8e
-  subpackages:
-  - snappy
 - name: golang.org/x/crypto
   version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
   subpackages:
