@@ -63,7 +63,7 @@ $("#settings-import-file").on('click', function(e){
 
 
 $("#settings-uploaded-file").on('change', function(){
-	input = document.getElementById('uploaded-file');
+	input = document.getElementById('settings-uploaded-file');
 	if (!input) {
 		SetGeneralError("Error: Couldn't find the fileinput element.")
 	}
