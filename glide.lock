@@ -1,5 +1,5 @@
-hash: 885ea297bc7c34b8c17f1b8e3e16e454bf5e3856cce705b7e61705364684e17b
-updated: 2017-02-14T10:31:38.835801205-06:00
+hash: 4ca8f1d064dfa0813e82191e525c0eeba3cb093ca26052356ddbacbb26fe9823
+updated: 2017-02-14T11:06:43.763970291-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -88,7 +88,7 @@ imports:
 - name: github.com/FactomProject/netki-go-partner-client
   version: 426acb535e66cc2f9e6226ae254555e3572fd142
 - name: github.com/FactomProject/snappy-go
-  version: fff4c573c694b1e2d5c7a9b2b72dbe947b6a4c8e
+  version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
 - name: golang.org/x/crypto
   version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
   subpackages:
