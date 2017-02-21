@@ -20,6 +20,9 @@ var (
 
 	mux           *http.ServeMux
 	TemplateMutex sync.Mutex
+
+	// How often to update balances in cache
+	BALANCE_UPDATE_INTERVAL time.Duration = 10 * time.Second
 )
 
 // Use or no use compiled statics. Keeping a non-compiled
@@ -54,7 +57,7 @@ func ServeWallet(port int) {
 
 	// Update the balances every 10 seconds to keep it updated. We can force
 	// an update if we send a transaction or something
-	go doEvery(10*time.Second, updateBalances)
+	go doEvery(BALANCE_UPDATE_INTERVAL, updateBalances)
 
 	// Load the initial transaction DB. This takes some time, should start before user hits first page
 	go MasterWallet.GetRelatedTransactions()

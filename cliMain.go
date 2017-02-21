@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var (
@@ -22,9 +24,10 @@ func main() {
 		randomAdds      = flag.Bool("randadd", true, "Overrides ADD_RANDOM_ADDRESSES if false and does not add random addresses")
 		v1Import        = flag.Bool("i", true, "Search for M1 wallet, if there is no M2 wallet file")
 		v1Path          = flag.String("v1path", "/.factom/factoid_wallet_bolt.db", "Change the path for V1 import")
-		factomdLocation = flag.String("", "", "Change the location of factomd. Default comes from the config file")
+		factomdLocation = flag.String("factomdlocation", "", "Change the location of factomd. Default comes from the config file")
 
-		min = flag.Bool("min", false, "Temporary flag, for testing")
+		min   = flag.Bool("min", false, "Temporary flag, for testing")
+		balup = flag.Int64("balup", 10000, "Changes how often the balances of addresses are updated in the cache. Value is in MillSeconds")
 	)
 	flag.Parse()
 	c := make(chan os.Signal, 2)
@@ -37,6 +40,10 @@ func main() {
 
 	if !(*compiled) {
 		COMPILED_STATICS = false
+	}
+
+	if *balup != 10000 {
+		BALANCE_UPDATE_INTERVAL = time.Duration(*balup) * time.Millisecond
 	}
 
 	if *walDB == "Map" {
