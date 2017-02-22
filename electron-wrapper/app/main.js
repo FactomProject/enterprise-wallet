@@ -11,6 +11,14 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
+require('electron-context-menu')({
+    prepend: (params, browserWindow) => [{
+        label: 'Rainbow',
+        // only show it when right-clicking images 
+        visible: params.mediaType === 'image'
+    }]
+});
+
 // var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 

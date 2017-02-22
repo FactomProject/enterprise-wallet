@@ -9,6 +9,8 @@ import:
   subpackages:
   - wallet
   - wallet/wsapi
+- package: github.com/FactomProject/bolt
+  version: master
 - package: github.com/FactomProject/factomd
   version: develop
   subpackages:
