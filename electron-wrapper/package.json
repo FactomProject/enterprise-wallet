@@ -61,7 +61,7 @@
       ]
     },
     "win": {
-      "iconUrl": "https://github.com/FactomProject/enterprise-wallet/blob/SOF-552/electron-wrapper/build/icon.ico?raw=true",
+      "iconUrl": "https://github.com/FactomProject/enterprise-wallet/blob/master/electron-wrapper/build/icon.ico?raw=true",
       "asarUnpack": "bin/*"
     },
     "nsis": {
