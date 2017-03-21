@@ -56,7 +56,7 @@ function LoadAddresses(){
 function addressTableRow(address, type, loading) {
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
-		address.Balance = Number(FCTNormalize(address.Balance)).toFixed(4) //Number(address.Balance.toFixed(4))
+		address.Balance = ShrinkFixedPoint(FCTNormalize(address.Balance),4) //Number(address.Balance.toFixed(4))
 	} else {
 		token = " EC"
 	}
@@ -429,7 +429,7 @@ function appendTrans(pic, index, amt, token, date, addrs) {
         '<td><a id="transaction-link" data-toggle="transDetails" value="' + index + '"><i class="transIcon ' + pic + '"><img src="img/transaction_' + pic + '.svg" class="svg"></i></a></td>' +
         '<td>' + date + ' : <a value="' + index + '" id="transaction-link" data-toggle="transDetails">' + pic.capitalize() + '</a>' +
         addrs + '</td>' +
-        '<td style="word-wrap: break-word;">' + Number(amt.toFixed(4)) + ' ' + token + '</td>' +
+        '<td style="word-wrap: break-word;">' + ShrinkFixedPoint(amt,4) + ' ' + token + '</td>' +
     '</tr>'
 )
 }
@@ -845,7 +845,7 @@ function getTransactionObject(checkInput) {
   }
 
   if(err){
-    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
+    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "' for output and 'FCT' for input. "}
     if(amtErr){errMessage += "Amounts should not be 0. "}
     if(feeErr){errMessage += "Fee Address must be given. "}
     SetGeneralError("Error(s): " + errMessage)
@@ -867,7 +867,7 @@ CurrentInput = 0
 TotalNeeded = 0
 InputLeft = 0
 function GetNeededInput() {
-  transObject = getTransactionObject(true)
+  transObject = getTransactionObject(false)
 
   if(transObject == null) {
     return

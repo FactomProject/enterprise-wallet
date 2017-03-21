@@ -335,7 +335,7 @@ function getTransactionObject(checkInput) {
   }
 
   if(err){
-    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
+    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "' for output and 'FCT' for input. "}
     if(amtErr){errMessage += "Amounts should not be 0. "}
     if(feeErr){errMessage += "Fee Address must be given. "}
     SetGeneralError("Error(s): " + errMessage)
@@ -357,7 +357,7 @@ CurrentInput = 0
 TotalNeeded = 0
 InputLeft = 0
 function GetNeededInput() {
-  transObject = getTransactionObject(true)
+  transObject = getTransactionObject(false)
 
   if(transObject == null) {
     return

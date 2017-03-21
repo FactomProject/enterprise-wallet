@@ -80,6 +80,20 @@ function FCTNormalize(fct) {
   //return Number((fct/1e8).toFixed(FCTDecminalLength))
 }
 
+function ShrinkFixedPoint(num, places) {
+  str = num.toString()
+  numarr = str.split(".")
+  if (numarr.length == 1) {
+    return str
+  } else {
+    if (numarr[1].length > places) {
+      return numarr[0] + "." + numarr[1].substring(0, places)
+    } else {
+      return str
+    }
+  }
+}
+
 function prependArray(arr, pad, totL) {
   while(arr.length < totL) {
     arr.unshift(pad)

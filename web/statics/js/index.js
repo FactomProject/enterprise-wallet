@@ -144,7 +144,7 @@ function appendTrans(pic, index, amt, token, date, addrs) {
         '<td><a id="transaction-link" data-toggle="transDetails" value="' + index + '"><i class="transIcon ' + pic + '"><img src="img/transaction_' + pic + '.svg" class="svg"></i></a></td>' +
         '<td>' + date + ' : <a value="' + index + '" id="transaction-link" data-toggle="transDetails">' + pic.capitalize() + '</a>' +
         addrs + '</td>' +
-        '<td style="word-wrap: break-word;">' + Number(amt.toFixed(4)) + ' ' + token + '</td>' +
+        '<td style="word-wrap: break-word;">' + ShrinkFixedPoint(amt,4) + ' ' + token + '</td>' +
     '</tr>'
 )
 }
