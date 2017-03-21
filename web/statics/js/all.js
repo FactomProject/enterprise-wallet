@@ -450,10 +450,11 @@ $("main").bind('scroll', function() {
 LOCAL_EXPLORER = true
 $("#transaction-list").on('click', '#transaction-link', function(){
 	port = $("#controlpanel-port").text()
+	factomd = $("#factomd-location").text()
 	setTransDetails($(this).attr("value"))
 	$("#transDetails #link").attr("href", "http://explorer.factom.org/tx/" + Transactions[$(this).attr("value")].TxID)
 	
-	if(port == -1) {
+	if(!(factomd.includes("localhost") || factomd.includes("127.0.0.1"))) {
 		LOCAL_EXPLORER = false
 		$("#transDetails #local-link").addClass("disabled-input")
 		$("#transDetails #local-link").prop("disabled", true)

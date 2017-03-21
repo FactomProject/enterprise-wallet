@@ -1,5 +1,5 @@
-hash: 4ca8f1d064dfa0813e82191e525c0eeba3cb093ca26052356ddbacbb26fe9823
-updated: 2017-02-14T11:06:43.763970291-06:00
+hash: 142215013ba4381d8bec482be545abff18c48a2492a0320b63ebcb5f78891a8e
+updated: 2017-02-22T11:04:58.105510264-06:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -28,7 +28,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: 69e0366ba3d6be5bbc851eefb7cda090eb1926d3
+  version: 22c2a7941890085f4031ac4f84f9e8c2a1f2bd8a
   subpackages:
   - wallet
   - wallet/wsapi
@@ -37,7 +37,7 @@ imports:
   subpackages:
   - controlpanel
 - name: github.com/FactomProject/factomd
-  version: 46a991a2a2445fe375949d000f1c0dfffdedcf1c
+  version: 701f2cca5ed1f71771a36f8e0386f707106190fb
   subpackages:
   - anchor
   - common/adminBlock
@@ -90,12 +90,12 @@ imports:
 - name: github.com/FactomProject/snappy-go
   version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
 - name: golang.org/x/crypto
-  version: c3b1d0d6d8690eaebe3064711b026770cc37efa3
+  version: bed12803fa9663d7aa2c2346b0c634ad2dcd43b7
   subpackages:
   - pbkdf2
   - ripemd160
 - name: golang.org/x/sys
-  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
+  version: 7a6e5648d140666db5d920909e082ca00a87ba2c
   subpackages:
   - unix
 - name: gopkg.in/gcfg.v1

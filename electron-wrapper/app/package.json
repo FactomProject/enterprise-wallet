@@ -17,6 +17,7 @@
   "author": "Factom.org",
   "license": "MIT",
   "dependencies": {
+    "electron-context-menu": "^0.8.0",
     "electron-is-dev": "^0.1.2",
     "electron-single-instance": "0.0.2",
     "ps-node": "^0.1.4",
