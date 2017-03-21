@@ -18,6 +18,13 @@ import:
   - database/hybridDB
   - database/mapdb
   - util
+- package: github.com/FactomProject/bolt
+  version: 952a1b4e9a55f458d536cf703bce25a4e9c99841
+- package: github.com/FactomProject/goleveldb
+  version: 9d147f2b8f767adca2a29f9728658681081b03a8
+- package: github.com/FactomProject/snappy-go
+  version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
+  
 testImport:
 - package: github.com/FactomProject/ed25519
   version: master

@@ -56,7 +56,7 @@ function LoadAddresses(){
 function addressTableRow(address, type, loading) {
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
-		address.Balance = Number(address.Balance.toFixed(4))
+		address.Balance = Number(FCTNormalize(address.Balance)).toFixed(4) //Number(address.Balance.toFixed(4))
 	} else {
 		token = " EC"
 	}

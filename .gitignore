@@ -6,3 +6,5 @@ windows-binaries/*
 tmp/*
 scripts/*
 builds/*
+min-statics/*
+min-templats/*

@@ -470,7 +470,7 @@ function LoadAddressesSendConvert(){
 function factoidAddressRadio(address, name){
 return '<pre>' +
   '  <input type="radio" name="' + name + '" id="address" value="' + address.Address + 
-  '"> <span for="' + address.Address + '" id="address-name" name="(' + address.Balance  + " FCT) "  + address.Name + '">(' + + address.Balance  + " FCT) " + address.Name + '</span>' +
+  '"> <span for="' + address.Address + '" id="address-name" name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
   '</pre><br />'
 }
 

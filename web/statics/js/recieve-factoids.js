@@ -71,7 +71,7 @@ function updateWithGivenAddress(address){
 			$("#balance").val("Error")
 		} else {
 			if(obj.Content.Address.startsWith("FA")) {
-				$("#balance").val((obj.Content.Balance).toFixed(8))
+				$("#balance").val(FCTNormalize(obj.Content.Balance))
 				$("#balance-type").text("FCT")
 			} else {
 				$("#balance").val(obj.Content.Balance)

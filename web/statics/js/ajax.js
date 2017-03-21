@@ -63,7 +63,28 @@ function formatFC(fcBalance){
 }
 
 function FCTNormalize(fct) {
-  return Number((fct/1e8).toFixed(FCTDecminalLength))
+  fctStr = fct.toString()
+  fctSplit = fctStr.split("")
+  if(fctSplit.length < FCTDecminalLength) {
+    fctSplit = prependArray(fctSplit, "0", FCTDecminalLength)
+    res = fctSplit.join("")
+    return "0." + res
+
+  } else if (fctSplit.length == FCTDecminalLength) {
+    fctSplit.splice(fctSplit.length - FCTDecminalLength, 0, ".")
+    return "0" + fctSplit.join("")
+  } else {
+    fctSplit.splice(fctSplit.length - FCTDecminalLength, 0, ".")
+    return fctSplit.join("")
+  }
+  //return Number((fct/1e8).toFixed(FCTDecminalLength))
+}
+
+function prependArray(arr, pad, totL) {
+  while(arr.length < totL) {
+    arr.unshift(pad)
+  }
+  return arr
 }
 
 // On most pages

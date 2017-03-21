@@ -56,7 +56,7 @@ function LoadAddresses(){
 function addressTableRow(address, type, loading) {
 	if(address.Address.startsWith("FA")){
 		token = " FCT"
-		address.Balance = Number(address.Balance.toFixed(4))
+		address.Balance = Number(FCTNormalize(address.Balance)).toFixed(4) //Number(address.Balance.toFixed(4))
 	} else {
 		token = " EC"
 	}
@@ -980,7 +980,7 @@ function LoadAddressesSendConvert(){
 function factoidAddressRadio(address, name){
 return '<pre>' +
   '  <input type="radio" name="' + name + '" id="address" value="' + address.Address + 
-  '"> <span for="' + address.Address + '" id="address-name" name="(' + address.Balance  + " FCT) "  + address.Name + '">(' + + address.Balance  + " FCT) " + address.Name + '</span>' +
+  '"> <span for="' + address.Address + '" id="address-name" name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
   '</pre><br />'
 }
 
@@ -1453,7 +1453,7 @@ function updateWithGivenAddress(address){
 			$("#balance").val("Error")
 		} else {
 			if(obj.Content.Address.startsWith("FA")) {
-				$("#balance").val((obj.Content.Balance).toFixed(8))
+				$("#balance").val(FCTNormalize(obj.Content.Balance))
 				$("#balance-type").text("FCT")
 			} else {
 				$("#balance").val(obj.Content.Balance)
@@ -1694,7 +1694,7 @@ function GetDefaultData(){
 			$("#balance-container").text("Can not find the addresses in address book")
 		} else {
 			if(obj.Content.Address.startsWith("FA")) {
-				$("#balance").text((obj.Content.Balance).toFixed(8))
+				$("#balance").text(FCTNormalize(obj.Content.Balance))
 			} else {
 				$("#balance").text(obj.Content.Balance)
 			}

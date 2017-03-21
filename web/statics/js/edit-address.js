@@ -16,7 +16,7 @@ function GetDefaultData(){
 			$("#balance-container").text("Can not find the addresses in address book")
 		} else {
 			if(obj.Content.Address.startsWith("FA")) {
-				$("#balance").text((obj.Content.Balance).toFixed(8))
+				$("#balance").text(FCTNormalize(obj.Content.Balance))
 			} else {
 				$("#balance").text(obj.Content.Balance)
 			}

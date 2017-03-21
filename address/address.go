@@ -24,7 +24,7 @@ type AddressNamePair struct {
 	Seeded  bool // Derived from seeed
 
 	// Not Marshaled
-	Balance float64 // Unused except for JSON return
+	Balance int64 // Unused except for JSON return
 }
 
 // NewAddress used if addresses DOES NOT derives from the seed
