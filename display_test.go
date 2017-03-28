@@ -335,7 +335,7 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 	}
 
 	var totalSent int = 0
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1; i++ {
 		type jsonResponseRTS struct {
 			Error   string            `json:"Error"`
 			Content ReturnTransStruct `json:"Content"`
@@ -402,7 +402,7 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 	}
 
 	if fail {
-		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %d, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
 	}
 }
 
@@ -431,7 +431,7 @@ func TestConstructTransaction(t *testing.T) {
 	if err != nil || respA.Error != "none" {
 		t.Error("Error occured getting address")
 	} else {
-		currAmt = respA.Content.Balance
+		currAmt = float64(respA.Content.Balance) / 1e8
 	}
 
 	var totalSent float64 = 0
@@ -498,7 +498,7 @@ func TestConstructTransaction(t *testing.T) {
 		if err != nil || respA.Error != "none" {
 			t.Error("Error occured getting address")
 		} else {
-			diff := (totalSent + currAmt) - respA.Content.Balance
+			diff := (totalSent + currAmt) - (float64(respA.Content.Balance) / 1e8)
 			if diff < 0 {
 				diff = -1 * diff
 			}
@@ -513,7 +513,7 @@ func TestConstructTransaction(t *testing.T) {
 	}
 
 	if fail {
-		t.Errorf("Construct:Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+		t.Errorf("Construct:Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, float64(respA.Content.Balance)/1e8, totalSent+currAmt, currAmt, totalSent)
 	}
 }
 
@@ -542,7 +542,7 @@ func TestSendFactoidsTransaction(t *testing.T) {
 	if err != nil || respA.Error != "none" {
 		t.Error("Error occured getting address")
 	} else {
-		currAmt = respA.Content.Balance
+		currAmt = float64(respA.Content.Balance) / 1e8
 	}
 
 	var totalSent float64 = 0
@@ -597,7 +597,7 @@ func TestSendFactoidsTransaction(t *testing.T) {
 		if err != nil || respA.Error != "none" {
 			t.Error("Error occured getting address")
 		} else {
-			diff := (totalSent + currAmt) - respA.Content.Balance
+			diff := (totalSent + currAmt) - (float64(respA.Content.Balance) / 1e8)
 			if diff < 0 {
 				diff = -1 * diff
 			}
@@ -612,7 +612,7 @@ func TestSendFactoidsTransaction(t *testing.T) {
 	}
 
 	if fail {
-		t.Errorf("FactoidSubmit:Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+		t.Errorf("FactoidSubmit:Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %f\n CurrAmt: %f, TotalAdded: %f", trys, float64(respA.Content.Balance)/1e8, totalSent+currAmt, currAmt, totalSent)
 	}
 }
 
