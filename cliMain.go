@@ -1,3 +1,9 @@
+// .
+//
+// CLI Flags
+//
+// Enterprise-wallet when launched via CLI has various launch options, see:
+//	enterprise-wallet -h
 package main
 
 import (

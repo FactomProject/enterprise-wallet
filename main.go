@@ -1,13 +1,21 @@
+// Top-Level
+//
+// The enterprise wallet top level package (main) consists of:
+// 	* Serving web page
+// 	* GUI Related API calls (only served locally)
+// 	* Saving settings
+// 	* Various build scripts
+//
+// The 'electron-wrapper' directory contains all appropriate build tools for
+// compiling the enterprise-wallet as a desktop application
 package main
 
-/*
- * Begins all the services required by the GUI wallet
- * 		- WSAPI for wallet
- *		- Webserver
- * Requires for all functionality
- *		- Factomd Instance
- */
-
+//
+// Begins all the services required by the GUI wallet
+// 		- WSAPI for wallet
+//		- Webserver
+// Requires for all functionality
+//		- Factomd Instance
 import (
 	"fmt"
 
@@ -15,6 +23,7 @@ import (
 	"github.com/FactomProject/factomd/util"
 )
 
+// MasterWallet contains all addresses and databases related to a single wallet
 var MasterWallet *wallet.WalletDB
 
 func close() {
@@ -82,7 +91,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	}
 
 	// Start Walletd
-	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", IntToStringDBType(walletDB), IntToStringDBType(guiDB), IntToStringDBType(txDB))
+	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", intToStringDBType(walletDB), intToStringDBType(guiDB), intToStringDBType(txDB))
 
 	// Can adjust starting variables
 	// This will also start wallet wsapi
@@ -147,7 +156,7 @@ func addRandomAddresses() {
 	MasterWallet.AddAddress("Sand", "Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK")
 }
 
-func IntToStringDBType(t int) string {
+func intToStringDBType(t int) string {
 	switch t {
 	case wallet.MAP:
 		return "Map"

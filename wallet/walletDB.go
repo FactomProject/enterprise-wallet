@@ -1,8 +1,15 @@
+// .
+//
+// WalletDB
+//
+// The wallet consists of three 3 main structures that are interacted with:
+// Wallet : From 'factom' library, this contains all the funcationality related with transactions.
+// GuiWallet : Contains all the addresses associated with the addresses in the Wallet.
+// TransactionDB : Contains all transactions from factom. Has helpful functions to find transactions.
 package wallet
 
 /*
  * Manages all the addresses and 2 databases (Wallet DB and GUI DB)
- *
  */
 
 import (
@@ -24,18 +31,21 @@ import (
 	"github.com/FactomProject/factomd/database/mapdb"
 )
 
+// List of int to db type
 const (
 	MAP int = iota
 	LDB
 	BOLT
 )
 
+// Default settings
 var (
 	GUI_DB    = MAP
 	WALLET_DB = MAP
 	TX_DB     = MAP
 )
 
+// This has to do with launching via CLI. How often to show progress in syncing
 var (
 	STEPS_TO_PRINT int = 10000 // How many steps needed to alert user of progress
 )
@@ -184,7 +194,7 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 	return w, nil
 }
 
-// for sorting
+// DisplayTransactions is used for sorting
 type DisplayTransactions []DisplayTransaction
 
 func (slice DisplayTransactions) Len() int {
@@ -217,6 +227,8 @@ func (slice DisplayTransactions) IsSimilarTo(comp DisplayTransactions) bool {
 	return true
 }
 
+// NewDisplayTransaction is used because we don't keep the original interface of a transaction, but
+// build our own
 func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTransaction, error) {
 	if t == nil {
 		return nil, fmt.Errorf("Transaction is nil")
@@ -307,7 +319,6 @@ func prtOff() {
 //	Stage 1: Gathering Transactions
 //	Stage 2: Checking New Addresses
 //	Stage 3: Sorting
-
 var RTLock sync.RWMutex
 var RTStage int = 0
 
@@ -577,8 +588,7 @@ func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
 	return low
 }
 
-// GetRelatedTransactionsNoCaching
-// No cache solution, not going to use it. It is too slow, but was used in early phases and kept
+// GetRelatedTransactionsNoCaching is the no cache solution, not going to use it. It is too slow, but was used in early phases and kept
 // for testing comparisons as this should be all inclusive and correct
 func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, error) {
 	// ## No cache solution ##

@@ -1,3 +1,6 @@
+// Address is able to maintain a list of AddressNamePairs, which consists of an address
+// (Factoid or EC), a name, and a boolean flag to indicate if it is a seeded address.
+// The list is able to be marshaled into binary for saving
 package address
 
 import (
@@ -14,6 +17,7 @@ import (
 
 var _ = fmt.Sprintf("")
 
+// MaxNameLength is the longest a name is allowed to be.
 const MaxNameLength int = 20
 
 // AddressNamePair represents a public address to a user readable name. Also contains
@@ -60,6 +64,8 @@ func NewSeededAddress(name string, address string) (*AddressNamePair, error) {
 	return add, nil
 }
 
+// ChangeName should be used instead of manually changing the name, as ChangeName
+// ensure the new name is of an appropriate length
 func (anp *AddressNamePair) ChangeName(name string) error {
 	if len(name) > MaxNameLength {
 		return fmt.Errorf("Name too long, must be less than %d characters", MaxNameLength)
@@ -68,6 +74,7 @@ func (anp *AddressNamePair) ChangeName(name string) error {
 	return nil
 }
 
+// IsSimilarTo will ONLY compare addresses, not names or seeded.
 func (anp *AddressNamePair) IsSimilarTo(b *AddressNamePair) bool {
 	if strings.Compare(anp.Address, b.Address) != 0 {
 		return false
@@ -76,6 +83,7 @@ func (anp *AddressNamePair) IsSimilarTo(b *AddressNamePair) bool {
 	return true
 }
 
+// IsSameAs will compare addresses and names
 func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
 	if !anp.IsSimilarTo(b) {
 		return false
@@ -88,6 +96,7 @@ func (anp *AddressNamePair) IsSameAs(b *AddressNamePair) bool {
 	return true
 }
 
+// MarshalBinary will convert an AddressNamePair to a []byte, which can be unmarshaled
 func (anp *AddressNamePair) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 
@@ -151,7 +160,7 @@ func NewAddressList() *AddressList {
 	return addList
 }
 
-// Get searches for Address
+// Get searches for Address by Address, not by name
 func (addList *AddressList) Get(address string) (*AddressNamePair, int) {
 	if !factom.IsValidAddress(address) {
 		return nil, -1
@@ -165,6 +174,8 @@ func (addList *AddressList) Get(address string) (*AddressNamePair, int) {
 	return nil, -1
 }
 
+// AddANP ensures the address is valid before it adds it. It will also not add
+// a duplicate address
 func (addList *AddressList) AddANP(anp *AddressNamePair) error {
 	if len(anp.Name) == 0 || !factom.IsValidAddress(anp.Address) {
 		return errors.New("Nil AddressNamePair")
@@ -182,6 +193,7 @@ func (addList *AddressList) AddANP(anp *AddressNamePair) error {
 
 }
 
+// AddSeeded should be called when an address is seeded, as this will set the seeded flag
 func (addList *AddressList) AddSeeded(name string, address string) (*AddressNamePair, error) {
 	anp, err := NewSeededAddress(name, address)
 	if err != nil {
@@ -190,6 +202,7 @@ func (addList *AddressList) AddSeeded(name string, address string) (*AddressName
 	return addList.add(anp)
 }
 
+// Add is called when an address is not seeded.
 func (addList *AddressList) Add(name string, address string) (*AddressNamePair, error) {
 	anp, err := NewAddress(name, address)
 	if err != nil {
@@ -231,6 +244,7 @@ func (addList *AddressList) Remove(removeAdd string) error {
 	return nil
 }
 
+// ResetSeeded is used when importing a new seed. This will set all addresses to be unseeded.
 func (addList *AddressList) ResetSeeded() {
 	for i := range addList.List {
 		addList.List[i].Seeded = false
@@ -276,6 +290,8 @@ func (addList *AddressList) UnmarshalBinary(data []byte) (err error) {
 	return
 }
 
+// IsSameAs will call the IsSameAs for individual elemtents, meaning it will compare
+// length, addresses, names, AND order
 func (addList *AddressList) IsSameAs(b *AddressList) bool {
 	if addList.Length != b.Length {
 		return false

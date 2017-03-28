@@ -1,3 +1,10 @@
+// Page Handlers
+//
+// Page handlers is the HTML serving of each page. All static files are compiled into the binary,
+// meaning there is no need for absolute pathing. The static files follow a relative pathing scheme
+// to mimic the normal non-compiled in behavior, which means you can turn off compilated statics when
+// developing.
+//		enterprise-wallet -compiled=false
 package main
 
 import (
