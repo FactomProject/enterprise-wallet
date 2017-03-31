@@ -1,5 +1,5 @@
-hash: 142215013ba4381d8bec482be545abff18c48a2492a0320b63ebcb5f78891a8e
-updated: 2017-02-22T11:04:58.105510264-06:00
+hash: 12f5cef5a25ca3e241d4f5e2887029d519056425a27805d37efa92266484b36f
+updated: 2017-03-31T16:32:39.888364994-05:00
 imports:
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
@@ -28,7 +28,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: 22c2a7941890085f4031ac4f84f9e8c2a1f2bd8a
+  version: cceac7c3e8611bff774b218d65b4215b2498cd5c
   subpackages:
   - wallet
   - wallet/wsapi
@@ -37,7 +37,7 @@ imports:
   subpackages:
   - controlpanel
 - name: github.com/FactomProject/factomd
-  version: 701f2cca5ed1f71771a36f8e0386f707106190fb
+  version: 9f119afafe95d0961b72331ee7cfad546ad909ef
   subpackages:
   - anchor
   - common/adminBlock
