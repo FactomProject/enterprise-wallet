@@ -14,10 +14,19 @@ import (
 	"github.com/FactomProject/enterprise-wallet/TestHelper"
 	"github.com/FactomProject/enterprise-wallet/address"
 	"github.com/FactomProject/enterprise-wallet/wallet"
+	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factomd/common/primitives/random"
 
 	. "github.com/FactomProject/enterprise-wallet"
 )
+
+func ready() bool {
+	r, err := factom.GetHeights()
+	if err != nil || r.DirectoryBlockHeight < 1 {
+		return false
+	}
+	return true
+}
 
 var TestWallet *wallet.WalletDB
 var _ = fmt.Sprintf("")
@@ -60,6 +69,9 @@ type jsonANPResponse struct {
 // It is big... It kept growing. Many variables are shared
 // TODO: Break this up
 func TestDisplayGETandPOST(t *testing.T) {
+	for !ready() {
+		time.Sleep(1 * time.Second)
+	}
 	var err error
 	LoadTestWallet(7089)
 
@@ -306,6 +318,9 @@ func importSandAddress() {
 }
 
 func TestSendEntryCreditsTransaction(t *testing.T) {
+	for !ready() {
+		time.Sleep(1 * time.Second)
+	}
 	// Import addresses with factoids
 	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
 	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
@@ -407,6 +422,9 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 }
 
 func TestConstructTransaction(t *testing.T) {
+	for !ready() {
+		time.Sleep(1 * time.Second)
+	}
 	// Import addresses with factoids
 	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
 	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
@@ -518,6 +536,9 @@ func TestConstructTransaction(t *testing.T) {
 }
 
 func TestSendFactoidsTransaction(t *testing.T) {
+	for !ready() {
+		time.Sleep(1 * time.Second)
+	}
 	// Import addresses with factoids
 	// Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK - Sand
 	// FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q
