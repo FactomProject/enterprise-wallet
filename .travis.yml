@@ -10,6 +10,7 @@ install:
         - glide install
 script:
         - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
+        - glide install
         - go build -v
         - cd $GOPATH/src/github.com/FactomProject/factomd && git checkout develop && glide install
         - go build -v
