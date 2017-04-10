@@ -21,9 +21,9 @@ import:
   - database/mapdb
   - util
 - package: github.com/FactomProject/goleveldb
-  version: 9d147f2b8f767adca2a29f9728658681081b03a8
+  version: master
 - package: github.com/FactomProject/snappy-go
-  version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
+  version: master
   
 testImport:
 - package: github.com/FactomProject/ed25519
