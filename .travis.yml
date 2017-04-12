@@ -4,13 +4,13 @@ go:
 before_install:
         - go get github.com/mattn/goveralls
         - go get -d github.com/FactomProject/factomd
-        - cd $GOPATH/src/github.com/FactomProject/factomd && git checkout develop && glide install
-        - go build -v
-        - nohup ./factomd -network=LOCAL -db=Map -blktime=1 &
 install:
         - go get -v github.com/Masterminds/glide
         - cd $GOPATH/src/github.com/Masterminds/glide && git checkout tags/v0.12.3 && go install && cd -
         - glide install
+        - cd $GOPATH/src/github.com/FactomProject/factomd && git checkout develop && glide install
+        - go build -v
+        - nohup ./factomd -network=LOCAL -db=Map -blktime=1 &
 script:
         - glide install
         - go build -v
