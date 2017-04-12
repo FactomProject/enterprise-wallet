@@ -21,6 +21,7 @@ import (
 )
 
 func ready() bool {
+	factom.SetFactomdServer("localhost:8088")
 	r, err := factom.GetHeights()
 	if err != nil || r.DirectoryBlockHeight < 1 {
 		return false
@@ -391,8 +392,8 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 	fail := true
 	trys := 0
 	// try 3 times for correct ammount, sometimes it takes a little longer
-	for i := 0; i < 3; i++ {
-		time.Sleep(10 * time.Second)
+	for i := 0; i < 30; i++ {
+		time.Sleep(1 * time.Second)
 		TestWallet.AddBalancesToAddresses()
 		time.Sleep(1 * time.Second)
 
@@ -505,8 +506,8 @@ func TestConstructTransaction(t *testing.T) {
 	fail := true
 	trys := 0
 	// try 3 times for correct ammount, sometimes it takes a little longer
-	for i := 0; i < 3; i++ {
-		time.Sleep(10 * time.Second)
+	for i := 0; i < 30; i++ {
+		time.Sleep(1 * time.Second)
 		TestWallet.AddBalancesToAddresses()
 		time.Sleep(1 * time.Second)
 
@@ -607,8 +608,8 @@ func TestSendFactoidsTransaction(t *testing.T) {
 	fail := true
 	trys := 0
 	// try 3 times for correct ammount, sometimes it takes a little longer
-	for i := 0; i < 3; i++ {
-		time.Sleep(10 * time.Second)
+	for i := 0; i < 50; i++ {
+		time.Sleep(1 * time.Second)
 		TestWallet.AddBalancesToAddresses()
 		time.Sleep(1 * time.Second)
 
@@ -623,7 +624,7 @@ func TestSendFactoidsTransaction(t *testing.T) {
 				diff = -1 * diff
 			}
 
-			if diff > 1 {
+			if diff > 5 {
 				trys++
 			} else {
 				fail = false
