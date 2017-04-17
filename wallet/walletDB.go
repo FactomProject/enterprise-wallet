@@ -1,8 +1,15 @@
+// .
+//
+// WalletDB
+//
+// The wallet consists of three 3 main structures that are interacted with:
+// Wallet : From 'factom' library, this contains all the funcationality related with transactions.
+// GuiWallet : Contains all the addresses associated with the addresses in the Wallet.
+// TransactionDB : Contains all transactions from factom. Has helpful functions to find transactions.
 package wallet
 
 /*
  * Manages all the addresses and 2 databases (Wallet DB and GUI DB)
- *
  */
 
 import (
@@ -24,23 +31,26 @@ import (
 	"github.com/FactomProject/factomd/database/mapdb"
 )
 
+// List of int to db type
 const (
 	MAP int = iota
 	LDB
 	BOLT
 )
 
+// Default settings
 var (
 	GUI_DB    = MAP
 	WALLET_DB = MAP
 	TX_DB     = MAP
 )
 
+// This has to do with launching via CLI. How often to show progress in syncing
 var (
 	STEPS_TO_PRINT int = 10000 // How many steps needed to alert user of progress
 )
 
-// Wallet interacting with LDB and factom/wallet
+// WalletDB interacting with LDB and factom/wallet
 //   The LDB doesn't need to be updated often, so we save after every add and only
 //   deal with cached version
 type WalletDB struct {
@@ -59,7 +69,7 @@ type WalletDB struct {
 	addrMap                  map[string]address.AddressNamePair // Find addresses quick, All addresses already searched for up to last FBlock
 }
 
-// For now is same as New
+// LoadWalletDB is the same as New
 func LoadWalletDB(v1Import bool) (*WalletDB, error) {
 	return NewWalletDB(v1Import)
 }
@@ -161,7 +171,7 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("Could not add transaction database to wallet:", err)
+		return nil, fmt.Errorf("Could not add transaction database to wallet: %s\n", err.Error())
 	}
 
 	w.Wallet.AddTXDB(txdb)
@@ -184,7 +194,7 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 	return w, nil
 }
 
-// for sorting
+// DisplayTransactions is used for sorting
 type DisplayTransactions []DisplayTransaction
 
 func (slice DisplayTransactions) Len() int {
@@ -217,6 +227,8 @@ func (slice DisplayTransactions) IsSimilarTo(comp DisplayTransactions) bool {
 	return true
 }
 
+// NewDisplayTransaction is used because we don't keep the original interface of a transaction, but
+// build our own
 func (w *WalletDB) NewDisplayTransaction(t interfaces.ITransaction) (*DisplayTransaction, error) {
 	if t == nil {
 		return nil, fmt.Errorf("Transaction is nil")
@@ -301,6 +313,29 @@ func prtOff() {
 	PROCESSING_RELATED_TRANSACTIONS = false
 }
 
+// The user's need feedback on the sync. The function prints out the best information,
+// but to display to front end, we need a simple 1 percent number
+// 	Stage 0: Setup
+//	Stage 1: Gathering Transactions
+//	Stage 2: Checking New Addresses
+//	Stage 3: Sorting
+var RTLock sync.RWMutex
+var RTStage int = 0
+
+func (w *WalletDB) SetStage(stage int) {
+	RTLock.Lock()
+	RTStage = stage
+	RTLock.Unlock()
+}
+
+func (w *WalletDB) GetStage() int {
+	RTLock.RLock()
+	t := RTStage
+	RTLock.RUnlock()
+	return t
+}
+
+// GetRelatedTransactions
 // This function grabs all transactions related to any address in the address book
 // and sorts them by time.Time. If a new address is added, this will grab all transactions
 // from that new address and insert them.
@@ -308,6 +343,8 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	if PROCESSING_RELATED_TRANSACTIONS { // Already working on it
 		return
 	}
+
+	w.SetStage(0)
 
 	// If we print 1 step, we should print all so user knows it is done
 	// Some steps may be very quick
@@ -318,7 +355,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 
 	// Temporary
 	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
+		// recover from panic if one occurred. Set err to nil otherwise.
 		if recover() != nil {
 			err = fmt.Errorf("There was an issue trying to load the database. Please try again in a few seconds. If you keep encountering this error," +
 				"factomd might be having issues syncing with the network.")
@@ -333,14 +370,13 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	for i = 0; i < 2; i++ { // 2 tries, if fails first, updates transactions and trys again
 		block, err = w.TransactionDB.DBO.FetchFBlockHead()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("There has been an issue when trying to grab a block from the database. Please try again in a few seconds.")
 		}
 		if block == nil {
 			if i == 0 {
-
 				w.TransactionDB.GetAllTXs()
 			} else {
-				return nil, fmt.Errorf("Error with loading transaction database.")
+				return nil, fmt.Errorf("Error with loading transaction database. It could be in the process of loading all transactions. Try waiting a minute and reloading the page.")
 			}
 		} else {
 			break
@@ -357,17 +393,23 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		w.cachedHeight = block.GetDatabaseHeight()
 	} else {
 		w.TransactionDB.GetAllTXs() // UpdateDB for next attempt if user tries again
-		return nil, fmt.Errorf("Error with loading transaction database.")
+		return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
 	}
+
+	//
+	// STAGE 1
+	w.SetStage(1)
+	// Gather all new transactions, and add the ones related to us into a list
+	//
 
 	// Get all new transaction to go through
 	transactions, err := w.TransactionDB.GetTXRange(int(oldHeight), int(w.cachedHeight))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error with loading transactions from the database. When grabbing from transaction range.")
 	}
 	totalTransactions := len(transactions)
 	var newTransactions []DisplayTransaction
-	// Sort throught new transactions for any related
+	// Sort through new transactions for any related
 	for i, trans := range transactions {
 		if totalTransactions > STEPS_TO_PRINT && i%STEPS_TO_PRINT == 0 {
 			fmt.Printf("Step 1/3 for Transactions %d / %d\n", i, totalTransactions)
@@ -422,6 +464,12 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 1/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	//
+	// STAGE 2
+	w.SetStage(2)
+	// Sort transactions we already have, and get transactions from any new addresses
+	//
+
 	// Sort the new ones
 	sort.Sort(DisplayTransactions(newTransactions))
 
@@ -464,6 +512,12 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 2/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	//
+	// STAGE 3
+	w.SetStage(3)
+	// Insert any new transactions from new addresses into our list to append
+	//
+
 	totalTransactions = len(moreTransactions)
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
@@ -500,7 +554,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 
 	// The edge case of no transactions. If you have no related transactions, we still need to signal we
-	// are completely loaded. So we will add a blank transaction with an "empty" txid, which is impossibe to get otherwise.
+	// are completely loaded. So we will add a blank transaction with an "empty" txid, which is impossible to get otherwise.
 	if len(w.cachedTransactions) == 0 {
 		empty := new(DisplayTransaction)
 		empty.TxID = "empty"
@@ -512,7 +566,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 }
 
-// Binary search
+// findTransactionIndex uses binary search
 func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
 	low := 0
 	high := len(w.cachedTransactions) - 1
@@ -534,7 +588,7 @@ func (w *WalletDB) findTransactionIndex(t DisplayTransaction) int {
 	return low
 }
 
-// No cache solution, not going to use it. It is too slow, but was used in early phases and kept
+// GetRelatedTransactionsNoCaching is the no cache solution, not going to use it. It is too slow, but was used in early phases and kept
 // for testing comparisons as this should be all inclusive and correct
 func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, error) {
 	// ## No cache solution ##
@@ -564,8 +618,10 @@ func (w *WalletDB) GetRelatedTransactionsNoCaching() ([]DisplayTransaction, erro
 	return transList, nil
 }
 
-func (w *WalletDB) GetGUIWalletJSON() ([]byte, error) {
-	w.AddBalancesToAddresses()
+func (w *WalletDB) GetGUIWalletJSON(getBals bool) ([]byte, error) {
+	if getBals {
+		w.AddBalancesToAddresses()
+	}
 	return json.Marshal(w.guiWallet)
 }
 
@@ -573,8 +629,8 @@ func (w *WalletDB) AddBalancesToAddresses() {
 	w.guiWallet.AddBalancesToAddresses()
 }
 
-// Grabs the list of addresses from the walletDB and updates our GUI
-// with any that are missing. All will be external
+// UpdateGUIDB grabs the list of addresses from the walletDB and updates our
+// GUI with any that are missing. All will be external
 func (w *WalletDB) UpdateGUIDB() error {
 	faAdds, ecAdds, err := w.Wallet.GetAllAddresses()
 	if err != nil {
@@ -809,7 +865,7 @@ func (w *WalletDB) ImportSeed(seed string) error {
 }
 
 func (w *WalletDB) ImportKoinify(name string, koinify string) (*address.AddressNamePair, error) {
-	add, err := factom.ImportKoinify(koinify)
+	add, err := factom.MakeFactoidAddressFromKoinify(koinify)
 	if err != nil {
 		return nil, err
 	}
@@ -885,7 +941,7 @@ func (w *WalletDB) AddAddress(name string, secret string) (*address.AddressNameP
 	return nil, fmt.Errorf("Not a valid private key")
 }
 
-// Only adds to GUI Database
+// addBatchGUIAddresses only adds to GUI Database
 func (w *WalletDB) addBatchGUIAddresses(names []string, addresses []string) error {
 	if len(names) != len(addresses) {
 		return fmt.Errorf("List length does not match")
@@ -902,7 +958,7 @@ func (w *WalletDB) addBatchGUIAddresses(names []string, addresses []string) erro
 	return w.Save()
 }
 
-// Only adds to GUI database
+// addGUIAddress only adds to GUI database
 func (w *WalletDB) addGUIAddress(name string, addressStr string, list int) (*address.AddressNamePair, error) {
 	var anp *address.AddressNamePair
 	var err error
@@ -932,15 +988,15 @@ func (w *WalletDB) addGUIAddress(name string, addressStr string, list int) (*add
 	return anp, nil
 }
 
-// Returns address with associated name
+// GetGUIAddress returns address with associated name
 // List is 0 for not found, 1 for Factoid address, 2 for EC Address, 3 for External
 func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, list int) {
 	anp, list, _ = w.guiWallet.GetAddress(address)
 	return
 }
 
-// Scrub all transactions before serving to front end. Changes the names to the current names of the addresses, as
-// user can change the name of their addresses.
+// ScrubDisplayTransactionsForNameChanges scrubs all transactions before serving to front end. Changes the names to
+// the current names of the addresses, as user can change the name of their addresses.
 func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
 	w.relatedTransactionLock.Lock()
 	for i := range list {

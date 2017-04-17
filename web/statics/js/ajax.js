@@ -63,10 +63,111 @@ function formatFC(fcBalance){
 }
 
 function FCTNormalize(fct) {
-  return Number((fct/1e8).toFixed(FCTDecminalLength))
+  fctStr = fct.toString()
+  fctSplit = fctStr.split("")
+  if(fctSplit.length < FCTDecminalLength) {
+    fctSplit = prependArray(fctSplit, "0", FCTDecminalLength)
+    res = fctSplit.join("")
+    return "0." + res
+
+  } else if (fctSplit.length == FCTDecminalLength) {
+    fctSplit.splice(fctSplit.length - FCTDecminalLength, 0, ".")
+    return "0" + fctSplit.join("")
+  } else {
+    fctSplit.splice(fctSplit.length - FCTDecminalLength, 0, ".")
+    return fctSplit.join("")
+  }
+  //return Number((fct/1e8).toFixed(FCTDecminalLength))
+}
+
+function ShrinkFixedPoint(num, places) {
+  str = num.toString()
+  numarr = str.split(".")
+  if (numarr.length == 1) {
+    return str
+  } else {
+    if (numarr[1].length > places) {
+      return numarr[0] + "." + numarr[1].substring(0, places)
+    } else {
+      return str
+    }
+  }
+}
+
+function prependArray(arr, pad, totL) {
+  while(arr.length < totL) {
+    arr.unshift(pad)
+  }
+  return arr
 }
 
 // On most pages
+checkSynced()
+setInterval(checkSynced,3000);
+var CheckingSync = false
+function checkSynced(){
+  if(CheckingSync) {
+    return
+  }
+  CheckingSync = true
+  getRequest("synced", function(resp){
+    CheckingSync = false
+    obj = JSON.parse(resp)
+    // Change progress
+    switch (obj.Content.Stage) {
+      case 0:
+        $("#load-message").text("Setting up...")
+        break;
+      case 1:
+        $("#load-message").text("Gathering new transactions...")
+        break;
+      case 2:
+        $("#load-message").text("Checking any new addresses...")
+        break;
+      case 3:
+        $("#load-message").text("Sorting transactions...")
+        break;
+    }
+
+    eBlockPercent = obj.Content.EntryHeight / obj.Content.LeaderHeight
+    eBlockPercent = HelperFunctionForPercent(eBlockPercent, 100)
+
+    fBlockPercent = obj.Content.FblockHeight / obj.Content.LeaderHeight
+    fBlockPercent = HelperFunctionForPercent(fBlockPercent, 100)
+
+    percent = 0
+    // We are getting fblocks, but it is taking awhile.
+    if(fBlockPercent == 0 && eBlockPercent > 5) {
+      $("#load-percent").text("Syncing...")
+    } else {
+      percent = fBlockPercent
+      if(percent > 98) {
+        $("#sync-bar").removeClass("alert")
+      } else {
+        $("#sync-bar").addClass("alert")
+      }
+      $("#load-percent").text(percent.toFixed(2) + "%")
+    }
+
+    // Remove error message
+    if (obj.Content.Synced == true) {
+      $("#synced-indicator").slideUp(100)
+    }
+  })
+}
+
+function HelperFunctionForPercent(percent, multiBy){
+  if(percent == undefined || isNaN(percent)) {
+    percent = 0
+  }
+
+  percent = percent * multiBy
+  if(percent > multiBy) {
+    percent = multiBy
+  }
+  return percent
+}
+
 function SetGeneralError(err) {
   $("#success-zone").slideUp(100)
   $("#error-zone").text(err)
@@ -92,4 +193,3 @@ function saveTextAsFile(text, filename) {
     document.body.appendChild(downloadLink);
     downloadLink.click();
 }
-

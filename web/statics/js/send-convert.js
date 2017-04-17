@@ -1,6 +1,14 @@
 // Import/Export page acts differently
 importexport = false
 
+// Load the Reveal
+/*$(window).load(function() {
+    LoadAddresses()
+    if($("#coin-control").hasClass("coin-control")) {
+      $("#fee-address-input").css("display", "none")
+    }
+});*/
+
 // Used for sending factoids or converting to entry credits
 PageTokenABR = "FCT"
 PageToken = "factoids"
@@ -213,7 +221,18 @@ function MakeTransaction(sig) {
       ShowNewButtons()
       totalInput = obj.Content.Total / 1e8
       feeFact = obj.Content.Fee / 1e8
+      
       total = totalInput + feeFact 
+
+      if(transObject.FeeAddress != "") {
+        for(var i = 0; i < transObject.OutputAddresses.length; i++) {
+          if(transObject.OutputAddresses[i] == transObject.FeeAddress) {
+            total = totalInput - feeFact
+            break
+          }
+        }           
+      }
+
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
       if(importexport) {
@@ -228,13 +247,17 @@ function MakeTransaction(sig) {
   })
 }
 
+
 function setExportDownload(json) {
   obj = JSON.parse(json)
   console.log(obj.params.transaction)
   fileExt = Date.now()
+  $("#export-transaction").attr("value", obj.params.transaction)
+  $("#export-transaction").attr("fileExt", fileExt)
   $("#export-transaction").click(function() {
-    $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.params.transaction))
-    $(this).attr("download", "Exported-" + fileExt)
+    saveTextAsFile($(this).attr("value"), "Exported-" + $(this).attr("fileExt"))
+    // $(this).attr("href", "data:text/plain;charset=UTF-8," + encodeURIComponent(obj.params.transaction))
+    // $(this).attr("download", "Exported-" + fileExt)
   })
 }
 
@@ -312,7 +335,7 @@ function getTransactionObject(checkInput) {
   }
 
   if(err){
-    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "'. "}
+    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "' for output and 'FCT' for input. "}
     if(amtErr){errMessage += "Amounts should not be 0. "}
     if(feeErr){errMessage += "Fee Address must be given. "}
     SetGeneralError("Error(s): " + errMessage)
@@ -334,14 +357,14 @@ CurrentInput = 0
 TotalNeeded = 0
 InputLeft = 0
 function GetNeededInput() {
-  transObject = getTransactionObject(true)
+  transObject = getTransactionObject(false)
 
   if(transObject == null) {
     return
   }
 
   CurrentInput = 0
-  console.log(transObject)
+  // console.log(transObject)
   for(var i = 0; i < transObject.InputAmounts.length; i++) {
     if(transObject.InputAmounts[i] != undefined) {
       CurrentInput += Number(transObject.InputAmounts[i])
@@ -399,16 +422,8 @@ $("#edit-transaction").on('click', function(){
   HideMessages()
 })
 
-// Load the Reveal
-$(window).load(function() {
-    LoadAddresses()
-    if($("#coin-control").hasClass("coin-control")) {
-      $("#fee-address-input").css("display", "none")
-    }
-});
-
-function LoadAddresses(){
-  resp = getRequest("addresses",function(resp){
+function LoadAddressesSendConvert(){
+  resp = getRequest("addresses-no-bal",function(resp){
     obj = JSON.parse(resp)
 
     if(obj.FactoidAddresses.List  != null) {
@@ -446,12 +461,17 @@ function LoadAddresses(){
       }
     }
   })
+
+  if($("#coin-control").hasClass("coin-control")) {
+    $("#fee-address-input").css("display", "none")
+  }
 }
 
 function factoidAddressRadio(address, name){
 return '<pre>' +
-'  <input type="radio" name="' + name + '" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
-'</pre><br />'
+  '  <input type="radio" name="' + name + '" id="address" value="' + address.Address + 
+  '"> <span for="' + address.Address + '" id="address-name" name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
+  '</pre><br />'
 }
 
 $('#addresses-reveal').on("mouseover", "#address-name", function(){
@@ -460,6 +480,16 @@ $('#addresses-reveal').on("mouseover", "#address-name", function(){
 })
 
 $('#addresses-reveal').on("mouseout", "#address-name", function(){
+  $(this).text($(this).attr("name"));
+  $(this).css("font-size", "100%")
+})
+
+$('#fee-addresses-reveal').on("mouseover", "#address-name", function(){
+  $(this).css("font-size", "90%")
+  $(this).text($(this).parent().find("#address").val());
+})
+
+$('#fee-addresses-reveal').on("mouseout", "#address-name", function(){
   $(this).text($(this).attr("name"));
   $(this).css("font-size", "100%")
 })
@@ -469,16 +499,6 @@ function factoidECRadio(address, type){
   '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
   '</pre> <br />'
 }
-
-$('#addresses-reveal').on("mouseover", "#address-name", function(){
-  $(this).css("font-size", "90%")
-  $(this).text($(this).parent().find("#address").val());
-})
-
-$('#addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).attr("name"));
-  $(this).css("font-size", "100%")
-})
 
 done = false
 
@@ -620,7 +640,6 @@ $("#import-file").on('click', function(){
 })
 
 $("#uploaded-file").on('change', function(){
-  console.log("hey")
   input = document.getElementById('uploaded-file');
   if (!input) {
     SetGeneralError("Error with upload file javascript.")
@@ -691,6 +710,8 @@ $("#broadcast-transaction").on('click', function(){
     obj = JSON.parse(resp)
     if(obj.Error == "none") {
       SetGeneralSuccess('Transaction Sent, transaction ID: ' + obj.Content )
+      $("#broadcast-transaction").addClass("disabled-input")
+      $("#broadcast-transaction").prop("disabled", true)
     } else {
       SetGeneralError(obj.Error)
     }

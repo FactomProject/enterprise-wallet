@@ -1,3 +1,10 @@
+// Page Handlers
+//
+// Page handlers is the HTML serving of each page. All static files are compiled into the binary,
+// meaning there is no need for absolute pathing. The static files follow a relative pathing scheme
+// to mimic the normal non-compiled in behavior, which means you can turn off compilated statics when
+// developing.
+//		enterprise-wallet -compiled=false
 package main
 
 import (
@@ -21,18 +28,57 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 	return e
 }
 
+const MAX_FACTOMDLOCATION_SIZE int = 30
+
+// SettingsStruct
 // Every Handle struct must have settings
 // This is used on every page
 type SettingsStruct struct {
 	// Marshaled
-	DarkTheme    bool
-	KeyExport    bool // Allow export of private key
-	CoinControl  bool
-	ImportExport bool //Transaction import/export
+	DarkTheme       bool
+	KeyExport       bool // Allow export of private key
+	CoinControl     bool
+	ImportExport    bool //Transaction import/export
+	FactomdLocation string
 
 	// Not marshaled
 	Theme            string // darkTheme or ""
 	ControlPanelPort int
+	Synced           bool
+}
+
+// Refresh refreshes the "synced" flag, and anything else that needs to be done
+// before a page loads
+func (s *SettingsStruct) Refresh() (leaderHeight int64, entryHeight int64, fblockHeight uint32) {
+	var err error
+	leaderHeight = 0
+	entryHeight = 0
+	fblockHeight = 0
+
+	h, err := factom.GetHeights()
+	if err != nil || h == nil {
+		s.Synced = false
+		return
+	}
+
+	leaderHeight = h.LeaderHeight
+	entryHeight = h.EntryHeight
+
+	fblockHeight, err = MasterWallet.Wallet.TXDB().FetchNextFBlockHeight()
+	if err != nil {
+		s.Synced = false
+		return
+	}
+
+	// 1 block grace period
+	if h != nil && (h.EntryHeight >= (h.LeaderHeight - 1)) {
+		if fblockHeight >= uint32(h.EntryHeight) {
+			s.Synced = true
+			return
+		}
+	}
+	s.Synced = false
+	return
 }
 
 func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
@@ -53,7 +99,15 @@ func (a *SettingsStruct) IsSameAs(b *SettingsStruct) bool {
 		return false
 	}
 
+	if a.FactomdLocation != b.FactomdLocation {
+		return false
+	}
+
 	return true
+}
+
+func (s *SettingsStruct) SetFactomdLocation(factomdLocation string) {
+	factom.SetFactomdServer(factomdLocation)
 }
 
 func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
@@ -79,6 +133,12 @@ func (s *SettingsStruct) MarshalBinary() ([]byte, error) {
 	}
 
 	buf.Write(b)
+
+	data, err := MarshalStringToBytes(s.FactomdLocation, MAX_FACTOMDLOCATION_SIZE)
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
 
 	return buf.Next(buf.Len()), nil
 }
@@ -132,6 +192,26 @@ func (s *SettingsStruct) UnmarshalBinaryData(data []byte) (newData []byte, err e
 		return data, err
 	}
 	newData = newData[5:]
+
+	switch {
+	case len(newData) == 0: // v1 : No settings
+		s.FactomdLocation = "localhost:8088" // Will be overwritten if changed anyhow
+	case len(newData) == 30 && bytes.Compare(newData[28:30], []byte{0x00, 0x00}) == 0: // v2 : Settings at length 30
+		//end := MAX_FACTOMDLOCATION_SIZE
+		nameData := bytes.Trim(newData[:30], "\x00")
+		s.FactomdLocation = fmt.Sprintf("%s", nameData)
+		if s.FactomdLocation == "" {
+			s.FactomdLocation = "localhost:8088"
+		}
+		newData = newData[30:]
+	default: // current
+		var loc string
+		loc, newData, err = UnmarshalStringFromBytesData(newData, MAX_FACTOMDLOCATION_SIZE)
+		if err != nil {
+			return data, err
+		}
+		s.FactomdLocation = loc
+	}
 
 	return
 }

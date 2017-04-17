@@ -1,6 +1,6 @@
-$(window).load(function() {
+/*$(window).load(function() {
     LoadTransactions()
-});
+});*/
 
 CurrentCount = 0
 ContentLen = 0
@@ -144,7 +144,7 @@ function appendTrans(pic, index, amt, token, date, addrs) {
         '<td><a id="transaction-link" data-toggle="transDetails" value="' + index + '"><i class="transIcon ' + pic + '"><img src="img/transaction_' + pic + '.svg" class="svg"></i></a></td>' +
         '<td>' + date + ' : <a value="' + index + '" id="transaction-link" data-toggle="transDetails">' + pic.capitalize() + '</a>' +
         addrs + '</td>' +
-        '<td style="word-wrap: break-word;">' + Number(amt.toFixed(4)) + ' ' + token + '</td>' +
+        '<td style="word-wrap: break-word;">' + ShrinkFixedPoint(amt,4) + ' ' + token + '</td>' +
     '</tr>'
 )
 }
@@ -165,10 +165,11 @@ $("main").bind('scroll', function() {
 LOCAL_EXPLORER = true
 $("#transaction-list").on('click', '#transaction-link', function(){
 	port = $("#controlpanel-port").text()
+	factomd = $("#factomd-location").text()
 	setTransDetails($(this).attr("value"))
 	$("#transDetails #link").attr("href", "http://explorer.factom.org/tx/" + Transactions[$(this).attr("value")].TxID)
 	
-	if(port == -1) {
+	if(!(factomd.includes("localhost") || factomd.includes("127.0.0.1"))) {
 		LOCAL_EXPLORER = false
 		$("#transDetails #local-link").addClass("disabled-input")
 		$("#transDetails #local-link").prop("disabled", true)

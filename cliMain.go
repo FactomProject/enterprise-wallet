@@ -1,3 +1,9 @@
+// .
+//
+// CLI Flags
+//
+// Enterprise-wallet when launched via CLI has various launch options, see:
+//	enterprise-wallet -h
 package main
 
 import (
@@ -5,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var (
@@ -18,14 +25,14 @@ func main() {
 		walDB           = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
 		txDB            = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
 		port            = flag.Int("port", 8091, "The port for the GUIWallet")
-		walletdPort     = flag.Int("walletport", 8089, "The port for factom-walletd instance to be run on")
 		compiled        = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
 		randomAdds      = flag.Bool("randadd", true, "Overrides ADD_RANDOM_ADDRESSES if false and does not add random addresses")
 		v1Import        = flag.Bool("i", true, "Search for M1 wallet, if there is no M2 wallet file")
 		v1Path          = flag.String("v1path", "/.factom/factoid_wallet_bolt.db", "Change the path for V1 import")
 		factomdLocation = flag.String("factomdlocation", "", "Change the location of factomd. Default comes from the config file")
 
-		min = flag.Bool("min", false, "Temporary flag, for testing")
+		min   = flag.Bool("min", false, "Temporary flag, for testing")
+		balup = flag.Int64("balup", 10000, "Changes how often the balances of addresses are updated in the cache. Value is in MillSeconds")
 	)
 	flag.Parse()
 	c := make(chan os.Signal, 2)
@@ -40,6 +47,10 @@ func main() {
 		COMPILED_STATICS = false
 	}
 
+	if *balup != 10000 {
+		BALANCE_UPDATE_INTERVAL = time.Duration(*balup) * time.Millisecond
+	}
+
 	if *walDB == "Map" {
 		if *randomAdds {
 			ADD_RANDOM_ADDRESSES = true
@@ -52,5 +63,5 @@ func main() {
 		FILES_PATH += "min-"
 	}
 
-	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *walletdPort, *v1Import, *v1Path, *factomdLocation)
+	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *v1Import, *v1Path, *factomdLocation)
 }

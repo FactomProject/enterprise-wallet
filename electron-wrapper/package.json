@@ -1,0 +1,76 @@
+{
+  "name": "enterprisewallet",
+  "version": "0.1.1",
+  "description": "Factom Enterprise Wallet",
+  "main": "index.js",
+  "scripts": {
+    "setBin:mac": "./macSetBin.sh",
+    "dist:mac": "./macSetBin.sh && build --mac",
+    "dist:win": "sh winSetBin.sh && build --win",
+    "predist:linux": "sh linSetBin.sh",
+    "dist:linux": "npm run predist:linux && run-p dist:linux:*",
+    "dist:linux:deb": "npm run predist:linux && build --linux deb",
+    "dist:linux:zip": "npm run predist:linux && build --linux zip",
+    "dist:all":"npm run dist:win && npm run dist:mac && npm run dist:linux:zip && npm run dist:linux:deb",
+    "win:dist:win": "build --win"
+  },
+  "author": "Factom.org",
+  "repository": "https://github.com/FactomProject/enterprise-wallet",
+  "homepage": "https://www.factom.com/",
+  "license": "MIT",
+  "devDependencies": {
+    "7zip": "0.0.6",
+    "asar": "^0.12.0",
+    "copyfiles": "~1.0.0",
+    "electron": "^1.4.1",
+    "electron-builder": "^11.2.4",
+    "electron-packager": "^8.5.0",
+    "electron-packager-interactive": "0.0.8",
+    "gm": "^1.23.0",
+    "mkdirp": "~0.5.1",
+    "npm-run-all": "~2.3.0",
+    "rimraf": "~2.5.3"
+  },
+  "build": {
+    "appId": "factom.enterprisewallet",
+    "productName": "EnterpriseWallet",
+    "mac": {
+      "asarUnpack": "bin/*"
+    },
+    "dmg": {
+      "title": "EnterpriseWallet",
+      "background": "build/background.png",
+      "icon": "build/icon.icns",
+      "iconSize": 128,
+      "window": {
+        "width": "1000",
+        "height": "667"
+      },
+      "contents": [
+        {
+          "x": 250,
+          "y": 470,
+          "type": "file"
+        },
+        {
+          "x": 780,
+          "y": 470,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "iconUrl": "https://github.com/FactomProject/enterprise-wallet/blob/master/electron-wrapper/build/icon.ico?raw=true",
+      "asarUnpack": "bin/*"
+    },
+    "nsis": {
+      "oneClick" : true,
+      "allowToChangeInstallationDirectory": false
+    },
+    "linux": {
+      "maintainer": "Steven Masley <steven@factom.org>",
+      "asarUnpack": "bin/*"
+    }
+  }
+}

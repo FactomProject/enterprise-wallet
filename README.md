@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/FactomProject/enterprise-wallet.svg?branch=master)](https://travis-ci.org/FactomProject/enterprise-wallet)
+[![Coverage Status](https://coveralls.io/repos/github/FactomProject/enterprise-wallet/badge.svg?branch=master)](https://coveralls.io/github/FactomProject/enterprise-wallet?branch=master)
+
 # Enterprise Wallet - GUI Wallet for M2
 This uses the same wallet file as factom-walletd and the same port. This means, enterprise-wallet cannot run alongside factom-walletd. enterprise-wallet will import any and all addresses created in the CLI and will monitor any changes the CLI makes and be sure to update itself to reflect those changes. Any addresses created from the CLI however will be marked as not created from the seed, so it is recommended to create all addresses from within the GUI.
 
@@ -20,7 +23,7 @@ When backing up, backing up #1 is most important. #2 is good to have if you plan
 
 ## To Launch for testing
  - Run 'factomd'
- - Run 'EnterpriseWaller'
+ - Run 'enterprise-wallet'
  - Default, open localhost:8091 in any browser
 
 

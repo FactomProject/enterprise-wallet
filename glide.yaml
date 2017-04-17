@@ -1,13 +1,18 @@
 package: github.com/FactomProject/enterprise-wallet
 import:
 - package: github.com/FactomProject/btcutil
+  version: develop
   subpackages:
   - base58
 - package: github.com/FactomProject/factom
+  version: develop
   subpackages:
   - wallet
   - wallet/wsapi
+- package: github.com/FactomProject/bolt
+  version: master
 - package: github.com/FactomProject/factomd
+  version: develop
   subpackages:
   - common/factoid
   - common/interfaces
@@ -15,6 +20,11 @@ import:
   - database/hybridDB
   - database/mapdb
   - util
+- package: github.com/FactomProject/goleveldb
+  version: 9d147f2b8f767adca2a29f9728658681081b03a8
+- package: github.com/FactomProject/snappy-go
+  version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
+  
 testImport:
 - package: github.com/FactomProject/ed25519
   version: master

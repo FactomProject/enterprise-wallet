@@ -10,4 +10,6 @@ cd web/
 sh compile.sh $1
 
 cd ..
-go install
+
+# Build binaries
+sh compileAll.sh

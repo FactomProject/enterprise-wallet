@@ -1,0 +1,29 @@
+{
+  "name": "enterprisewallet",
+  "version": "0.1.1",
+  "description": "Factom Enterprise Wallet",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/FactomProject/enterprise-wallet",
+  "keywords": [
+    "Electron",
+    "Factom",
+    "Enterprise",
+    "Wallet",
+    "GUI"
+  ],
+  "author": "Factom.org",
+  "license": "MIT",
+  "dependencies": {
+    "electron-context-menu": "^0.8.0",
+    "electron-is-dev": "^0.1.2",
+    "electron-single-instance": "0.0.2",
+    "ps-node": "^0.1.4",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "electron": "^1.4.1"
+  }
+}

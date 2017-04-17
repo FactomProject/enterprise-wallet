@@ -3,15 +3,22 @@ $("#save-changes").on('click', function(){
 	exportKeys = $("#export-keys").is(":checked")
 	coinControl = $("#coin-control").is(":checked")
 	importExport = $("#import-export").is(":checked")
+	fd = $("#factomd-location").val()
+
+	if(!$("#customFactomd").is(":checked")){
+		fd = "localhost:8088"
+	}
 
 	var SettingsStruct = {
-    	Values:[]
+    	Values:[],
+    	FactomdLocation:""
 	}
 
 	SettingsStruct.Values.push(theme)
 	SettingsStruct.Values.push(exportKeys)
 	SettingsStruct.Values.push(coinControl)
 	SettingsStruct.Values.push(importExport)
+	SettingsStruct.FactomdLocation = fd
 
 	j = JSON.stringify(SettingsStruct)
 	postRequest("adjust-settings", j, function(resp){
@@ -29,6 +36,14 @@ $("#save-changes").on('click', function(){
 	})
 })
 
+$("#customFactomd").on('click', function(){
+	if($("#customFactomd").is(":checked")){
+		$("#factomd-location-container").removeClass("hide")
+	} else {
+		$("#factomd-location-container").addClass("hide")
+	}
+})
+
 $("#export-seed").on('click', function(){
 	postRequest("get-seed", "", function(resp){
 	    obj = JSON.parse(resp)
@@ -40,29 +55,15 @@ $("#export-seed").on('click', function(){
 	})
 })
 
-function saveTextAsFile(text, filename) {
-    var textToWrite = text
-    var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' })
-    var fileNameToSaveAs = filename
-
-    var downloadLink = document.createElement("a");
-    downloadLink.download = fileNameToSaveAs;
-    window.URL = window.URL || window.webkitURL;
-    downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-}
-
 //selected = false
 // Import/Export
-$("#import-file").on('click', function(e){
-	document.getElementById('uploaded-file').click()
+$("#settings-import-file").on('click', function(e){
+	document.getElementById('settings-uploaded-file').click()
 })
 
 
-$("#uploaded-file").on('change', function(){
-	input = document.getElementById('uploaded-file');
+$("#settings-uploaded-file").on('change', function(){
+	input = document.getElementById('settings-uploaded-file');
 	if (!input) {
 		SetGeneralError("Error: Couldn't find the fileinput element.")
 	}

@@ -1,6 +1,6 @@
 // Load drop down if we were not directed with a specific link
 function LoadRecAddresses(){
-	resp = getRequest("addresses",function(resp){
+	resp = getRequest("addresses-no-bal",function(resp){
 		obj = JSON.parse(resp)
 		
 		if(obj.FactoidAddresses.List != null){
@@ -38,7 +38,7 @@ function dropDownOption(address) {
 }
 
 // Copy to clipboard
-$("#copy-to-clipboard").on('click', function(){
+$("#rec-copy-to-clipboard").on('click', function(){
 	var aux = document.createElement("input");
 	aux.setAttribute("value", $('#selected-address-info').val());
 	document.body.appendChild(aux);
@@ -71,7 +71,7 @@ function updateWithGivenAddress(address){
 			$("#balance").val("Error")
 		} else {
 			if(obj.Content.Address.startsWith("FA")) {
-				$("#balance").val((obj.Content.Balance).toFixed(8))
+				$("#balance").val(FCTNormalize(obj.Content.Balance))
 				$("#balance-type").text("FCT")
 			} else {
 				$("#balance").val(obj.Content.Balance)
@@ -120,3 +120,4 @@ this.getLength()-a.getLength())return this;for(var c=l.glog(this.get(0))-l.glog(
 correctLevel:2,background:"#ffffff",foreground:"#000000"},h);return this.each(function(){var a;if("canvas"==h.render){a=new o(h.typeNumber,h.correctLevel);a.addData(h.text);a.make();var c=document.createElement("canvas");c.width=h.width;c.height=h.height;for(var d=c.getContext("2d"),b=h.width/a.getModuleCount(),e=h.height/a.getModuleCount(),f=0;f<a.getModuleCount();f++)for(var i=0;i<a.getModuleCount();i++){d.fillStyle=a.isDark(f,i)?h.foreground:h.background;var g=Math.ceil((i+1)*b)-Math.floor(i*b),
 j=Math.ceil((f+1)*b)-Math.floor(f*b);d.fillRect(Math.round(i*b),Math.round(f*e),g,j)}}else{a=new o(h.typeNumber,h.correctLevel);a.addData(h.text);a.make();c=r("<table></table>").css("width",h.width+"px").css("height",h.height+"px").css("border","0px").css("border-collapse","collapse").css("background-color",h.background);d=h.width/a.getModuleCount();b=h.height/a.getModuleCount();for(e=0;e<a.getModuleCount();e++){f=r("<tr></tr>").css("height",b+"px").appendTo(c);for(i=0;i<a.getModuleCount();i++)r("<td></td>").css("width",
 d+"px").css("background-color",a.isDark(e,i)?h.foreground:h.background).appendTo(f)}}a=c;jQuery(a).appendTo(this)})}})(jQuery);
+

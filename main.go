@@ -1,13 +1,21 @@
+// Top-Level
+//
+// The enterprise wallet top level package (main) consists of:
+// 	* Serving web page
+// 	* GUI Related API calls (only served locally)
+// 	* Saving settings
+// 	* Various build scripts
+//
+// The 'electron-wrapper' directory contains all appropriate build tools for
+// compiling the enterprise-wallet as a desktop application
 package main
 
-/*
- * Begins all the services required by the GUI wallet
- * 		- WSAPI for wallet
- *		- Webserver
- * Requires for all functionality
- *		- Factomd Instance
- */
-
+//
+// Begins all the services required by the GUI wallet
+// 		- WSAPI for wallet
+//		- Webserver
+// Requires for all functionality
+//		- Factomd Instance
 import (
 	"fmt"
 
@@ -15,6 +23,7 @@ import (
 	"github.com/FactomProject/factomd/util"
 )
 
+// MasterWallet contains all addresses and databases related to a single wallet
 var MasterWallet *wallet.WalletDB
 
 func close() {
@@ -30,16 +39,15 @@ func close() {
 	fmt.Println("Complete shut down.")
 }
 
-// Initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
+// InitiateWalletAndWeb initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
 // and will be created if they are not found.
-func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, walletdPort int, v1Import bool, v1Path string, factomdLocFlag string) {
+func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, v1Import bool, v1Path string, factomdLocFlag string) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
 
 	filename := util.ConfigFilename() //file name and path to factomd.conf file
 	cfg := util.ReadConfig(filename)
 
 	// Ports
-	walletPort := walletdPort
 	factomdLocation := cfg.Walletd.FactomdLocation
 	if factomdLocFlag != "" {
 		factomdLocation = factomdLocFlag
@@ -82,11 +90,12 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		txDB = wallet.LDB
 	}
 
-	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", IntToStringDBType(walletDB), IntToStringDBType(guiDB), IntToStringDBType(txDB))
+	// Start Walletd
+	fmt.Printf("Wallet DB using %s, GUI DB using %s, TX DB using %s\n", intToStringDBType(walletDB), intToStringDBType(guiDB), intToStringDBType(txDB))
 
 	// Can adjust starting variables
 	// This will also start wallet wsapi
-	wal, err := wallet.StartWallet(walletPort, factomdLocation, walletDB, guiDB, txDB, v1Import)
+	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import)
 	if err != nil {
 		panic("Error in starting wallet: " + err.Error())
 	}
@@ -97,19 +106,35 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	MasterSettings = new(SettingsStruct)
 	data, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 	if err != nil || data == nil {
-		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
-		if err != nil {
-			panic("Error in loading settings: " + err.Error())
-		}
+		// Settings are not saved, AKA fresh start
+
+		MasterSettings.FactomdLocation = factomdLocation
 
 		// Default dark
 		MasterSettings.DarkTheme = true
 		MasterSettings.Theme = "darkTheme"
+		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+		if err != nil {
+			panic("Error in loading settings: " + err.Error())
+		}
 	} else {
 		MasterSettings = data.(*SettingsStruct)
+		// If we have a custom config file, or a custom flag, we will overwrite the settings.
+		// This is so we can still trump the settings in the GUI
+		if factomdLocation != "localhost:8088" {
+			MasterSettings.FactomdLocation = factomdLocation
+		}
+		// Here is the first override of the factomd location from the GUI settings.
+		// You can see abover, this value will be overwritten by any config or flag
+		factomdLocation = MasterSettings.FactomdLocation
 	}
 
+	MasterSettings.SetFactomdLocation(factomdLocation)
+
 	MasterSettings.ControlPanelPort = controlPanelPort
+	// We always need to load transactions, even if in database. So let's start as not synced
+	MasterSettings.Synced = false
+
 	// For Testing adds random addresses
 	if ADD_RANDOM_ADDRESSES {
 		addRandomAddresses()
@@ -131,7 +156,7 @@ func addRandomAddresses() {
 	MasterWallet.AddAddress("Sand", "Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK")
 }
 
-func IntToStringDBType(t int) string {
+func intToStringDBType(t int) string {
 	switch t {
 	case wallet.MAP:
 		return "Map"
