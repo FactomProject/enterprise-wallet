@@ -418,7 +418,7 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 	}
 
 	if fail {
-		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %d, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
 	}
 }
 
