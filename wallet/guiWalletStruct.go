@@ -436,7 +436,6 @@ func (w *WalletStruct) AddBalancesToAddresses() {
 
 	for i, fa := range w.FactoidAddresses.List {
 		if a, ok := faList[fa.Address]; ok {
-			fmt.Println(a.Balance)
 			w.FactoidAddresses.List[i].Balance = a.Balance
 		}
 	}

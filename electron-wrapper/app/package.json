@@ -1,6 +1,6 @@
 {
   "name": "enterprisewallet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Factom Enterprise Wallet",
   "main": "main.js",
   "scripts": {
