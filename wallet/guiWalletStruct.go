@@ -357,53 +357,103 @@ func (w *WalletStruct) RemoveAddress(address string, list int) (string, error) {
 
 // AddBalancesToAddresses adds balances to addresses so the GUI can display
 func (w *WalletStruct) AddBalancesToAddresses() {
+	w.AddBalancesToAddresses2()
+	return
+	// Copy Lists to avoid having to hold the lock during api calls
+	faList := make(map[string]address.AddressNamePair)
+	ecList := make(map[string]address.AddressNamePair)
+	exList := make(map[string]address.AddressNamePair)
+
 	w.Lock()
-	defer w.Unlock()
+	for _, a := range w.FactoidAddresses.List {
+		faList[a.Address] = a
+	}
+	for _, a := range w.EntryCreditAddresses.List {
+		ecList[a.Address] = a
+	}
+	for _, a := range w.ExternalAddresses.List {
+		exList[a.Address] = a
+	}
+	w.Unlock()
 
-	w.FactoidTotal = 0
-	w.ECTotal = 0
+	faTotal := int64(0)
+	ecTotal := int64(0)
 
-	if w.FactoidAddresses.Length > 0 {
-		for i, fa := range w.FactoidAddresses.List {
+	if len(faList) > 0 {
+		for i, fa := range faList {
 			bal, err := factom.GetFactoidBalance(fa.Address)
 			if err != nil {
-				w.FactoidAddresses.List[i].Balance = -1
+				fa.Balance = -1
+				faList[i] = fa
 			} else {
-				w.FactoidAddresses.List[i].Balance = bal
-				w.FactoidTotal += bal
+				fa.Balance = bal
+				faList[i] = fa
+				faTotal += bal
 			}
 		}
 	}
 
-	if w.EntryCreditAddresses.Length > 0 {
-		for i, ec := range w.EntryCreditAddresses.List {
+	if len(ecList) > 0 {
+		for i, ec := range ecList {
 			bal, err := factom.GetECBalance(ec.Address)
 			if err != nil {
-				w.EntryCreditAddresses.List[i].Balance = -1
+				ec.Balance = -1
+				ecList[i] = ec
 			} else {
-				w.EntryCreditAddresses.List[i].Balance = bal
-				w.ECTotal += bal
+				ec.Balance = bal
+				ecList[i] = ec
+				ecTotal += bal
 			}
 		}
 	}
 
-	if w.ExternalAddresses.Length > 0 {
-		for i, a := range w.ExternalAddresses.List {
+	if len(exList) > 0 {
+		for i, a := range exList {
 			if a.Address[:2] == "FA" {
 				bal, err := factom.GetFactoidBalance(a.Address)
 				if err != nil {
-					w.ExternalAddresses.List[i].Balance = -1
+					a.Balance = -1
+					exList[i] = a
 				} else {
-					w.ExternalAddresses.List[i].Balance = bal
+					a.Balance = bal
+					exList[i] = a
 				}
 			} else if a.Address[:2] == "EC" {
 				bal, err := factom.GetECBalance(a.Address)
 				if err != nil {
-					w.ExternalAddresses.List[i].Balance = -1
+					a.Balance = -1
+					exList[i] = a
 				} else {
-					w.ExternalAddresses.List[i].Balance = bal
+					a.Balance = bal
+					exList[i] = a
 				}
 			}
 		}
 	}
+
+	// Update values in the wallet
+	w.Lock()
+	w.FactoidTotal = faTotal
+	w.ECTotal = ecTotal
+
+	for i, fa := range w.FactoidAddresses.List {
+		if a, ok := faList[fa.Address]; ok {
+			fmt.Println(a.Balance)
+			w.FactoidAddresses.List[i].Balance = a.Balance
+		}
+	}
+
+	for i, fa := range w.EntryCreditAddresses.List {
+		if a, ok := ecList[fa.Address]; ok {
+			w.EntryCreditAddresses.List[i].Balance = a.Balance
+		}
+	}
+
+	for i, fa := range w.ExternalAddresses.List {
+		if a, ok := exList[fa.Address]; ok {
+			w.ExternalAddresses.List[i].Balance = a.Balance
+		}
+	}
+
+	w.Unlock()
 }
