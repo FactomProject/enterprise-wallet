@@ -357,8 +357,6 @@ func (w *WalletStruct) RemoveAddress(address string, list int) (string, error) {
 
 // AddBalancesToAddresses adds balances to addresses so the GUI can display
 func (w *WalletStruct) AddBalancesToAddresses() {
-	w.AddBalancesToAddresses2()
-	return
 	// Copy Lists to avoid having to hold the lock during api calls
 	faList := make(map[string]address.AddressNamePair)
 	ecList := make(map[string]address.AddressNamePair)
