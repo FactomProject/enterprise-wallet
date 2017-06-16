@@ -71,8 +71,8 @@ func (s *SettingsStruct) Refresh() (leaderHeight int64, entryHeight int64, fbloc
 	}
 
 	// 1 block grace period
-	if h != nil && (h.EntryHeight >= (h.LeaderHeight - 1)) {
-		if fblockHeight >= uint32(h.EntryHeight) {
+	if h != nil && (h.DirectoryBlockHeight >= (h.LeaderHeight - 1)) {
+		if fblockHeight >= uint32(h.DirectoryBlockHeight) {
 			s.Synced = true
 			return
 		}
