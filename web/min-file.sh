@@ -26,12 +26,20 @@ if [ "$1" == "closure" ] # Closure compile by google
 	java -jar closure/compiler.jar  --js_output_file=min-statics/js/ajax.js statics/js/ajax.js
 	echo "  Minifying app.js..."
 	java -jar closure/compiler.jar  --js_output_file=min-statics/js/app.js statics/js/app.js
+elif [ "$1" == "none" ] 
+	then
+	echo "No minify"
 else
 	minify -r -o min-statics/js statics/js/
 fi
 
-echo "Minfying css..."
-echo "  Minifying statics/css/app.css..."
-minify -o min-statics/css/app.css statics/css/app.css
-echo "  Minifying statics/css/other.css..."
-minify -o min-statics/css/other.css statics/css/other.css
+if [ "$1" == "none" ] 
+	then
+	echo "Not minify css"
+else 
+	echo "Minfying css..."
+	echo "  Minifying statics/css/app.css..."
+	minify -o min-statics/css/app.css statics/css/app.css
+	echo "  Minifying statics/css/other.css..."
+	minify -o min-statics/css/other.css statics/css/other.css
+fi

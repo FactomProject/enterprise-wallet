@@ -162,6 +162,7 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Printf("An error has occurred")
+		HandleError(w, r, err)
 	}
 }
 
