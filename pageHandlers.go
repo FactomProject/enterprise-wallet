@@ -287,9 +287,9 @@ func NewEditAddressStruct(address string, name string) *EditAddressStruct {
 
 func handleEditAddress(w http.ResponseWriter, r *http.Request) (*EditAddressStruct, error) {
 	address := r.FormValue("address")
-
 	if !factom.IsValidAddress(address) {
-		return nil, fmt.Errorf("Invalid Address")
+		reqStruct := fmt.Sprintf("%-10s: %s\n%10s: %s", "RequestUrl", r.URL, "RequestForm", r.Form)
+		return nil, fmt.Errorf(" %s is an invalid address.\n%s", address, reqStruct)
 	}
 
 	name := r.FormValue("name")
@@ -305,7 +305,7 @@ func HandleEditAddressFactoids(w http.ResponseWriter, r *http.Request) error {
 
 	e, err := handleEditAddress(w, r)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error in HandleEditAddressFactoids(): %s", err.Error())
 	}
 
 	templates.ExecuteTemplate(w, "edit-address-factoid", e)
@@ -318,7 +318,7 @@ func HandleEditAddressEntryCredits(w http.ResponseWriter, r *http.Request) error
 
 	e, err := handleEditAddress(w, r)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error in HandleEditAddressEntryCredits(): %s", err.Error())
 	}
 
 	templates.ExecuteTemplate(w, "edit-address-entry-credits", e)
@@ -331,7 +331,7 @@ func HandleEditAddressExternal(w http.ResponseWriter, r *http.Request) error {
 
 	e, err := handleEditAddress(w, r)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error in HandleEditAddressExternal(): %s", err.Error())
 	}
 
 	templates.ExecuteTemplate(w, "edit-address-external", e)
@@ -450,5 +450,15 @@ func HandleNotFoundError(w http.ResponseWriter, r *http.Request) error {
 	defer TemplateMutex.Unlock()
 
 	templates.ExecuteTemplate(w, "notFoundError", NewPlaceHolderStruct())
+	return nil
+}
+
+func HandleError(w http.ResponseWriter, r *http.Request, err error) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	s := NewPlaceHolderStruct()
+	s.Content = err.Error()
+	templates.ExecuteTemplate(w, "customError", s)
 	return nil
 }
