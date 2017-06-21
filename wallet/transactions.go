@@ -456,12 +456,18 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
 		}
 		if list[i].Balance > totalLeft {
-			wal.Wallet.AddInput(trans, list[i].Address, totalLeft)
+			err := wal.Wallet.AddInput(trans, list[i].Address, totalLeft)
+			if err != nil {
+				return trans, nil, err
+			}
 			list[i].Balance -= totalLeft
 			totalLeft = 0
 		} else {
 			if list[i].Balance > 0 {
-				wal.Wallet.AddInput(trans, list[i].Address, list[i].Balance)
+				err := wal.Wallet.AddInput(trans, list[i].Address, list[i].Balance)
+				if err != nil {
+					return trans, nil, err
+				}
 				totalLeft -= list[i].Balance
 				list[i].Balance = 0
 			}
@@ -485,7 +491,10 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 		if i == -1 || err != nil { // We don't have an address that can pay for the fee.
 			return trans, nil, fmt.Errorf("Not enough factoids to cover the transaction")
 		} else {
-			wal.Wallet.AddInput(trans, list[i].Address, 0)
+			err := wal.Wallet.AddInput(trans, list[i].Address, 0)
+			if err != nil {
+				return trans, nil, err
+			}
 		}
 	}
 
