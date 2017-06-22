@@ -95,6 +95,12 @@ func (anp *AddressNamePair) ChangeName(name string) error {
 	if len(name) > MaxNameLength {
 		return fmt.Errorf("Name too long, must be less than %d characters", MaxNameLength)
 	}
+
+	err, _ := sanitize(name)
+	if err != nil {
+		return nil, err
+	}
+
 	anp.Name = name
 	return nil
 }
