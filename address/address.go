@@ -37,6 +37,12 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 		return nil, fmt.Errorf("Name must be max %d characters", MaxNameLength)
 	}
 
+	err, _ := sanitize(name)
+	if err != nil {
+		return nil, err
+	}
+	// name = strings.Replace(name, " ", "_", -1)
+
 	if !factom.IsValidAddress(address) {
 		return nil, errors.New("Address is invalid")
 	}
@@ -51,6 +57,20 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 	add.Seeded = false
 
 	return add, nil
+}
+
+var IllegalCharacters = `!@#$%^&*()+=';:.,?/*` + "`"
+
+func sanitize(str string) (error, string) {
+	var err error
+	notAllowed := strings.Split(IllegalCharacters, "")
+	for _, na := range notAllowed {
+		if strings.Contains(str, na) {
+			err = fmt.Errorf("The '%s' character not allowed in names", na)
+			str = strings.Replace(str, na, "_", -1)
+		}
+	}
+	return err, str
 }
 
 // NewSeededAddress used if addresses derives from the seed
@@ -125,6 +145,10 @@ func (anp *AddressNamePair) UnmarshalBinaryData(data []byte) (newData []byte, er
 	nameData := bytes.Trim(newData[:MaxNameLength], "\x00")
 	anp.Name = fmt.Sprintf("%s", nameData)
 	newData = newData[MaxNameLength:]
+
+	// Correct any bad names
+	_, anp.Name = sanitize(anp.Name)
+	// 	anp.Name = strings.Replace(anp.Name, " ", "_", -1)
 
 	anp.Address = base58.Encode(newData[:38])
 	newData = newData[38:]

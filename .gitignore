@@ -1,3 +1,8 @@
+web/min-statics/*
+web/min-templates/*
+
+
+
 mapStart.sh
 web/closure
 vendor/*
