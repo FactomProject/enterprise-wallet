@@ -98,7 +98,7 @@ func (anp *AddressNamePair) ChangeName(name string) error {
 
 	err, _ := sanitize(name)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	anp.Name = name
