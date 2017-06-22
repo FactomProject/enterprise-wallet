@@ -59,7 +59,7 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 	return add, nil
 }
 
-var IllegalCharacters = `!@#$%^&*()+=';:.,?/* ` + "`"
+var IllegalCharacters = `!@#$%^&*()+=';:.,?/*<> ` + "`"
 
 func sanitize(str string) (error, string) {
 	var err error
