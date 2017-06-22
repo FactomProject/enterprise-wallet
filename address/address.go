@@ -59,14 +59,18 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 	return add, nil
 }
 
-var IllegalCharacters = `!@#$%^&*()+=';:.,?/*` + "`"
+var IllegalCharacters = `!@#$%^&*()+=';:.,?/* ` + "`"
 
 func sanitize(str string) (error, string) {
 	var err error
 	notAllowed := strings.Split(IllegalCharacters, "")
 	for _, na := range notAllowed {
 		if strings.Contains(str, na) {
-			err = fmt.Errorf("The '%s' character not allowed in names", na)
+			if na == " " {
+				err = fmt.Errorf("No spaces are allowed in names. Please replace any ' ' with a '_' or '-'")
+			} else {
+				err = fmt.Errorf("The '%s' character not allowed in names", na)
+			}
 			str = strings.Replace(str, na, "_", -1)
 		}
 	}

@@ -656,25 +656,32 @@ $("#all-inputs").on('click','#remove-new-input', function(){
 // Ensure factoids/ec being sent are valid, this is not a security feature, but an ease of use
 // feature
 $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
-  if(PageTokenABR == "FCT") {
-    var self = $(this);
-    self.val(self.val().replace(/[^0-9\.]/g, ''));
-    if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57) && evt.which != 8) {
-      //evt.preventDefault();
-    }
+    if(PageTokenABR == "FCT") {
+      if(evt.which < 48 || (evt.which > 57 && (evt.which != 190))) evt.preventDefault();
+    } else {
+        if(evt.which < 48 || evt.which > 57) evt.preventDefault();
+      }
+    });
+//   if(PageTokenABR == "FCT") {
+//     var self = $(this);
+//     // self.val(self.val().replace(/[^0-9\.]/g, ''));
+//     if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57) && evt.which != 8) {
+//       //evt.preventDefault();
+//     }
 
-    decSplit = $(this).val().split(".")
-    if(decSplit.length > 2) {
-      evt.preventDefault();
-    }
-  } else {
-    var self = $(this);
-    self.val(self.val().replace(/[^0-9\.]/g, ''));
-    if ((evt.which < 48 || evt.which > 57) && evt.which != 8) {
-      evt.preventDefault();
-    }
-  }
-});
+//     decSplit = $(this).val().split(".")
+//     if(decSplit.length > 2) {
+//       evt.preventDefault();
+//     }
+//   } else {
+//     var self = $(this);
+//     self.val(self.val().replace(/[^0-9\.]/g, ''));
+//     if ((evt.which < 48 || evt.which > 57) && evt.which != 8) {
+//       evt.preventDefault();
+//     }
+//   }
+// });
+
 
 // Update Fee
 $("#all-outputs").on('change', '#output-factoid-amount', function(){
