@@ -59,21 +59,22 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 	return add, nil
 }
 
-var IllegalCharacters = `!@#$%^&*()+=';:.,?/* ` + "`"
+var IllegalCharacters = `!@#$%^&*()+=';:.,?/*<>"'[]{}~|\ ` + "`"
 
 func sanitize(str string) (error, string) {
 	var err error
+	badChars := ""
 	notAllowed := strings.Split(IllegalCharacters, "")
 	for _, na := range notAllowed {
 		if strings.Contains(str, na) {
-			if na == " " {
-				err = fmt.Errorf("No spaces are allowed in names. Please replace any ' ' with a '_' or '-'")
-			} else {
-				err = fmt.Errorf("The '%s' character not allowed in names", na)
-			}
+			badChars += na
 			str = strings.Replace(str, na, "_", -1)
 		}
 	}
+	if badChars != "" {
+		err = fmt.Errorf("A name can only contain the following characters 'a-z, A-Z, 0-9, _ , -'\n The characters '%s' are not allowed", badChars)
+	}
+
 	return err, str
 }
 
@@ -94,6 +95,12 @@ func (anp *AddressNamePair) ChangeName(name string) error {
 	if len(name) > MaxNameLength {
 		return fmt.Errorf("Name too long, must be less than %d characters", MaxNameLength)
 	}
+
+	err, _ := sanitize(name)
+	if err != nil {
+		return err
+	}
+
 	anp.Name = name
 	return nil
 }
