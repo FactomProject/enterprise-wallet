@@ -37,6 +37,12 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 		return nil, fmt.Errorf("Name must be max %d characters", MaxNameLength)
 	}
 
+	err, _ := sanitize(name)
+	if err != nil {
+		return nil, err
+	}
+	// name = strings.Replace(name, " ", "_", -1)
+
 	if !factom.IsValidAddress(address) {
 		return nil, errors.New("Address is invalid")
 	}
@@ -51,6 +57,25 @@ func NewAddress(name string, address string) (*AddressNamePair, error) {
 	add.Seeded = false
 
 	return add, nil
+}
+
+var IllegalCharacters = `!@#$%^&*()+=';:.,?/*<>"'[]{}~|\ ` + "`"
+
+func sanitize(str string) (error, string) {
+	var err error
+	badChars := ""
+	notAllowed := strings.Split(IllegalCharacters, "")
+	for _, na := range notAllowed {
+		if strings.Contains(str, na) {
+			badChars += na
+			str = strings.Replace(str, na, "_", -1)
+		}
+	}
+	if badChars != "" {
+		err = fmt.Errorf("A name can only contain the following characters 'a-z, A-Z, 0-9, _ , -'\n The characters '%s' are not allowed", badChars)
+	}
+
+	return err, str
 }
 
 // NewSeededAddress used if addresses derives from the seed
@@ -70,6 +95,12 @@ func (anp *AddressNamePair) ChangeName(name string) error {
 	if len(name) > MaxNameLength {
 		return fmt.Errorf("Name too long, must be less than %d characters", MaxNameLength)
 	}
+
+	err, _ := sanitize(name)
+	if err != nil {
+		return err
+	}
+
 	anp.Name = name
 	return nil
 }
@@ -125,6 +156,10 @@ func (anp *AddressNamePair) UnmarshalBinaryData(data []byte) (newData []byte, er
 	nameData := bytes.Trim(newData[:MaxNameLength], "\x00")
 	anp.Name = fmt.Sprintf("%s", nameData)
 	newData = newData[MaxNameLength:]
+
+	// Correct any bad names
+	_, anp.Name = sanitize(anp.Name)
+	// 	anp.Name = strings.Replace(anp.Name, " ", "_", -1)
 
 	anp.Address = base58.Encode(newData[:38])
 	newData = newData[38:]

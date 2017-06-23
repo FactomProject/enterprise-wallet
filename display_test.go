@@ -702,7 +702,7 @@ func TestImportKoinify(t *testing.T) {
 	}
 }
 
-const StringAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
+const StringAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func randomString(l int) string {
 	answer := []byte{}
