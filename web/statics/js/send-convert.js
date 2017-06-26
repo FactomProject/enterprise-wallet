@@ -145,11 +145,11 @@ $("#all-inputs").on('click','#remove-new-input', function(){
 // Ensure factoids/ec being sent are valid, this is not a security feature, but an ease of use
 // feature
 $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
-    if(PageTokenABR == "FCT") {
+  //  if(PageTokenABR == "FCT") {
       if(evt.which < 48 || (evt.which > 57 && (evt.which != 190))) evt.preventDefault();
-    } else {
-        if(evt.which < 48 || evt.which > 57) evt.preventDefault();
-      }
+    //} else {
+    //    if(evt.which < 48 || evt.which > 57) evt.preventDefault();
+     // }
     });
 //   if(PageTokenABR == "FCT") {
 //     var self = $(this);
