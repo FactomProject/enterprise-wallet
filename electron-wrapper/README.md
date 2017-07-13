@@ -30,7 +30,11 @@ npm run dist:linux:deb
 npm run dist:linux:zip
 # Windows
 npm run dist:win
-# You distribution will be in /dist
+
+# Or run all
+npm run dist:all
+
+# You distributions will be in /dist
 ```
 
 
