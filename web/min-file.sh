@@ -39,7 +39,9 @@ if [ "$1" == "none" ]
 else 
 	echo "Minfying css..."
 	echo "  Minifying statics/css/app.css..."
-	minify -o min-statics/css/app.css statics/css/app.css
+	#minify -o min-statics/css/app.css statics/css/app.css
+	cp statics/css/app.css min-statics/css/app.css
 	echo "  Minifying statics/css/other.css..."
-	minify -o min-statics/css/other.css statics/css/other.css
+	cp statics/css/other.css min-statics/css/other.css
+	#minify -o min-statics/css/other.css statics/css/other.css
 fi
