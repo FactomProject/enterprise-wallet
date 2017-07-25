@@ -85,7 +85,7 @@ function execWalletd() {
 // Runs when the wallet is able to start serving web pages
 function runWhenWalletUp(callback){
   request.get('http://localhost:' + PORT_TO_SERVE + "/GET?request=on" ,function(err,res,body){
-    if (!err && res.statusCode == 200) {
+    if (res != undefined && res.statusCode == 200) {
       callback()
     } else {
       console.log("Not up yet, trying again in 0.5seconds...")
