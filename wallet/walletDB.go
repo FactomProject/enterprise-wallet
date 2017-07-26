@@ -36,6 +36,7 @@ const (
 	MAP int = iota
 	LDB
 	BOLT
+	ENCRYPTED
 )
 
 // Default settings
@@ -70,11 +71,11 @@ type WalletDB struct {
 }
 
 // LoadWalletDB is the same as New
-func LoadWalletDB(v1Import bool) (*WalletDB, error) {
-	return NewWalletDB(v1Import)
+func LoadWalletDB(v1Import bool, password string) (*WalletDB, error) {
+	return NewWalletDB(v1Import, password)
 }
 
-func NewWalletDB(v1Import bool) (*WalletDB, error) {
+func NewWalletDB(v1Import bool, password string) (*WalletDB, error) {
 	w := new(WalletDB)
 
 	var db interfaces.IDatabase
@@ -107,6 +108,11 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 
 	var wal *wallet.Wallet
 
+	// Cannot import to encrypted
+	if WALLET_DB == ENCRYPTED {
+		v1Import = false
+	}
+
 	switch v1Import {
 	case true:
 		if WALLET_DB == MAP {
@@ -122,6 +128,8 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 			case BOLT:
 				m2Path = GetHomeDir() + walletBoltPath
 				_, err = os.Stat(GetHomeDir() + walletBoltPath)
+			case ENCRYPTED:
+				return nil, fmt.Errorf("Cannot import from v1 to encrypted wallet")
 			}
 			if err != nil { // No M2 file, lets grab from M1
 				m1Path := ""
@@ -151,6 +159,8 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 			wal, err = wallet.NewOrOpenLevelDBWallet(GetHomeDir() + walletLDBPath)
 		case BOLT:
 			wal, err = wallet.NewOrOpenBoltDBWallet(GetHomeDir() + walletBoltPath)
+		case ENCRYPTED:
+			wal, err = wallet.NewEncryptedBoltDBWallet(GetHomeDir()+walletEncryptedBoltPath, password)
 		}
 	}
 	if err != nil {

@@ -7,7 +7,9 @@
 package main
 
 import (
+	"bufio"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -63,5 +65,13 @@ func main() {
 		FILES_PATH += "min-"
 	}
 
-	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *v1Import, *v1Path, *factomdLocation)
+	password := ""
+	if *walDB == "ENC" {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Println("Enter password: ")
+		text, _, _ := reader.ReadLine()
+		password = string(text)
+	}
+
+	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *v1Import, *v1Path, *factomdLocation, password)
 }

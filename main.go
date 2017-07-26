@@ -41,7 +41,7 @@ func close() {
 
 // InitiateWalletAndWeb initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
 // and will be created if they are not found.
-func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, v1Import bool, v1Path string, factomdLocFlag string) {
+func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, v1Import bool, v1Path string, factomdLocFlag string, password string) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
 
 	filename := util.ConfigFilename() //file name and path to factomd.conf file
@@ -80,6 +80,8 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		walletDB = wallet.BOLT
 	case "LDB":
 		walletDB = wallet.LDB
+	case "ENC":
+		walletDB = wallet.ENCRYPTED
 	}
 	switch txDBStr { // Holds transactions cache
 	case "Map":
@@ -95,7 +97,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 
 	// Can adjust starting variables
 	// This will also start wallet wsapi
-	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import)
+	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import, password)
 	if err != nil {
 		panic("Error in starting wallet: " + err.Error())
 	}
@@ -169,6 +171,8 @@ func intToStringDBType(t int) string {
 		return "LDB"
 	case wallet.BOLT:
 		return "Bolt"
+	case wallet.ENCRYPTED:
+		return "Encrypted"
 	}
 	return "[No DB Type Found]"
 }
