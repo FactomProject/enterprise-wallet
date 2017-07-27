@@ -59,7 +59,13 @@ h2, p, label {
 
 label {
     padding: 0px;
-    font-size: 13px;
+    font-size: 15px;
+}
+
+.error {
+    outline: none;
+    border-color: #f15a5a;
+    box-shadow: 0 0 5px #f15a5a;
 }
 
 .description {
