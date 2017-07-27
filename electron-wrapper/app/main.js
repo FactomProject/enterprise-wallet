@@ -380,9 +380,11 @@ app.on('window-all-closed', function () {
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     console.log("Properly exiting...")
-    walletd.stdin.pause();
-    walletd.kill();
-    WALLETD_UP = false
+    if(WALLETD_UP) {
+      walletd.stdin.pause();
+      walletd.kill();
+      WALLETD_UP = false
+    }
     cleanUp(function(){app.quit()})
   }
 })

@@ -405,7 +405,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 
 	if block.GetDatabaseHeight() == 0 {
-		return nil, fmt.Errorf("Must wait 1 block and try again.")
+		// return nil, fmt.Errorf("Must wait 1 block and try again.")
 	}
 
 	var oldHeight uint32
