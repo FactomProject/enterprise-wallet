@@ -68,6 +68,8 @@ type WalletDB struct {
 	cachedHeight             uint32                             // Last FBlock height used
 	transMap                 map[string]DisplayTransaction      // Prevent duplicate transactions
 	addrMap                  map[string]address.AddressNamePair // Find addresses quick, All addresses already searched for up to last FBlock
+
+	quit bool
 }
 
 // LoadWalletDB is the same as New
@@ -361,6 +363,9 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 
 	w.SetStage(0)
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+	}
 
 	// If we print 1 step, we should print all so user knows it is done
 	// Some steps may be very quick
@@ -410,6 +415,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	} else {
 		w.TransactionDB.GetAllTXs() // UpdateDB for next attempt if user tries again
 		return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
+	}
+
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
 	}
 
 	//
@@ -480,6 +489,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 1/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+	}
+
 	//
 	// STAGE 2
 	w.SetStage(2)
@@ -498,6 +511,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	totalTransactions = 0
 	currentCheckpoint := 0
 	for _, a := range anps {
+		if w.quit {
+			return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+		}
+
 		_, ok := w.addrMap[a.Address]
 		if ok { // Found
 
@@ -528,6 +545,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 2/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+	}
+
 	//
 	// STAGE 3
 	w.SetStage(3)
@@ -538,6 +559,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
 	for i, t := range moreTransactions {
+		if w.quit {
+			return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+		}
+
 		if totalTransactions > STEPS_TO_PRINT && i%STEPS_TO_PRINT == 0 {
 			fmt.Printf("Step 3/3 for Transactions %d / %d\n", i, totalTransactions)
 		}
@@ -699,6 +724,8 @@ func (w *WalletDB) UpdateGUIDB() error {
 }
 
 func (w *WalletDB) Close() error {
+	w.quit = true
+
 	// Combine all close errors, as all need to get closed
 	errCount := 0
 	errString := ""

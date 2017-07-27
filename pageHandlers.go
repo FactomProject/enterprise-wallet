@@ -45,6 +45,7 @@ type SettingsStruct struct {
 	Theme            string // darkTheme or ""
 	ControlPanelPort int
 	Synced           bool
+	Encrypted        bool
 }
 
 // Refresh refreshes the "synced" flag, and anything else that needs to be done

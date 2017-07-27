@@ -32,10 +32,20 @@
                         <li id="settings-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}><a href="Settings" class="settings nav-element" nav-click="true"><i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>Settings</a></li>
                     </ul>
                 </nav>
-                <div id="sync-status" class="hide-for-small-only">
-			<small>Enterprise: Version v0.1.3.1</small><br>
-			<span id="sync-bar" class="label alert">Wallet Sync: <span id="load-percent">0</span></span>
+            <div id="sync-status" class="hide-for-small-only">
+            <div id="encrypted-indicator" style="width: 100%;" {{ if $settings.Encrypted }}{{else}} class="hide" {{end}}>
+                <div style="padding-left: 40%;">
+                      <div class="icon-lock" >
+                        <div class="lock-top-1" style="background-color: #C5BFB6"></div>
+                        <div class="lock-top-2"></div>
+                        <div class="lock-body" style="background-color: #C5BFB6"></div>
+                        <div class="lock-hole"></div>
+                    </div>
                 </div>
+            </div>
+			 <small>Enterprise: Version v0.1.3.1</small><br>
+			 <span id="sync-bar" class="label alert">Wallet Sync: <span id="load-percent">0</span></span>
+            </div>
             </section>
             <section class="rightCol small-12 medium-expand columns">
                 <section class="balances">

@@ -106,8 +106,8 @@ function execWalletd(password) {
       var errormessage = ""
       if(s.includes("message authentication failed")) {
         errormessage = "The password given to unlock the encrypted database was incorrect. "+
-         "Please try launching the wallet again with the correct password. If you feel this is an" +
-         "error, please reach out on our slack."
+         "Please try launching the wallet again with the correct password. If you feel this is an " +
+         "error, please reach out on our Factom Community slack."
       } else {
         var n = s.indexOf("Error in starting wallet");
         errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
@@ -320,11 +320,6 @@ function createLoadingWindow() {
     // transparent: true
   })
 
-  if(choiceWindow !== null) {
-    choiceWindow.close()
-    choiceWindow === null
-  }
-
   // Load loading window
   console.log("Showing a loading...")
   loadingWindow.loadURL(url.format({
@@ -332,6 +327,11 @@ function createLoadingWindow() {
     protocol: 'file:',
     slashes: true
   }))
+
+  if(choiceWindow !== null) {
+    choiceWindow.close()
+    choiceWindow === null
+  }
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()

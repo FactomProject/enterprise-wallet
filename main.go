@@ -146,6 +146,10 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings.FactomdLocation = "courtesy-node.factom.com"
 	}
 
+	if walletDB == wallet.ENCRYPTED {
+		MasterSettings.Encrypted = true
+	}
+
 	MasterSettings.SetFactomdLocation(factomdLocation)
 
 	MasterSettings.ControlPanelPort = controlPanelPort
