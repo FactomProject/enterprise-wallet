@@ -347,9 +347,6 @@ function createLoadingWindow() {
 
 // Recieve the start options and start the wallet
 ipcMain.on('submitForm', function(event, data) {
-  // Access form data here
-  console.log(data)
-
   // Look for hanging golang process and kill them
   createLoadingWindow()
   console.log("Checking for hanging enterprise-wallet process...")
