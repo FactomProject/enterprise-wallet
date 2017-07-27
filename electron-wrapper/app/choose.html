@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Choose EnterpriseWallet Type</title>
+	<link rel="stylesheet" href="choose.css">
+</head>
+<body>
+	<div class="flex-container">
+		<div class="wrapper">
+			<header class="header">
+				<table class="home-reset" onclick="reset()">
+					<tr>
+						<td><img src="img/factom-foundation_mark.svg"></td>
+						<td><h1 style="padding-left: 90px;"> Choose your wallet type</h1></td>
+					</tr>
+				</table>
+			</header>
+			<content class="main" id="level-one">
+				<div class="option encased" id="secure" onclick="select(true)" onmouseover="secureHover(true)" onmouseleave="secureHover(false)">
+					<h2>Secure</h2>
+					<p>Opening a secure wallet will encrypt all private keys and the seed. Keep in mind this means that if you forget your password, there is no recovery option. Be careful selecting this option</p>  
+				</div>
+				<div class="option encased" id="normal" onclick="select(false)" onmouseover="normalHover(true)" onmouseleave="normalHover(false)">
+					<h2>Not Secure</h2>
+					<p>Opening a non-secure wallet does not use encryption, and therefore can always be opened. This does leave your private keys exposed in plaintext on your disk.</p>  
+				</div>
+			</content>
+			<content class="main" id="secure-second" style="display: none;">
+				<div class="encased full" style="text-align: center;">
+					<h2>Secure</h2>
+					<div class="description" style="text-align: left;margin-top: -10px;">
+					<p>When using an encrypted wallet, be sure to immediately back up your seed upon first launch. This allows you to regenerate your wallet if you lose the password or the database gets corrupted.</p>
+					<p>
+					This option will not convert a v1 wallet if found on disk. This is intentional, as converting any wallet to an encrypted wallet means the original wallet still exists, and still insecure. Addresses and seeds can still be imported/exported.
+					</p>
+					</div>
+					<label for="password">Input the password that will be used to encrypt all private wallet data.</label>
+					<table style="width: 80%;">
+						<tr>
+							<td style="width: 25%"></td>
+							<td style="width: 45%">
+								<input id="secure-password-input" type="password" id="password" name="firstname" placeholder="">
+							</td>
+							<td style="width: 30%; text-align: left;">
+								<button onclick="sendChoiceToMain(true)"> Proceed to Encryped Wallet </button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</content>
+			<content class="main" id="normal-second" style="display: none;">
+				<div class="encased full">
+					<h2>Not Secure</h2>
+					<div class="description">
+						<p>You are choosing the unsecured version of EnterpriseWallet. This means all private keys will be kept in plaintext on your disk. Use at your own risk.
+						</p>
+					</div>
+					<button onclick="sendChoiceToMain(false)"> Proceed to Non-Encrypted Wallet </button>
+				</div>
+			</content>
+
+			<footer class="footer">Each option maintains a different wallet file. This means you can have both a non-secure, and secure wallet. To open either one, just reopen EnterpriseWallet and select the wallet you wish to open.</footer>
+		</div>
+	</div>
+</body>
+
+<script>
+const ipc = require('electron').ipcRenderer
+
+function reset() {
+	document.getElementById("secure-second").style.display = "none"
+	document.getElementById("normal-second").style.display = "none"
+	document.getElementById("level-one").style.opacity = 100
+	document.getElementById("level-one").style.display = "flex"
+}
+
+function select(option) {
+	var top = document.getElementById("level-one") //.style.display = "none"
+	if(option) {
+		// Secure
+		var bot = document.getElementById("secure-second") // .style.display = "flex"
+		fade(top, bot)
+	} else {
+		// Not secure
+		var bot = document.getElementById("normal-second") //.style.display = "flex"
+		fade(top, bot)
+	}
+}
+
+function fade(outelem, inelem) {
+	outelem.style.opacity = "0"
+    setTimeout(
+        function Remove() {
+        	outelem.style.display = "none"
+        	inelem.style.display = "flex"
+        },
+        500 );
+}
+
+
+function secureHover(select) {
+	if(select) {
+		document.getElementById("secure").style.transform = "scale(1.05)";
+		document.getElementById("normal").style.transform = "scale(.95)";
+	} else {
+		document.getElementById("secure").style.transform = "scale(1)";
+		document.getElementById("normal").style.transform = "scale(1)";
+	}
+}
+
+function normalHover(select) {
+	if(select) {
+		document.getElementById("normal").style.transform = "scale(1.05)";
+		document.getElementById("secure").style.transform = "scale(.95)";
+	} else {
+		document.getElementById("normal").style.transform = "scale(1)";
+		document.getElementById("secure").style.transform = "scale(1)";
+	}
+}
+
+function sendChoiceToMain(secure) {
+	if(secure) {
+		ipc.send('submitForm', document.getElementById("secure-password-input").value)
+	} else {
+		ipc.send('submitForm', "");
+	}
+}
+
+</script>
+
+</html>

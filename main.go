@@ -18,6 +18,7 @@ package main
 //		- Factomd Instance
 import (
 	"fmt"
+	"time"
 
 	"github.com/FactomProject/enterprise-wallet/wallet"
 	"github.com/FactomProject/factomd/util"
@@ -37,6 +38,15 @@ func close() {
 		fmt.Println(err)
 	}
 	fmt.Println("Complete shut down.")
+}
+
+// panicWallet gives the nodejs application time to read the error and handle it
+func panicWallet(msg string, err error) {
+	if err != nil {
+		fmt.Println("Error in starting wallet: " + err.Error())
+		time.Sleep(1 * time.Second)
+		panic(fmt.Sprintf("%s: %s", msg, err.Error()))
+	}
 }
 
 // InitiateWalletAndWeb initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
@@ -99,7 +109,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	// This will also start wallet wsapi
 	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import, password)
 	if err != nil {
-		panic("Error in starting wallet: " + err.Error())
+		panicWallet("Error in starting wallet", err)
 	}
 
 	MasterWallet = wal
@@ -117,7 +127,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings.Theme = "darkTheme"
 		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 		if err != nil {
-			panic("Error in loading settings: " + err.Error())
+			panicWallet("Error in loading settings", err)
 		}
 	} else {
 		MasterSettings = data.(*SettingsStruct)

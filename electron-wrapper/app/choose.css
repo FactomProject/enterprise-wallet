@@ -1,0 +1,162 @@
+body {
+  height: 100vh;
+  width: 100vw;
+}
+
+
+body {
+    width: 98%;
+}
+
+.flex-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.wrapper {
+    width: 100%;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    font-weight: bold;
+    text-align: center;
+}
+
+button {
+    width: 50%%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.home-reset {
+    cursor: pointer;
+}
+
+h1 {
+    font-size: 50px;
+    font-weight: normal;
+}
+
+h1{
+    color: #407ba4;
+}
+
+h2, p, label {
+    color: #417ba4;
+}
+
+label {
+    padding: 0px;
+    font-size: 13px;
+}
+
+.description {
+    width: 80%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#level-one {
+    -webkit-transition: opacity 500ms linear;
+}
+
+.hide {
+    opacity: 0;
+}
+
+.wrapper > * {
+    padding: 10px;
+    flex: 1 100%;
+}
+
+.full {
+    width: 100%;
+}
+
+.encased {
+    border-radius: 20px;
+    background: #f3f3f3;
+    padding: 5px;
+    margin: 5px;
+}
+
+.option {
+    cursor: pointer;
+    width: 50%;
+
+    transition: all .2s ease-in-out;
+}
+
+.option:hover {
+    background-color: #e2e2e2;
+/*    //transform: scale(1.05);*/
+}
+
+.secure:hover {
+    background-color: #e2e2e2;
+  /*  //transform: scale(1.05);*/
+}
+
+.grow { transition: all .2s ease-in-out; }
+.grow:hover { transform: scale(1.1); }
+
+.header {
+
+}
+
+.header img{
+    width: 80%;
+}
+
+.footer {
+     font-weight: bold;
+}
+
+.main {
+    text-align: left;
+    display: flex;
+    text-align: center;
+}
+
+input[type=password], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: block;
+}
+
+input[type=submit] {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+.inner-secure {
+    border-radius: 5px;
+/*    padding: 20px;*/
+}

@@ -1,4 +1,6 @@
 const electron = require('electron')
+const {ipcMain} = require('electron')
+const dialog = require('electron').dialog
 var ps = require('ps-node');
 var request=require('request');
 // Module to control application life.
@@ -41,6 +43,7 @@ if (isDev) {
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 let loadingWindow
+let choiceWindow
 let walletd
 
 // Start own enterprise-wallet daemon
@@ -49,7 +52,7 @@ const startOwn = true
 WALLETD_UP = false
 
 const PORT_TO_SERVE = "8091"
-function execWalletd() {
+function execWalletd(password) {
   if(!startOwn || WALLETD_UP){
     return
   }
@@ -63,7 +66,13 @@ function execWalletd() {
       }
     });*/
     console.log("Running as Windows")
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[])
+    if(password === "") {
+      console.log("Running without Encryption")
+      walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[])
+    } else {
+      console.log("Running with Encryption")
+      walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[])
+    }
   } else {
     /*walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
       console.log(stdout)
@@ -72,8 +81,42 @@ function execWalletd() {
       } 
     });*/
     console.log("Running as Mac/Linux")
-    walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),[])
+    if(password === "") {
+      console.log("Running without Encryption")
+      walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),[])
+    } else {
+      console.log("Running with Encryption")
+      walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet'),["-walDB=ENC"])
+    }
   }
+
+  walletd.stdout.on('data', function(data) {
+    var s = data.toString()
+    
+    console.log(s)
+    // Look for password prompt
+    if(s.includes("password")){
+      console.log("Found prompt, inputting password to wallet")
+      walletd.stdin.setEncoding('utf-8');
+      walletd.stdin.write(password + "\n");
+      //walletd.stdin.close()
+    } 
+
+    if(s.includes("Error in starting wallet")) {
+      var errormessage = ""
+      if(s.includes("message authentication failed")) {
+        errormessage = "The password given to unlock the encrypted database was incorrect. "+
+         "Please try launching the wallet again with the correct password. If you feel this is an" +
+         "error, please reach out on our slack."
+      } else {
+        var n = s.indexOf("Error in starting wallet");
+        errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
+        "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
+      }
+      dialog.showErrorBox('Error Launching EnterpriseWallet', errormessage)
+      app.quit()
+    }
+  });
 
   runWhenWalletUp(function(){
     loadMainWindow()
@@ -145,26 +188,43 @@ function cleanUp(functionAfterCleanup) {
   });
 }
 
+function ChooseWalletType() {
+  // Create the browser window.
+  choiceWindow = new BrowserWindow({
+    width: 1000, 
+    height: 500,
+    center: true,
+    autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    resizable: false,
+    title: 'EnterpriseWallet',
+    // transparent: true
+  })
+
+  // Load choice window
+  console.log("Showing a choice...")
+  choiceWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'choose.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+
+  // Open the DevTools.
+  //mainWindow.webContents.openDevTools()
+
+  // Emitted when the window is closed.
+  choiceWindow.on('closed', function () {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    choiceWindow = null
+  })
+}
+
 // Before we launch, we need to check if we already have the app running, then check if
 // enterprise-wallet has been left hanging around
 function startApp(){
-  // Look for hanging golang process and kill them
-  createLoadingWindow()
-  console.log("Checking for hanging enterprise-wallet process...")
-  // Cleanup takes incredibly long on windows, so on bootup it makes things hang and be slow.
-  // It is a safeguard to do at launch, and not required. We cleanup on close, so if a user closes
-  // incorrectly, we will get a hanging process. They will have to launch, then close properly to
-  // clean up the haning processes
-  if(isWin) {
-    execWalletd()
-    WALLETD_UP = true
-  } else {
-    cleanUp(function(){
-      // Now we can start our processes and app
-      execWalletd()
-      WALLETD_UP = true
-    })
-  }
+  ChooseWalletType()
 }
 
 function loadMainWindow() {
@@ -260,6 +320,11 @@ function createLoadingWindow() {
     // transparent: true
   })
 
+  if(choiceWindow !== null) {
+    choiceWindow.close()
+    choiceWindow === null
+  }
+
   // Load loading window
   console.log("Showing a loading...")
   loadingWindow.loadURL(url.format({
@@ -279,6 +344,30 @@ function createLoadingWindow() {
     loadingWindow = null
   })
 }
+
+// Recieve the start options and start the wallet
+ipcMain.on('submitForm', function(event, data) {
+  // Access form data here
+  console.log(data)
+
+  // Look for hanging golang process and kill them
+  createLoadingWindow()
+  console.log("Checking for hanging enterprise-wallet process...")
+  // Cleanup takes incredibly long on windows, so on bootup it makes things hang and be slow.
+  // It is a safeguard to do at launch, and not required. We cleanup on close, so if a user closes
+  // incorrectly, we will get a hanging process. They will have to launch, then close properly to
+  // clean up the haning processes
+  if(isWin) {
+    execWalletd(data)
+    WALLETD_UP = true
+  } else {
+    cleanUp(function(){
+      // Now we can start our processes and app
+      execWalletd(data)
+      WALLETD_UP = true
+    })
+  }
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
