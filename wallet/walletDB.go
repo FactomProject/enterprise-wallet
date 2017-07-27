@@ -78,6 +78,10 @@ func LoadWalletDB(v1Import bool, password string) (*WalletDB, error) {
 func NewWalletDB(v1Import bool, password string) (*WalletDB, error) {
 	w := new(WalletDB)
 
+	if WALLET_DB == ENCRYPTED {
+		GUI_DB = ENCRYPTED
+	}
+
 	var db interfaces.IDatabase
 	var err error
 	switch GUI_DB { // Decides type of wallet DB
@@ -87,6 +91,8 @@ func NewWalletDB(v1Import bool, password string) (*WalletDB, error) {
 		db, err = database.NewOrOpenLevelDBWallet(GetHomeDir() + guiLDBPath)
 	case BOLT:
 		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + guiBoltPath)
+	case ENCRYPTED:
+		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + guiEncryptedBoltPath)
 	}
 	if err != nil {
 		return nil, err
