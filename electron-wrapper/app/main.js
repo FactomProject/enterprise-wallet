@@ -71,7 +71,7 @@ function execWalletd(password) {
       walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[])
     } else {
       console.log("Running with Encryption")
-      walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),[])
+      walletd = spawn(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet.exe'),["-walDB=ENC"])
     }
   } else {
     /*walletd = exec(path.join(__dirname, PATH_TO_BIN + 'enterprise-wallet -port=' + PORT_TO_SERVE), function callback(error, stdout, stderr){
