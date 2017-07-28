@@ -69,6 +69,9 @@ type WalletDB struct {
 	transMap                 map[string]DisplayTransaction      // Prevent duplicate transactions
 	addrMap                  map[string]address.AddressNamePair // Find addresses quick, All addresses already searched for up to last FBlock
 
+	changeAddrMap     map[string]UpdateANP // Addresses that need to be moved to addrmap
+	changeAddrMapLock sync.Mutex
+
 	quit bool
 }
 
@@ -206,6 +209,7 @@ func NewWalletDB(v1Import bool, password string) (*WalletDB, error) {
 
 	w.transMap = make(map[string]DisplayTransaction)
 	w.addrMap = make(map[string]address.AddressNamePair)
+	w.changeAddrMap = make(map[string]UpdateANP)
 	w.cachedHeight = 0
 	w.ActiveCachedTransactions = w.cachedTransactions
 
@@ -1042,6 +1046,8 @@ func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, 
 // the current names of the addresses, as user can change the name of their addresses.
 func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
 	w.relatedTransactionLock.Lock()
+	w.getNameChanges()
+
 	for i := range list {
 		ins := list[i].Inputs
 		for ii := range ins {
@@ -1065,19 +1071,30 @@ func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransact
 	return list
 }
 
+type UpdateANP struct {
+	Address string
+	Name    string
+}
+
+func (w *WalletDB) getNameChanges() {
+	w.changeAddrMapLock.Lock()
+	for k, v := range w.changeAddrMap {
+		anp := w.addrMap[k]
+		anp.Name = v.Name
+		w.addrMap[k] = anp
+	}
+	w.changeAddrMapLock.Unlock()
+}
+
 func (w *WalletDB) ChangeAddressName(address string, toName string) error {
 	err := w.guiWallet.ChangeAddressName(address, toName)
 	if err != nil {
 		return err
 	}
 
-	w.relatedTransactionLock.Lock() // Related Transactions uses this
-	anp, ok := w.addrMap[address]
-	if ok {
-		anp.Name = toName
-		w.addrMap[address] = anp
-	}
-	w.relatedTransactionLock.Unlock()
+	w.changeAddrMapLock.Lock() // Related Transactions uses this
+	w.changeAddrMap[address] = UpdateANP{Address: address, Name: toName}
+	w.changeAddrMapLock.Unlock()
 	return w.Save()
 }
 
