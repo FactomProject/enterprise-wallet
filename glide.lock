@@ -32,7 +32,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: 04cc85d4c701bfa7c163c0ca97692201c29124b6
+  version: a76dcd6263b2b9870cfdb850ecb882d477f99bc3
   subpackages:
   - wallet
   - wallet/wsapi
