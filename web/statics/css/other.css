@@ -144,3 +144,8 @@ pre {
   top: 100%;
   background-color: inherit;
 }
+
+#qrcode canvas {
+  border-style: solid;
+  border-color: white;
+}
