@@ -24,7 +24,7 @@ func main() {
 	// configure the server
 	var (
 		guiDB           = flag.String("guiDB", "Bolt", "GUI Database: Bolt, LDB, or Map")
-		walDB           = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
+		walDB           = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, Map, or ENC")
 		txDB            = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
 		port            = flag.Int("port", 8091, "The port for the GUIWallet")
 		compiled        = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
