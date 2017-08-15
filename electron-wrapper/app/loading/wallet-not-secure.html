@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enterprise Wallet - UI</title>
+    <link rel="shortcut icon" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/app.js"></script>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header class="section">
+            <a href="index.html" class="back">
+                <img src="images/arrow-back.svg" alt="back to home">
+            </a>
+            <div class="wallet-type">
+                <div class="wallet-icon icon-not-secure"><img src="images/icon-not-secure.svg" alt=""></div>
+                <div>
+                    <h1>Not Secure</h1>
+                    <p>Unencrypted Wallet</p>
+                </div>
+            </div>
+            <a href="index.html" class="logo-header">
+                <div class="isologo">
+                    <img src="images/factom-isologo.svg" alt="">
+                </div>
+                <h1>EnterpriseWallet</h1>
+            </a>
+        </header>
+        <main>
+            <div class="content">
+                <div class="col-1">
+                    <div class="highlight">
+                        <p><strong>A non-secure wallet does not use encryption, and therefore it can be accessed by other users on your machine or malware.</strong></p>
+                        <p><strong class="red">This will leave your private keys exposed and unencrypted on your hard drive.</strong></p>
+                    </div>
+                    <p><strong>For directions on how to transfer your Factoids to a secure wallet, <a href="https://www.factom.com/blog/encrypted-enterprise-wallet" target="_blank" class="blog-link">read our blog <br> post here.</a></strong></p>
+                </div>
+                <div class="col-2">
+                    <div>
+                        <form action="wallet-not-secure-detail.html">
+                            <div class="text-input">
+                                <label for="">Last warning: You are choosing the unsecured version of EnterpriseWallet. Use at your own risk.</label>
+                            </div>
+                            <div class="checkbox">
+                                <input type="checkbox" id="checkbox" onclick="updateCheckbox()" />
+                                <label for="checkbox">
+                                    <span></span>
+                                    <div>
+                                        I acknowledge that my private keys will not be encrypted and are thus unprotected.
+                                    </div>
+                                </label>
+                            </div>
+                            <button id="proceed-button" onclick="sendChoiceToMain(false)" disabled="">Proceed to Unencrypted Wallet</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <span>ENTERPRISE WALLET BY</span>
+            <img src="images/factom-logo.svg" alt="Factom Inc." class="logo-footer">
+        </footer>
+    </div>
+
+</body>
+</html>

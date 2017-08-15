@@ -204,7 +204,7 @@ function ChooseWalletType() {
   // Load choice window
   console.log("Showing a choice...")
   choiceWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'choose.html'),
+    pathname: path.join(__dirname, 'loading/index.html'),
     protocol: 'file:',
     slashes: true
   }))

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enterprise Wallet - UI</title>
+    <link rel="shortcut icon" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/app.js"></script>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header class="section">
+            <a href="index.html" class="back">
+                <img src="images/arrow-back.svg" alt="back to home">
+            </a>
+            <div class="wallet-type">
+                <div class="wallet-icon"><img src="images/icon-secure.svg" alt=""></div>
+                <div>
+                    <h1>Secure</h1>
+                    <p>Encrypted Wallet</p>
+                </div>
+            </div>
+            <a href="index.html" class="logo-header">
+                <div class="isologo">
+                    <img src="images/factom-isologo.svg" alt="">
+                </div>
+                <h1>EnterpriseWallet</h1>
+            </a>
+        </header>
+        <main>
+            <div class="content">
+                <div class="col-1">
+                    <div class="highlight">
+                        <p><strong>Opening a secure wallet will encrypt all private keys and the seed.</strong></p>
+                        <p>Keep in mind this means that <strong class="red">if you forget your password and seed, there is no recovery option.</strong></p>
+                        <p>Be careful selecting this option</p>
+                    </div>
+                    <p>When using an encrypted wallet, be sure to immediately back up your seed. This allows you to regenerate your wallet if you lose the password of the database gets corrupted.</p>
+                    <p>This option will not convert a v1 wallet if found on disk. This is intentional, as converting any wallet to an encrypted wallet means the original wallet still exists, and still insecure. Addresses and seeds can still be imported/exported.</p>
+                    <p><strong>For directions on how to transfer your Factoids to a secure wallet, <a href="https://www.factom.com/blog/encrypted-enterprise-wallet" target="_blank" class="blog-link">read our blog <br> post here.</a></strong></p>
+                </div>
+                <div class="col-2">
+                    <div>
+                        <div>
+                            <div class="text-input">
+                                <label for="">Input the password used to encrypt your wallet.</label>
+                                <input id="secure-password-input" type="password" class="">
+                                <p class="error-text" id="error-text"></p>
+                            </div>
+                            <div class="checkbox">
+                                <input type="checkbox" id="checkbox" onclick="updateCheckbox()"/>
+                                <label for="checkbox">
+                                    <span></span>
+                                    <div>
+                                        I acknowledge that if I lose this password and my seed I will lose access to the wallet and its funds
+                                    </div>
+                                </label>
+                            </div>
+                            <button id="proceed-button" disabled onclick="sendChoiceToMain(true)">Proceed to Encryped Wallet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <span>ENTERPRISE WALLET BY</span>
+            <img src="images/factom-logo.svg" alt="Factom Inc." class="logo-footer">
+        </footer>
+    </div>
+
+</body>
+</html>
