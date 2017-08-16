@@ -798,3 +798,7 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     -webkit-transform: scaleY(1.0);
   }
 }
+
+.pointer {
+    cursor: pointer;
+}

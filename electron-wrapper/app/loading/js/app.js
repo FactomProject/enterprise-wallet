@@ -1,5 +1,10 @@
 const ipc = require('electron').ipcRenderer
 
+const {shell} = require('electron')
+function openBlog(link) {
+	shell.openExternal(link)
+}
+
 function sendChoiceToMain(secure) {
 	if(secure) {
 		var dom = document.getElementById("secure-password-input")
