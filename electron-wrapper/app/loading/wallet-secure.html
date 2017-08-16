@@ -49,7 +49,7 @@
                         <div>
                             <div class="text-input">
                                 <label for="">Input the password used to encrypt your wallet.</label>
-                                <input id="secure-password-input" type="password" class="">
+                                <input id="secure-password-input" type="password" class="" oninput="clearError()">
                                 <p class="error-text" id="error-text"></p>
                             </div>
                             <div class="checkbox">
@@ -72,6 +72,17 @@
             <img src="images/factom-logo.svg" alt="Factom Inc." class="logo-footer">
         </footer>
     </div>
+
+    <script type="text/javascript">
+    var urlParams = new URLSearchParams(window.location.search);
+    var errmsg = urlParams.get('error')
+    if(errmsg.length > 0) {
+        // alert(errmsg)
+        document.getElementById("error-text").innerHTML = errmsg
+        document.getElementById("secure-password-input").classList.add("has-error")
+
+    }
+    </script>
 
 </body>
 </html>

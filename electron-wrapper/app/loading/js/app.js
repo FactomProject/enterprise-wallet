@@ -1,12 +1,11 @@
-//const ipc = require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 
 function sendChoiceToMain(secure) {
 	if(secure) {
 		var dom = document.getElementById("secure-password-input")
 		if(checkValidPassword(dom.value)) {
 			ipc.send('submitForm', dom.value)
-			dom.classList.remove("has-error")
-			document.getElementById("error-text").innerHTML = ""
+			clearError()
 		} else {
 			dom.classList.add("has-error")
 		}
@@ -14,6 +13,11 @@ function sendChoiceToMain(secure) {
 		ipc.send('submitForm', "");
 	}
 	return false
+}
+
+function clearError() {
+	document.getElementById("secure-password-input").classList.remove("has-error")
+	document.getElementById("error-text").innerHTML = ""
 }
 
 function updateCheckbox() {

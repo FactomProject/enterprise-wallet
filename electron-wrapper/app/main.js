@@ -113,16 +113,35 @@ function execWalletd(password) {
         errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
         "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
       }
-      dialog.showErrorBox('Error Launching EnterpriseWallet', errormessage)
-      app.quit()
+      sendMsgToLoading(errormessage, function() {
+        ChooseWalletType(true)
+        loadingWindow.close()
+        loadingWindow = null
+      }, 2000)
+      //dialog.showErrorBox('Error Launching EnterpriseWallet', errormessage)
+      return
+      //app.quit()
+    }
+    if(s.includes("Starting GUI")){
+      sendMsgToLoading("success", function(){
+        runWhenWalletUp(function(){
+        loadMainWindow()
+          // Clear cache always, makes updates easier
+           deleteChromeCache()
+        })  
+      }, 2000)
     }
   });
+}
 
-  runWhenWalletUp(function(){
-    loadMainWindow()
-    // Clear cache always, makes updates easier
-    deleteChromeCache()
-  })
+function sendMsgToLoading(mesg, f, wait) {
+  console.log(mesg)
+  loadingWindow.webContents.send('info' , {msg:mesg})
+  if(f !== undefined) {
+    setTimeout(function(){
+      f()
+    }, wait)
+  }
 }
 
 // Runs when the wallet is able to start serving web pages
@@ -188,7 +207,7 @@ function cleanUp(functionAfterCleanup) {
   });
 }
 
-function ChooseWalletType() {
+function ChooseWalletType(witherror) {
   // Create the browser window.
   choiceWindow = new BrowserWindow({
     width: 1000, 
@@ -201,13 +220,20 @@ function ChooseWalletType() {
     // transparent: true
   })
 
+  var pathurl = 'loading/index.html'
+  var ext = ''
+  if(witherror) {
+    ext = `?error=Wrong Password`
+    pathurl = 'loading/wallet-secure.html'
+  }
+
   // Load choice window
   console.log("Showing a choice...")
   choiceWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'loading/index.html'),
+    pathname: path.join(__dirname, pathurl),
     protocol: 'file:',
     slashes: true
-  }))
+  }) + ext)
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
@@ -224,7 +250,7 @@ function ChooseWalletType() {
 // Before we launch, we need to check if we already have the app running, then check if
 // enterprise-wallet has been left hanging around
 function startApp(){
-  ChooseWalletType()
+  ChooseWalletType(false)
 }
 
 function loadMainWindow() {
@@ -310,8 +336,8 @@ function loadMainWindow() {
 function createLoadingWindow() {
   // Create the browser window.
   loadingWindow = new BrowserWindow({
-    width: 700, 
-    height: 200,
+    width: 1000, 
+    height: 500,
     center: true,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
@@ -323,7 +349,7 @@ function createLoadingWindow() {
   // Load loading window
   console.log("Showing a loading...")
   loadingWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'loading.html'),
+    pathname: path.join(__dirname, 'loading/loading.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -343,6 +369,7 @@ function createLoadingWindow() {
     // when you should delete the corresponding element.
     loadingWindow = null
   })
+
 }
 
 // Recieve the start options and start the wallet
@@ -355,13 +382,15 @@ ipcMain.on('submitForm', function(event, data) {
   // incorrectly, we will get a hanging process. They will have to launch, then close properly to
   // clean up the haning processes
   if(isWin) {
-    execWalletd(data)
+    setTimeout(function(){execWalletd(data)}, 300)
     WALLETD_UP = true
   } else {
     cleanUp(function(){
       // Now we can start our processes and app
-      execWalletd(data)
-      WALLETD_UP = true
+      setTimeout(function(){
+        execWalletd(data)
+        WALLETD_UP = true
+      }, 300)
     })
   }
 });

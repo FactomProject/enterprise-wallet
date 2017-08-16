@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
+    <script src="js/app.js"></script>
 </head>
 <body>
 
@@ -18,7 +19,7 @@
                 <img src="images/factom-isologo.svg" alt="Enterprise Wallet by Factom">
                 <h1>EnterpriseWallet</h1>
             </div>
-            <div class="load-state">
+            <div id="loading-state" class="load-state">
             <div class="load-result-success"><img src="images/icon-check.svg" alt="loading success"></div>
             <div class="load-result-error"><img src="images/icon-times.svg" alt="loading error"></div>
               <div class="spinner">
@@ -35,6 +36,16 @@
             <img src="images/factom-logo.svg" alt="Factom Inc." class="logo-footer">
         </footer>
     </div>
+
+<script type="text/javascript">
+    ipc.on('info' , function(event , data){ 
+        if(data.msg === "success") {
+            document.getElementById("loading-state").classList.add("load-success")
+        } else {
+            document.getElementById("loading-state").classList.add("load-error")
+        }
+    });
+</script>
 
 </body>
 </html>
