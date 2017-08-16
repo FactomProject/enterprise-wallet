@@ -1055,6 +1055,7 @@ func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransact
 			anp, ok := w.addrMap[add]
 			if ok {
 				list[i].Inputs[ii].Name = anp.Name
+				list[i].Action[0] = true
 			}
 		}
 		outs := list[i].Outputs
@@ -1063,6 +1064,11 @@ func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransact
 			anp, ok := w.addrMap[add]
 			if ok {
 				list[i].Outputs[ii].Name = anp.Name
+				if add[:2] == "FA" {
+					list[i].Action[1] = true
+				} else {
+					list[i].Action[2] = true
+				}
 			}
 		}
 	}
