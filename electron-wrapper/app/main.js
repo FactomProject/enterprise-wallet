@@ -103,6 +103,7 @@ function execWalletd(password) {
     } 
 
     if(s.includes("Error in starting wallet")) {
+      WALLETD_UP = false
       var errormessage = ""
       if(s.includes("message authentication failed")) {
         errormessage = "The password given to unlock the encrypted database was incorrect. "+
@@ -135,7 +136,6 @@ function execWalletd(password) {
 }
 
 function sendMsgToLoading(mesg, f, wait) {
-  console.log(mesg)
   loadingWindow.webContents.send('info' , {msg:mesg})
   if(f !== undefined) {
     setTimeout(function(){
