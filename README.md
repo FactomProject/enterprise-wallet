@@ -48,3 +48,4 @@ When backing up, backing up #1 is most important. #2 is good to have if you plan
   - Default: true
 - ```-min=BOOLEAN``` - If not using compiled in statics, min will decide to use minified versions of the JS and CSS. Reccomend not touching this
   - Default: false
+
