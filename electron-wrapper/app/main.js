@@ -56,6 +56,7 @@ function execWalletd(password) {
   if(!startOwn || WALLETD_UP){
     return
   }
+  WALLETD_UP = true
   console.log("Executing enterprise-wallet...")
 
   if(isWin){
@@ -90,6 +91,12 @@ function execWalletd(password) {
     }
   }
 
+  runWhenWalletUp(function(){
+    loadMainWindow()
+    // Clear cache always, makes updates easier
+    deleteChromeCache()
+  })
+
   walletd.stdout.on('data', function(data) {
     var s = data.toString()
     
@@ -123,19 +130,13 @@ function execWalletd(password) {
       return
       //app.quit()
     }
-    if(s.includes("Starting GUI")){
-      sendMsgToLoading("success", function(){
-        runWhenWalletUp(function(){
-        loadMainWindow()
-          // Clear cache always, makes updates easier
-           deleteChromeCache()
-        })  
-      }, 2000)
-    }
   });
 }
 
 function sendMsgToLoading(mesg, f, wait) {
+  if(loadingWindow === null) {
+    return
+  }
   loadingWindow.webContents.send('info' , {msg:mesg})
   if(f !== undefined) {
     setTimeout(function(){
@@ -146,6 +147,9 @@ function sendMsgToLoading(mesg, f, wait) {
 
 // Runs when the wallet is able to start serving web pages
 function runWhenWalletUp(callback){
+  if(!WALLETD_UP) {
+    return
+  }
   request.get('http://localhost:' + PORT_TO_SERVE + "/GET?request=on" ,function(err,res,body){
     if (!err && res.statusCode == 200) {
       callback()
@@ -383,13 +387,11 @@ ipcMain.on('submitForm', function(event, data) {
   // clean up the haning processes
   if(isWin) {
     setTimeout(function(){execWalletd(data)}, 300)
-    WALLETD_UP = true
   } else {
     cleanUp(function(){
       // Now we can start our processes and app
       setTimeout(function(){
         execWalletd(data)
-        WALLETD_UP = true
       }, 300)
     })
   }
