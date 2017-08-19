@@ -92,9 +92,13 @@ function execWalletd(password) {
   }
 
   runWhenWalletUp(function(){
-    loadMainWindow()
-    // Clear cache always, makes updates easier
-    deleteChromeCache()
+    sendMsgToLoading("success", function(){
+        runWhenWalletUp(function(){
+        loadMainWindow()
+          // Clear cache always, makes updates easier
+           deleteChromeCache()
+        })  
+      }, 2000)
   })
 
   walletd.stdout.on('data', function(data) {
