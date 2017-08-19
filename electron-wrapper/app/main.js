@@ -102,37 +102,42 @@ function execWalletd(password) {
   })
 
   walletd.stdout.on('data', function(data) {
+    if(walletd == undefined) {
+      // stdout happens when the wallet closes.
+      return
+    }
     var s = data.toString()
     
     console.log(s)
-    // Look for password prompt
-    if(s.includes("password")){
-      console.log("Found prompt, inputting password to wallet")
-      walletd.stdin.setEncoding('utf-8');
-      walletd.stdin.write(password + "\n");
-      //walletd.stdin.close()
-    } 
+    // Initialization stuff
+    if(loadingWindow != null) {
+      // Look for password prompt
+      if(s.includes("password")){
+        console.log("Found prompt, inputting password to wallet")
+        walletd.stdin.setEncoding('utf-8');
+        walletd.stdin.write(password + "\n");
+        //walletd.stdin.close()
+      } 
 
-    if(s.includes("Error in starting wallet")) {
-      WALLETD_UP = false
-      var errormessage = ""
-      if(s.includes("message authentication failed")) {
-        errormessage = "The password given to unlock the encrypted database was incorrect. "+
-         "Please try launching the wallet again with the correct password. If you feel this is an " +
-         "error, please reach out on our Factom Community slack."
-      } else {
-        var n = s.indexOf("Error in starting wallet");
-        errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
-        "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
+      if(s.includes("Error in starting wallet")) {
+        WALLETD_UP = false
+        var errormessage = ""
+        if(s.includes("message authentication failed")) {
+          errormessage = "The password given to unlock the encrypted database was incorrect. "+
+          "Please try launching the wallet again with the correct password. If you feel this is an " +
+          "error, please reach out on our Factom Community slack."
+        } else {
+          var n = s.indexOf("Error in starting wallet");
+          errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
+          "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
+        }
+        sendMsgToLoading(errormessage, function() {
+          ChooseWalletType(true)
+          loadingWindow.close()
+          loadingWindow = null
+        }, 2000)
+        return
       }
-      sendMsgToLoading(errormessage, function() {
-        ChooseWalletType(true)
-        loadingWindow.close()
-        loadingWindow = null
-      }, 2000)
-      //dialog.showErrorBox('Error Launching EnterpriseWallet', errormessage)
-      return
-      //app.quit()
     }
   });
 }
