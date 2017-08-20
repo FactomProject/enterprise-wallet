@@ -203,6 +203,7 @@ header {
     &.row { max-width: 100%; }
     > section { padding: 0; }
     section.leftCol {
+        position: relative;
         max-width: 314px;
 		background: $light-gray;
         @include breakpoint(small only) {

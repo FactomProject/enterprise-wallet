@@ -48,16 +48,24 @@
                     </ul>
                 </nav>
             <div id="sync-status" class="hide-for-small-only">
-            <div id="encrypted-indicator" style="width: 100%;" {{ if $settings.Encrypted }}{{else}} class="hide" {{end}}>
-                <div style="padding-left: 40%;">
-                      <div class="icon-lock" >
-                        <div class="lock-top-1" style="background-color: #C5BFB6"></div>
-                        <div class="lock-top-2"></div>
-                        <div class="lock-body" style="background-color: #C5BFB6"></div>
-                        <div class="lock-hole"></div>
-                    </div>
+
+            {{ if $settings.Encrypted }}
+            <div class="wallet-type">
+                <div class="wallet-icon"><img src="images/icon-secure.svg" alt=""></div>
+                <div>
+                    <h1>Secure</h1>
+                    <p>Encrypted Wallet</p>
                 </div>
             </div>
+            {{else}}
+            <div class="wallet-type">
+                <div class="wallet-icon icon-not-secure"><img src="images/icon-not-secure.svg" alt=""></div>
+                <div>
+                    <h1>Not Secure</h1>
+                    <p>Unencrypted Wallet</p>
+                </div>
+            </div>
+            {{end}}
 			 <small>Enterprise: Version v0.1.4.0</small><br>
 			 <span id="sync-bar" class="label alert">Wallet Sync: <span id="load-percent">0</span></span>
             </div>

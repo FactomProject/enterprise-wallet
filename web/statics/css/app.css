@@ -3585,6 +3585,7 @@ header {
   #frame > section {
     padding: 0; }
   #frame section.leftCol {
+    position: relative;
     max-width: 314px;
     background: #f3f3f3; }
     @media screen and (min-width: 0em) and (max-width: 39.9375em) {
