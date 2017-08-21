@@ -21,6 +21,7 @@ html, body {
     height: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-y: hidden;
 }
 body {
     font-family: 'Open Sans', sans-serif;
