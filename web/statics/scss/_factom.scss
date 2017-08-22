@@ -8,8 +8,12 @@ $font-weight-bold: 700;
 $text-color: #656666;
 
 $white: #FFF;
+$purple: #302c42;
 
 $border-purple-light: 1px solid #4A4857;
+$border-gray-light: 1px solid #e8e8e8;
+
+$bg-dark: #13101d;
 
 $sidebar-bg-dark: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
 $sidebar-bg-light: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
@@ -178,6 +182,8 @@ header {
     min-height: 150px;
     padding: 32px 0 22px;
     text-align: center;
+    border-bottom: $border-gray-light;
+
     @include breakpoint(small only) {
         min-height: 0;
         padding: 24px 0 16px;
@@ -189,10 +195,11 @@ header {
     }
     h1 {
 		margin-bottom: 1rem;
-        color: $tertiary-color;
-        font-size: 26px;
-		letter-spacing: 3px;
-		text-transform: uppercase;
+        font-size: 2rem;
+        color: $purple;
+        letter-spacing: 0;
+        text-transform: none;
+
         @include breakpoint(medium down) { font-size: 20px; }
     }
 	@include breakpoint(small only) { background: $white; }
@@ -205,7 +212,9 @@ header {
     section.leftCol {
         position: relative;
         max-width: 314px;
-		background: $light-gray;
+        background: $sidebar-bg-light;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
         @include breakpoint(small only) {
             flex: none;
             width: 100%;
@@ -307,6 +316,57 @@ header {
                 }
             }
         }
+
+        .wallet-type {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-top: $border-gray-light;
+            border-bottom: $border-gray-light;
+
+            .wallet-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                border: 1px solid #656666;
+                margin-right: 12px;
+
+                img {
+                    filter: brightness(-1);
+                    opacity: 0.6;
+                    width: 26px;
+                    height: auto;
+                }
+
+                &.icon-not-secure {
+                    img {
+                        margin-left: -2px;
+                    }
+                }
+            }
+
+            h1,
+            p {
+                text-align: left;
+                margin: 0;
+            }
+
+            h1 {
+                font-weight: 400;
+                font-size: 28px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+        }
+
 	#sync-status {
 		position: absolute;
 		bottom: 0;
@@ -315,6 +375,7 @@ header {
 		padding: 2em 1em;
 		text-align: center;
 		.label {
+            margin: 12px 0 0;
 			padding-left: 1em;
 			padding-right: 1em;
 			border-radius: 16px;
@@ -858,7 +919,7 @@ header {
 }
 
 body.darkTheme {
-	background: #000;
+	background: $bg-dark;
 	color: #939598;
 	a:not(.button) {
 		color: $primary-color;
@@ -874,16 +935,17 @@ body.darkTheme {
 	hr { border-bottom-color: $dark-gray; }
 	header {
 		h1 { color: $tertiary-color; }
-		@include breakpoint(small only) { background: #000; }
+		@include breakpoint(small only) { background: darken($bg-dark, 1%); }
 	}
 	#frame {
 		section.leftCol {
 			background: $sidebar-bg-dark;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+
             header {
                 border-bottom: $border-purple-light;
                 h1 {
                     font-size: 2rem;
-                    font-weight: 100;
                     color: $white;
                     letter-spacing: 0;
                     text-transform: none;
@@ -912,10 +974,28 @@ body.darkTheme {
                 opacity: 1;
 				background: none;
 			}
+
+            .wallet-type {
+                border-top: $border-purple-light;
+                border-bottom: $border-purple-light;
+
+                .wallet-icon {
+                    border: 1px solid #FFF;
+                }
+
+                h1 {
+                    color: #FFF;
+                }
+
+                img {
+                    filter: none;
+                    opacity: 1;
+                }
+            }
 		}
 		section.rightCol {
-			background: #000;
-			section.balances { background: #151515; }
+			background: $bg-dark;
+			section.balances { background: lighten($bg-dark, 3%); }
 			main table thead {
 				background: darken($primary-color, 35%);
 			}

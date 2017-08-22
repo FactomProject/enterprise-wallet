@@ -3555,7 +3555,8 @@ body {
 header {
   min-height: 150px;
   padding: 32px 0 22px;
-  text-align: center; }
+  text-align: center;
+  border-bottom: 1px solid #e8e8e8; }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
     header {
       min-height: 0;
@@ -3567,10 +3568,10 @@ header {
     margin-bottom: 8px; }
   header h1 {
     margin-bottom: 1rem;
-    color: #e8b521;
-    font-size: 26px;
-    letter-spacing: 3px;
-    text-transform: uppercase; }
+    font-size: 2rem;
+    color: #302c42;
+    letter-spacing: 0;
+    text-transform: none; }
     @media screen and (max-width: 74.9375em) {
       header h1 {
         font-size: 20px; } }
@@ -3587,7 +3588,8 @@ header {
   #frame section.leftCol {
     position: relative;
     max-width: 314px;
-    background: #f3f3f3; }
+    background: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); }
     @media screen and (min-width: 0em) and (max-width: 39.9375em) {
       #frame section.leftCol {
         flex: none;
@@ -3695,6 +3697,40 @@ header {
                 width: 40px; }
             #frame section.leftCol nav ul li.active a {
               background-color: none; } }
+    #frame section.leftCol .wallet-type {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 90%;
+      padding: 20px 0;
+      margin-bottom: 20px;
+      border-top: 1px solid #e8e8e8;
+      border-bottom: 1px solid #e8e8e8; }
+      #frame section.leftCol .wallet-type .wallet-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 1px solid #656666;
+        margin-right: 12px; }
+        #frame section.leftCol .wallet-type .wallet-icon img {
+          filter: brightness(-1);
+          opacity: 0.6;
+          width: 26px;
+          height: auto; }
+        #frame section.leftCol .wallet-type .wallet-icon.icon-not-secure img {
+          margin-left: -2px; }
+      #frame section.leftCol .wallet-type h1,
+      #frame section.leftCol .wallet-type p {
+        text-align: left;
+        margin: 0; }
+      #frame section.leftCol .wallet-type h1 {
+        font-weight: 400;
+        font-size: 28px; }
+      #frame section.leftCol .wallet-type p {
+        font-size: 12px; }
     #frame section.leftCol #sync-status {
       position: absolute;
       bottom: 0;
@@ -3703,6 +3739,7 @@ header {
       padding: 2em 1em;
       text-align: center; }
       #frame section.leftCol #sync-status .label {
+        margin: 12px 0 0;
         padding-left: 1em;
         padding-right: 1em;
         border-radius: 16px; }
@@ -4164,7 +4201,7 @@ header {
     display: block; }
 
 body.darkTheme {
-  background: #000;
+  background: #13101d;
   color: #939598; }
   body.darkTheme a:not(.button) {
     color: #417ba4; }
@@ -4181,14 +4218,14 @@ body.darkTheme {
     color: #e8b521; }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
     body.darkTheme header {
-      background: #000; } }
+      background: #110e1a; } }
   body.darkTheme #frame section.leftCol {
-    background: linear-gradient(0deg, #1F1B2F 0%, #434058 100%); }
+    background: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); }
     body.darkTheme #frame section.leftCol header {
       border-bottom: 1px solid #4A4857; }
       body.darkTheme #frame section.leftCol header h1 {
         font-size: 2rem;
-        font-weight: 100;
         color: #FFF;
         letter-spacing: 0;
         text-transform: none; }
@@ -4208,10 +4245,20 @@ body.darkTheme {
     body.darkTheme #frame section.leftCol nav ul li a:hover {
       opacity: 1;
       background: none; }
+    body.darkTheme #frame section.leftCol .wallet-type {
+      border-top: 1px solid #4A4857;
+      border-bottom: 1px solid #4A4857; }
+      body.darkTheme #frame section.leftCol .wallet-type .wallet-icon {
+        border: 1px solid #FFF; }
+      body.darkTheme #frame section.leftCol .wallet-type h1 {
+        color: #FFF; }
+      body.darkTheme #frame section.leftCol .wallet-type img {
+        filter: none;
+        opacity: 1; }
   body.darkTheme #frame section.rightCol {
-    background: #000; }
+    background: #13101d; }
     body.darkTheme #frame section.rightCol section.balances {
-      background: #151515; }
+      background: #191527; }
     body.darkTheme #frame section.rightCol main table thead {
       background: #0e1b24; }
     body.darkTheme #frame section.rightCol main table tbody tr td svg path, body.darkTheme #frame section.rightCol main table tbody tr td svg rect, body.darkTheme #frame section.rightCol main table tbody tr td svg poly, body.darkTheme #frame section.rightCol main table tbody tr td .svg path, body.darkTheme #frame section.rightCol main table tbody tr td .svg rect, body.darkTheme #frame section.rightCol main table tbody tr td .svg poly {
