@@ -1,0 +1,113 @@
+{{define "backup2"}}
+
+{{$pageTitle := "Backup Step 2"}}
+{{$mainClass := "address-book"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 2}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+<div id="guts">
+    <div class="app">
+        <main class="backup-main">
+            <div class="backup-pager">
+                <ul>
+                    <li>1</li>
+                    <li class="active">2</li>
+                    <li>3</li>
+                </ul>
+            </div>
+            {{if .Error}}
+            There had been an error exporting the seed
+            {{else}}
+            <!-- Array is 1 indexed to match the number given to the user-->
+            <div class="backup-content backup-step-two">
+                <h1 class="backup-title">Your wallet generation seed is</h1>
+                <div class="backup-box-content">
+                    <div class="backup-seed-table">
+                        <div>
+                            <ul>
+                                <li>
+                                    <div class="backup-seed-order">1</div>
+                                    <div class="backup-seed-word">{{index .Seed 1}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">5</div>
+                                    <div class="backup-seed-word">{{index .Seed 5}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">9</div>
+                                    <div class="backup-seed-word">{{index .Seed 9}}</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul>
+                                <li>
+                                    <div class="backup-seed-order">2</div>
+                                    <div class="backup-seed-word">{{index .Seed 2}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">6</div>
+                                    <div class="backup-seed-word">{{index .Seed 6}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">10</div>
+                                    <div class="backup-seed-word">{{index .Seed 10}}</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul>
+                                <li>
+                                    <div class="backup-seed-order">3</div>
+                                    <div class="backup-seed-word">{{index .Seed 3}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">7</div>
+                                    <div class="backup-seed-word">{{index .Seed 7}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">11</div>
+                                    <div class="backup-seed-word">{{index .Seed 11}}</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul>
+                                <li>
+                                    <div class="backup-seed-order">4</div>
+                                    <div class="backup-seed-word">{{index .Seed 4}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">8</div>
+                                    <div class="backup-seed-word">{{index .Seed 8}}</div>
+                                </li>
+                                <li>
+                                    <div class="backup-seed-order">12</div>
+                                    <div class="backup-seed-word">{{index .Seed 12}}</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="backup-checkbox">
+                    <input type="checkbox" id="checbox" />
+                    <label for="checbox">
+                        <span></span>
+                        <div>
+                            I copied my seed on paper
+                        </div>
+                    </label>
+                </div>
+            </div>
+            {{end}}
+            <div class="backup-footer">
+                <a href="backup1" nav-click="true" class="backup-btn backup-btn-gray"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a href="backup3" nav-click="true" class="backup-btn backup-btn-green">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i> </a>
+            </div>
+        </main>
+    </div>
+</div>
+{{template "templateBottom" ""}}
+{{end}}

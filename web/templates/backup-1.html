@@ -1,0 +1,47 @@
+{{define "backup1"}}
+
+{{$pageTitle := "Backup Step 1"}}
+{{$mainClass := "backup-main"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 2}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+<div id="guts">
+    <div class="app">
+        <main class="backup-main">
+            <div class="backup-pager">
+                <ul>
+                    <li class="active">1</li>
+                    <li>2</li>
+                    <li>3</li>
+                </ul>
+            </div>
+            <div class="backup-content backup-step-one">
+                <div class="backup-illustration"></div>
+                <h1 class="backup-title">Make sure no one is looking over your shoulder and click bellow to display the 12 words.</h1>
+                <div class="backup-box-content">
+                    <div>
+                        <p><strong>This set of 12 words allows you to recover your wallet in case of loss or damage.</strong></p>
+                        <p>Without it you will not be able to recover your Factoids if something goes wrong.</p>
+                    </div>
+                    <div>
+                        <p><strong>Save these 12 words on paper</strong></p>
+                        <ul>
+                            <li>Never disclose your seed</li>
+                            <li>Never type it on a website</li>
+                            <li>Do not store it electronically</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="backup-footer">
+            <a href="Backup" nav-click="true" class="backup-btn backup-btn-gray"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a href="backup2" nav-click="true" class="backup-btn backup-btn-green">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+        </main>
+    </div>
+</div>
+
+{{template "templateBottom" ""}}
+{{end}}

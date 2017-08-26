@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/FactomProject/factom"
 )
@@ -263,6 +264,88 @@ func HandleSettings(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	templates.ExecuteTemplate(w, "settings", st)
+	return nil
+}
+
+type BackupFlow struct {
+	Settings *SettingsStruct
+
+	SingleSeed string
+	Seed       []string
+
+	AddressesNotBackedUp []string
+
+	Error string
+}
+
+// Show addresses that will not be backed up
+func HandleBackup0(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	st := new(BackupFlow)
+	st.Settings = MasterSettings
+
+	adds := MasterWallet.GetAllMyGUIAddresses()
+	notBacked := []string{}
+	for _, a := range adds {
+		if !a.Seeded {
+			notBacked = append(notBacked, a.Address)
+		}
+	}
+	st.AddressesNotBackedUp = notBacked
+
+	templates.ExecuteTemplate(w, "backup0", st)
+	return nil
+}
+
+// Show warning to stop shoulder surfing
+func HandleBackup1(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	st := new(BackupFlow)
+	st.Settings = MasterSettings
+
+	templates.ExecuteTemplate(w, "backup1", st)
+	return nil
+}
+
+// Show 12 words
+func HandleBackup2(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	st := new(BackupFlow)
+	st.Settings = MasterSettings
+	seed, err := MasterWallet.ExportSeed()
+	if err != nil {
+		st.Error = err.Error()
+	} else {
+		st.Seed = strings.Split(seed, " ")
+		// Make the array 1 indexed to match what the user sees
+		st.Seed = append([]string{""}, st.Seed...)
+	}
+
+	templates.ExecuteTemplate(w, "backup2", st)
+	return nil
+}
+
+func HandleBackup3(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	st := new(BackupFlow)
+	st.Settings = MasterSettings
+
+	seed, err := MasterWallet.ExportSeed()
+	if err != nil {
+		st.Error = err.Error()
+	} else {
+		st.SingleSeed = seed
+	}
+
+	templates.ExecuteTemplate(w, "backup3", st)
 	return nil
 }
 

@@ -89,6 +89,19 @@ $(function() {
                                 case "Settings":
                                     ChangeNav("settings", 3)
                                     break;
+                                case "Backup":
+                                    ChangeNav("backup-main", 3, "address-book")
+                                    LoadBackup0()
+                                    break;
+                                case "backup1":
+                                    ChangeNav("backup-main", 3)
+                                    break;
+                                case "backup2":
+                                    ChangeNav("backup-main", 3)
+                                    break;
+                                case "backup3":
+                                    ChangeNav("backup-main", 3)
+                                    break;
                                 case "send-factoids":
                                     ChangeNav("send-factoids", 1)
                                     LoadAddressesSendConvert()
@@ -135,10 +148,13 @@ $(function() {
     } // otherwise, history is not supported, so nothing fancy here.    
 });
 
-function ChangeNav(mainClass, activeWindow) {
+function ChangeNav(mainClass, activeWindow, extraClass) {
     $("main").removeClass()
 
     $("main").addClass(mainClass)
+    if(extraClass !== undefined) {
+       $("main").addClass(extraClass) 
+    }
     if(activeWindow == 1) {
         $("#transactions-nav").addClass("active")
     } else if(activeWindow == 2) {

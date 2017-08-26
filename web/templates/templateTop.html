@@ -45,6 +45,12 @@
                                 Settings
                             </a>
                         </li>
+                        <li id="settings-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}>
+                            <a href="Backup" class="settings nav-element" nav-click="true">
+                                <i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>
+                                Backup
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             <div id="sync-status" class="hide-for-small-only">

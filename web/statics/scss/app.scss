@@ -45,3 +45,16 @@
 @include motion-ui-animations;
 
 @import 'factom';
+
+@charset 'utf-8';
+
+@import './backup-flow-scss/_resets';
+@import './backup-flow-scss/_variables';
+@import './backup-flow-scss/_backup-addresses-alert';
+@import './backup-flow-scss/_step-one';
+@import './backup-flow-scss/_step-two';
+@import './backup-flow-scss/_step-three';
+@import './backup-flow-scss/_general';
+@import './backup-flow-scss/_forms';
+@import './backup-flow-scss/_dark-theme';
+@import './backup-flow-scss/_light-theme';

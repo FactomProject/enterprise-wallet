@@ -1,0 +1,12 @@
+.backup-addresses-alert {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+
+    .addresses-table {
+        flex-grow: 1;
+    }
+}
+

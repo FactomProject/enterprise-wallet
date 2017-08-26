@@ -1,0 +1,156 @@
+@import '_variables';
+
+body.darkTheme {
+    background: $bg-body-dark;
+    color: $white;
+
+    aside {
+        background: $sidebar-bg-dark;
+        box-shadow: $sidebar-box-shadow-dark;
+    }
+
+    /* PAGER */
+
+    .backup-pager {
+        position: relative;
+
+        ul::before {
+            content: '';
+            position: absolute;
+            display: flex;
+            align-items: center;
+            height: 1px;
+            width: 100%;
+            background: white;
+            z-index: -1;
+        }
+
+        li {
+            border: $border-gray;
+            color: $gray;
+            background: $bg-body-dark;
+
+            &.active {
+                background: $white;
+                color: $bg-body-dark;
+            }
+        }
+    }
+
+    /* ADDRESSES ALERT */
+
+    .backup-icon-alert {
+        border: 1px solid $white;
+    }
+
+    /* TITLES */
+
+    h1 {
+        color: $yellow;
+
+        &.backup-title-alert {
+            color: $red;
+
+            a {
+                color: $white;
+            }
+        }
+    }
+
+    .backup-step-one h1 {
+        color: $white;
+    }
+
+    /* BOX CONTENT */
+
+    .backup-box-content {
+        border: $border-purple-light;
+    }
+
+    .backup-seed-word {
+        color: $white;
+    }
+
+    .backup-seed-order {
+        border: $border-purple-light;
+    }
+
+    /* ILLUSTRATION */
+
+    .backup-illustration {
+        background: url(../img/illus-dark.svg);
+        width: 280px;
+        height: 215px;
+        background-repeat: no-repeat;
+    }
+
+    /* FORMS */
+
+    .backup-input {
+        color: $white;
+        border-bottom: $border-purple-light;
+        transition: border $hover-transition;
+
+        &:focus {
+            border-bottom: $border-yellow
+        }
+    }
+
+    .backup-btn-gray {
+        border: $border-gray;
+        color: $gray;
+
+        &:hover {
+            color: $white;
+            background: $gray;
+        }
+
+        &:active {
+            background: darken($gray,15%);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: default;
+
+            &:hover,
+            &:active {
+                border: $border-gray;
+                color: $gray;
+            }
+        }
+    }
+
+    .backup-btn-green {
+        border: $border-green;
+        color: $green;
+        background:transparent;
+
+        &:hover {
+            color: $white;
+            background: $green;
+        }
+
+        &:active {
+            background: darken($green,15%);
+        }
+
+        &:disabled {
+            border: $border-gray;
+            color: $gray;
+            opacity: 0.5;
+            cursor: default;
+
+            &:hover,
+            &:active {
+                border: $border-gray;
+                color: $gray;
+                background: transparent;
+            }
+        }
+    }
+
+    .backup-spinner > div {
+        background: $white;
+    }
+}

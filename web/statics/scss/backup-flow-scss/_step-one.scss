@@ -1,0 +1,23 @@
+@import '_variables';
+
+.backup-step-one {
+    .backup-box-content {
+        display: flex;
+        align-items: center;
+        max-width: 70%;
+
+        div:first-child {
+            flex-basis: 60%;
+            padding-right: 30px;
+            margin-right: 30px;
+            border-right: $border-purple-light;
+        }
+
+        div:last-child {
+            ul {
+                margin-left: 20px;
+            }
+        }
+    }
+}
+

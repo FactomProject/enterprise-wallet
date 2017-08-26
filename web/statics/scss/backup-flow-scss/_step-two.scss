@@ -1,0 +1,39 @@
+@import '_variables';
+
+.backup-step-two {
+    .backup-box-content {
+        padding: 32px;
+        margin-bottom: 30px;
+    }
+
+    .backup-seed-table {
+        display: flex;
+
+        > div {
+            margin: 0 30px;
+            flex-basis: 25%;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        ul {
+            list-style: none;
+
+            li {
+                display: flex;
+                align-items: center;
+
+                &:not(:last-child) {
+                    margin-bottom: 30px;
+                }
+            }
+        }
+    }
+}
+

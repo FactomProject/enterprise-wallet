@@ -1,0 +1,200 @@
+@import '_variables';
+
+.backup-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.backup-btn {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    margin: 0 12px;
+    height: 48px;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all $hover-transition;
+
+    & .fa-arrow-left {
+        margin-right: 12px;
+    }
+
+    & .fa-arrow-right {
+        margin-left: 12px;
+    }
+}
+
+.backup-btn-verify {
+    position: relative;
+    width: 100px;
+    flex-direction: column;
+    transition: all $hover-transition;
+    overflow: hidden;
+
+    & > * {
+        position: absolute;
+        transition: all $hover-transition;
+        transition-delay: .2s;
+    }
+
+    i {
+        color: $white;
+        font-size: 20px;
+        transform: translateY(-40px);
+    }
+
+    & .backup-spinner {
+        opacity: 0;
+    }
+
+    &.backup-btn-checking {
+        background: $green;
+
+        & .backup-spinner {
+            opacity: 1;
+        }
+
+        span {
+            opacity: 0;
+        }
+    }
+
+    &.backup-btn-verified {
+        background: $green;
+
+        & .backup-spinner,
+        span {
+            opacity: 0;
+        }
+
+        .fa-check {
+            transform: translateY(0);
+        }
+    }
+
+    &.backup-btn-failed {
+        background: $red !important;
+        border: 1px solid $red !important;
+
+        & .backup-spinner,
+        span {
+            opacity: 0;
+        }
+
+        .fa-times {
+            transform: translateY(0);
+        }
+    }
+}
+
+.backup-input {
+    width: 100%;
+    font-family: 'Lato', sans-serif;
+    background: transparent;
+    padding: 4px;
+}
+
+.backup-checkbox {
+    margin-bottom: 16px;
+
+    label {
+        display: flex;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        display:none;
+    }
+
+    input[type="checkbox"] + label {
+        opacity: 0.5;
+        transition: opacity $hover-transition;
+    }
+
+    input[type="checkbox"]:checked + label {
+        opacity: 1;
+    }
+
+    input[type="checkbox"] + label span {
+        flex-shrink: 0;
+        position: relative;
+        display:inline-block;
+        width:19px;
+        height:19px;
+        margin: 0 8px 0 0;
+        vertical-align:middle;
+        border: 2px solid $gray;
+        border-radius: 4px;
+        cursor:pointer;
+        transition: all $hover-transition;
+    }
+
+    input[type="checkbox"]:checked + label span {
+        border: 2px solid $yellow;
+
+        &::before {
+            content: '';
+            width: 9px;
+            height: 5px;
+            position: absolute;
+            top: 3px;
+            left: 2px;
+            border: 2px solid $yellow;
+            border-top: none;
+            border-right: none;
+            opacity: 1;
+            transform: rotate(-45deg);
+        }
+    }
+}
+
+.backup-spinner {
+    margin: 0 auto;
+    width: 50px;
+    text-align: center;
+}
+
+.backup-spinner > div {
+    width: 14px;
+    height: 14px;
+    background-color: #333;
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.backup-spinner .backup-bounce1 {
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+}
+
+.backup-spinner .backup-bounce2 {
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+    0%, 80%, 100% { -webkit-transform: scale(0) }
+    40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+    0%, 80%, 100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    40% {
+        -webkit-transform: scale(1.0);
+        transform: scale(1.0);
+    }
+}

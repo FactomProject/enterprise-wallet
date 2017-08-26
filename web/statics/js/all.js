@@ -2,18 +2,25 @@
     LoadAddresses()
 });*/
 
-function LoadInitialAddresses(){
+function LoadInitialAddresses(showSeeded){
+	if(showSeeded === undefined) {
+		showSeeded = true
+	}
 	resp = getRequest("addresses-no-bal",function(resp){
 		obj = JSON.parse(resp)
 		
 		if(obj.FactoidAddresses.List != null) {
 			obj.FactoidAddresses.List.forEach(function(address){
-				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", true));
+				if(!address.Seeded || showSeeded) {
+					$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", true));
+				}
 			})
 		}
 		if(obj.EntryCreditAddresses.List != null) {
 			obj.EntryCreditAddresses.List.forEach(function(address){
-				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", true));
+				if(!address.Seeded || showSeeded) {
+					$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", true));
+				}
 			})
 		}
 		if(obj.ExternalAddresses.List != null) {
@@ -25,8 +32,11 @@ function LoadInitialAddresses(){
  	})
 }
 
-function LoadAddresses(){
-	LoadInitialAddresses()
+function LoadAddresses(showSeeded){
+	if(showSeeded === undefined) {
+		showSeeded = true
+	}
+	LoadInitialAddresses(showSeeded)
 	resp = getRequest("addresses",function(resp){
 		obj = JSON.parse(resp)
 		//console.log(resp)
@@ -34,13 +44,17 @@ function LoadAddresses(){
 		if(obj.FactoidAddresses.List != null) {
 			$('#factoid-addresses-table tbody').html("")
 			obj.FactoidAddresses.List.forEach(function(address){
-				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", false));
+				if(!address.Seeded || showSeeded) {
+					$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", false));
+				}
 			})
 		}
 		if(obj.EntryCreditAddresses.List != null) {
 			$('#credit-addresses-table tbody').html("")
 			obj.EntryCreditAddresses.List.forEach(function(address){
-				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", false));
+				if(!address.Seeded || showSeeded) {
+					$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", false));
+				}
 			})
 		}
 		if(obj.ExternalAddresses.List != null) {
@@ -1740,3 +1754,35 @@ $("#copy-to-clipboard").on('click', function(){
 	document.execCommand("copy");
 	document.body.removeChild(aux);
 })
+$("#backup-input-verify-button").on('click', function(){
+	$("#backup-input-verify-button").addClass("backup-btn-checking")
+
+	var seedSingle = $("#given-seed").attr("value");
+	var inputedSeedSplit = new Array(12);
+
+	$(".backup-input").each(function(){
+		var i = Number($(this).attr("index"))
+		inputedSeedSplit[i-1] = $(this).val()
+	})
+
+	var clear = function() {
+		$("#backup-input-verify-button").removeClass("backup-btn-failed")
+		$("#backup-input-verify-button").removeClass("backup-btn-checking")
+		$("#backup-input-verify-button").removeClass("backup-btn-verified")
+	}
+
+	if(inputedSeedSplit.join(" ") === seedSingle) {
+		clear()
+		$("#backup-input-verify-button").addClass("backup-btn-verified")
+	} else {
+		clear()
+		$("#backup-input-verify-button").addClass("backup-btn-failed")
+		setTimeout(clear, 3000);
+	}
+})
+
+$("#backup-html-form").on("submit",function(event){event.preventDefault()})
+
+function LoadBackup0() {
+	LoadAddresses(false)
+}
