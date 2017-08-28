@@ -56,6 +56,7 @@ function execWalletd(password) {
   if(!startOwn || WALLETD_UP){
     return
   }
+  WALLETD_UP = true
   console.log("Executing enterprise-wallet...")
 
   if(isWin){
@@ -90,52 +91,61 @@ function execWalletd(password) {
     }
   }
 
-  walletd.stdout.on('data', function(data) {
-    var s = data.toString()
-    
-    console.log(s)
-    // Look for password prompt
-    if(s.includes("password")){
-      console.log("Found prompt, inputting password to wallet")
-      walletd.stdin.setEncoding('utf-8');
-      walletd.stdin.write(password + "\n");
-      //walletd.stdin.close()
-    } 
-
-    if(s.includes("Error in starting wallet")) {
-      WALLETD_UP = false
-      var errormessage = ""
-      if(s.includes("message authentication failed")) {
-        errormessage = "The password given to unlock the encrypted database was incorrect. "+
-         "Please try launching the wallet again with the correct password. If you feel this is an " +
-         "error, please reach out on our Factom Community slack."
-      } else {
-        var n = s.indexOf("Error in starting wallet");
-        errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
-        "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
-      }
-      sendMsgToLoading(errormessage, function() {
-        ChooseWalletType(true)
-        loadingWindow.close()
-        loadingWindow = null
-      }, 2000)
-      //dialog.showErrorBox('Error Launching EnterpriseWallet', errormessage)
-      return
-      //app.quit()
-    }
-    if(s.includes("Starting GUI")){
-      sendMsgToLoading("success", function(){
+  runWhenWalletUp(function(){
+    sendMsgToLoading("success", function(){
         runWhenWalletUp(function(){
         loadMainWindow()
           // Clear cache always, makes updates easier
            deleteChromeCache()
         })  
       }, 2000)
+  })
+
+  walletd.stdout.on('data', function(data) {
+    if(walletd == undefined) {
+      // stdout happens when the wallet closes.
+      return
+    }
+    var s = data.toString()
+    
+    console.log(s)
+    // Initialization stuff
+    if(loadingWindow != null) {
+      // Look for password prompt
+      if(s.includes("password")){
+        console.log("Found prompt, inputting password to wallet")
+        walletd.stdin.setEncoding('utf-8');
+        walletd.stdin.write(password + "\n");
+        //walletd.stdin.close()
+      } 
+
+      if(s.includes("Error in starting wallet")) {
+        WALLETD_UP = false
+        var errormessage = ""
+        if(s.includes("message authentication failed")) {
+          errormessage = "The password given to unlock the encrypted database was incorrect. "+
+          "Please try launching the wallet again with the correct password. If you feel this is an " +
+          "error, please reach out on our Factom Community slack."
+        } else {
+          var n = s.indexOf("Error in starting wallet");
+          errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
+          "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
+        }
+        sendMsgToLoading(errormessage, function() {
+          ChooseWalletType(true)
+          loadingWindow.close()
+          loadingWindow = null
+        }, 2000)
+        return
+      }
     }
   });
 }
 
 function sendMsgToLoading(mesg, f, wait) {
+  if(loadingWindow === null) {
+    return
+  }
   loadingWindow.webContents.send('info' , {msg:mesg})
   if(f !== undefined) {
     setTimeout(function(){
@@ -146,6 +156,9 @@ function sendMsgToLoading(mesg, f, wait) {
 
 // Runs when the wallet is able to start serving web pages
 function runWhenWalletUp(callback){
+  if(!WALLETD_UP) {
+    return
+  }
   request.get('http://localhost:' + PORT_TO_SERVE + "/GET?request=on" ,function(err,res,body){
     if (!err && res.statusCode == 200) {
       callback()
@@ -383,13 +396,11 @@ ipcMain.on('submitForm', function(event, data) {
   // clean up the haning processes
   if(isWin) {
     setTimeout(function(){execWalletd(data)}, 300)
-    WALLETD_UP = true
   } else {
     cleanUp(function(){
       // Now we can start our processes and app
       setTimeout(function(){
         execWalletd(data)
-        WALLETD_UP = true
       }, 300)
     })
   }

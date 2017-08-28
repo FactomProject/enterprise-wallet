@@ -21,6 +21,7 @@ html, body {
     height: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-y: hidden;
 }
 body {
     font-family: 'Open Sans', sans-serif;
@@ -797,4 +798,8 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     transform: scaleY(1.0);
     -webkit-transform: scaleY(1.0);
   }
+}
+
+.pointer {
+    cursor: pointer;
 }
