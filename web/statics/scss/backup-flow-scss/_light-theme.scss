@@ -86,9 +86,9 @@ body {
     /* FORMS */
 
     .backup-input {
-        color: $blue;
-        border-bottom: $border-purple-light;
-        transition: border $hover-transition;
+        color: $blue !important;
+        border-bottom: $border-purple-light !important;
+        transition: border $hover-transition !important;
 
         &:focus {
             border-bottom: $border-yellow

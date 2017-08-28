@@ -6,6 +6,31 @@ html {
 .app {
     height: 100%;
     display: flex;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    border: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &:focus {
+        outline: none;
+    }
+
+    img {
+        image-rendering: pixelated;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
 }
 
 aside {
@@ -19,17 +44,23 @@ aside {
     justify-content: center;
     align-items: center;
     flex-grow: 1;
-    padding: 16px;
+    padding: 16px !important;
+
+    #dynamic-content {
+        width: 100%;
+    }
 
     .backup-pager {
         margin-bottom: 40px;
 
         ul {
+            position: relative;
             display: flex;
             align-items: center;
             list-style: none;
             margin: 0;
             padding: 0;
+            z-index: 200;
 
             li {
                 display: flex;
@@ -89,6 +120,7 @@ aside {
     height: 65px;
     border-radius: 50%;
     margin-bottom: 20px;
+    font-size: 22px;
 }
 
 h1.backup-title {
