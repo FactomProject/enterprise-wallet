@@ -1,3 +1,7 @@
+.balances {
+    display: none;
+}
+
 body,
 html {
     height: 100%;
@@ -33,18 +37,18 @@ html {
     }
 }
 
-aside {
-    width: 315px;
-    flex-shrink: 0;
-}
-
 .backup-main {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     flex-grow: 1;
-    padding: 16px !important;
+    padding: 16px;
+
+    @media(max-width: 1150px) {
+        justify-content: flex-start;
+        padding: 0;
+    }
 
     #dynamic-content {
         width: 100%;
@@ -124,12 +128,13 @@ aside {
 }
 
 h1.backup-title {
-    margin-bottom: 30px;
-    font-size: 32px;
-    line-height: 42px;
-    font-weight: 100;
-    text-align: center;
-    max-width: 80%;
+    margin-bottom: 30px !important;
+    font-size: 32px !important;
+    line-height: 42px !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+    max-width: 80% !important;
+    text-transform: none !important;
 
     a {
         font-size: 15px;
@@ -140,6 +145,7 @@ h1.backup-title {
 
 .backup-illustration {
     margin-bottom: 50px;
+    flex-shrink: 0;
 }
 
 .backup-box-content {

@@ -2,11 +2,6 @@
 
 body {
 
-    aside {
-        background: $sidebar-bg-light;
-        box-shadow: $sidebar-box-shadow-light;
-    }
-
     /* PAGER */
 
     .backup-pager {
@@ -45,10 +40,10 @@ body {
     /* TITLES */
 
     h1 {
-        color: $orange;
+        color: $orange !important;
 
         &.backup-title-alert {
-            color: $red;
+            color: $red !important;
 
             a {
                 color: $black;
@@ -57,7 +52,7 @@ body {
     }
 
     .backup-step-one h1 {
-        color: $orange;
+        color: $orange !important;
     }
 
     /* BOX CONTENT */
