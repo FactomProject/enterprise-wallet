@@ -1,5 +1,18 @@
 @import '_variables';
 
+body.darkTheme {
+    .backup-alert-note {
+        color: $white;
+        border: $border-purple-light;
+        margin: 0;
+
+        strong {
+            color: $red;
+            font-weight: 700;
+        }
+    }
+}
+
 body.darkTheme .backup-main {
     background: $bg-body-dark;
     color: $white;

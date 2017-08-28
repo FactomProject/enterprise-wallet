@@ -1,6 +1,17 @@
 @import '_variables';
 
-body {
+.backup-alert-note {
+    color: $black;
+    border: $border-purple-light;
+    margin: 0 12px;
+
+    strong {
+        color: $red;
+        font-weight: 700;
+    }
+}
+
+body .backup-main {
 
     /* PAGER */
 

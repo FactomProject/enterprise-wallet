@@ -3530,6 +3530,14 @@ body,
 html {
   height: 100%; }
 
+.backup-alert-note {
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px; }
+  @media (max-width: 639px) {
+    .backup-alert-note {
+      display: none; } }
+
 .app {
   height: 100%;
   display: flex;
@@ -3809,6 +3817,14 @@ h1.backup-title {
 /* GENERAL */
 /* DARK THEME */
 /* LIGHT THEME */
+body.darkTheme .backup-alert-note {
+  color: #FFF;
+  border: 1px solid #4A4857;
+  margin: 0; }
+  body.darkTheme .backup-alert-note strong {
+    color: #EC5840;
+    font-weight: 700; }
+
 body.darkTheme .backup-main {
   background: #0A0715;
   color: #FFF;
@@ -3902,16 +3918,24 @@ body.darkTheme .backup-main {
 /* GENERAL */
 /* DARK THEME */
 /* LIGHT THEME */
-body {
+.backup-alert-note {
+  color: #000;
+  border: 1px solid #4A4857;
+  margin: 0 12px; }
+  .backup-alert-note strong {
+    color: #EC5840;
+    font-weight: 700; }
+
+body .backup-main {
   /* PAGER */
   /* ADDRESSES ALERT */
   /* TITLES */
   /* BOX CONTENT */
   /* ILLUSTRATION */
   /* FORMS */ }
-  body .backup-pager {
+  body .backup-main .backup-pager {
     position: relative; }
-    body .backup-pager ul::before {
+    body .backup-main .backup-pager ul::before {
       content: '';
       position: absolute;
       display: flex;
@@ -3920,73 +3944,73 @@ body {
       width: 100%;
       background: #BEBEBE;
       z-index: -1; }
-    body .backup-pager li {
+    body .backup-main .backup-pager li {
       border: 1px solid #BEBEBE;
       color: #BEBEBE;
       background: #FFF; }
-      body .backup-pager li.active {
+      body .backup-main .backup-pager li.active {
         background: #0A0715;
         color: #FFF; }
-  body .backup-icon-alert {
+  body .backup-main .backup-icon-alert {
     border: 1px solid #EC5840;
     color: #EC5840; }
-  body h1 {
+  body .backup-main h1 {
     color: #DA8141 !important; }
-    body h1.backup-title-alert {
+    body .backup-main h1.backup-title-alert {
       color: #EC5840 !important; }
-      body h1.backup-title-alert a {
+      body .backup-main h1.backup-title-alert a {
         color: #000; }
-  body .backup-step-one h1 {
+  body .backup-main .backup-step-one h1 {
     color: #DA8141 !important; }
-  body .backup-box-content {
+  body .backup-main .backup-box-content {
     border: 1px solid #4A4857; }
-  body .backup-seed-word {
+  body .backup-main .backup-seed-word {
     color: #407BA4; }
-  body .backup-seed-order {
+  body .backup-main .backup-seed-order {
     border: 1px solid #4A4857; }
-  body .backup-illustration {
+  body .backup-main .backup-illustration {
     background: url(../img/illus-light.svg);
     width: 280px;
     height: 215px;
     background-repeat: no-repeat; }
-  body .backup-input {
+  body .backup-main .backup-input {
     color: #407BA4 !important;
     border-bottom: 1px solid #4A4857 !important;
     transition: border 0.3s ease !important; }
-    body .backup-input:focus {
+    body .backup-main .backup-input:focus {
       border-bottom: 1px solid #EDB820; }
-  body .backup-btn-gray {
+  body .backup-main .backup-btn-gray {
     border: 1px solid #BEBEBE;
     color: #BEBEBE; }
-    body .backup-btn-gray:hover {
+    body .backup-main .backup-btn-gray:hover {
       color: #FFF;
       background: #BEBEBE; }
-    body .backup-btn-gray:active {
+    body .backup-main .backup-btn-gray:active {
       background: #989898; }
-    body .backup-btn-gray:disabled {
+    body .backup-main .backup-btn-gray:disabled {
       opacity: 0.5;
       cursor: default; }
-      body .backup-btn-gray:disabled:hover, body .backup-btn-gray:disabled:active {
+      body .backup-main .backup-btn-gray:disabled:hover, body .backup-main .backup-btn-gray:disabled:active {
         border: 1px solid #BEBEBE;
         color: #BEBEBE; }
-  body .backup-btn-green {
+  body .backup-main .backup-btn-green {
     border: 1px solid #51C983;
     color: #FFF;
     background: #51C983; }
-    body .backup-btn-green:hover {
+    body .backup-main .backup-btn-green:hover {
       background: #39b86e; }
-    body .backup-btn-green:active {
+    body .backup-main .backup-btn-green:active {
       background: #319d5e; }
-    body .backup-btn-green:disabled {
+    body .backup-main .backup-btn-green:disabled {
       border: 1px solid #BEBEBE;
       color: #BEBEBE;
       opacity: 0.5;
       cursor: default; }
-      body .backup-btn-green:disabled:hover, body .backup-btn-green:disabled:active {
+      body .backup-main .backup-btn-green:disabled:hover, body .backup-main .backup-btn-green:disabled:active {
         border: 1px solid #BEBEBE;
         color: #BEBEBE;
         background: transparent; }
-  body .backup-spinner > div {
+  body .backup-main .backup-spinner > div {
     background: #FFF; }
 
 /* Webfont: Lato-Regular */
@@ -4212,6 +4236,12 @@ header {
               color: #5a95be; }
               #frame section.leftCol nav ul li a:hover svg path, #frame section.leftCol nav ul li a:hover svg rect, #frame section.leftCol nav ul li a:hover svg poly {
                 fill: #5a95be !important; }
+            #frame section.leftCol nav ul li a.never-backedup {
+              color: #EC5840 !important;
+              filter: none;
+              opacity: 1; }
+              #frame section.leftCol nav ul li a.never-backedup svg path, #frame section.leftCol nav ul li a.never-backedup svg rect, #frame section.leftCol nav ul li a.never-backedup svg poly, #frame section.leftCol nav ul li a.never-backedup .svg path, #frame section.leftCol nav ul li a.never-backedup .svg rect, #frame section.leftCol nav ul li a.never-backedup .svg poly {
+                fill: #EC5840 !important; }
           #frame section.leftCol nav ul li.active a {
             background: none;
             color: #e8b521; }
@@ -4776,6 +4806,12 @@ body.darkTheme {
     body.darkTheme #frame section.leftCol nav ul li a {
       opacity: 0.4;
       filter: brightness(20); }
+      body.darkTheme #frame section.leftCol nav ul li a.never-backedup {
+        color: #EC5840 !important;
+        filter: none;
+        opacity: 1; }
+        body.darkTheme #frame section.leftCol nav ul li a.never-backedup svg path, body.darkTheme #frame section.leftCol nav ul li a.never-backedup svg rect, body.darkTheme #frame section.leftCol nav ul li a.never-backedup svg poly, body.darkTheme #frame section.leftCol nav ul li a.never-backedup .svg path, body.darkTheme #frame section.leftCol nav ul li a.never-backedup .svg rect, body.darkTheme #frame section.leftCol nav ul li a.never-backedup .svg poly {
+          fill: #EC5840 !important; }
     body.darkTheme #frame section.leftCol nav ul li.active a {
       opacity: 1;
       filter: none;

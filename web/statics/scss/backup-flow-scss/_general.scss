@@ -7,6 +7,16 @@ html {
     height: 100%;
 }
 
+.backup-alert-note {
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+
+    @media(max-width:639px) {
+        display: none;
+    }
+}
+
 .app {
     height: 100%;
     display: flex;

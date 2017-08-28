@@ -268,6 +268,16 @@ header {
                                 path, rect, poly { fill: lighten($primary-color,10%) !important; }
                             }
                         }
+
+                        &.never-backedup {
+                            color: #EC5840 !important;
+                            filter: none;
+                            opacity: 1;
+
+                            svg, .svg {
+                                path, rect, poly { fill: #EC5840 !important; }
+                            }
+                        }
                     }
                     &.active a {
                         background: none;
@@ -944,6 +954,16 @@ body.darkTheme {
             nav ul li a {
                 opacity: 0.4;
                 filter: brightness(20);
+
+                &.never-backedup {
+                    color: #EC5840 !important;
+                    filter: none;
+                    opacity: 1;
+
+                    svg, .svg {
+                        path, rect, poly { fill: #EC5840 !important; }
+                    }
+                }
             }
             nav ul li.active a {
                 opacity: 1;
