@@ -4188,7 +4188,8 @@ header {
   #frame > section {
     padding: 0; }
   #frame section.leftCol {
-    position: relative;
+    display: flex;
+    flex-direction: column;
     max-width: 314px;
     background: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); }
@@ -4198,6 +4199,7 @@ header {
         width: 100%;
         max-width: none; } }
     #frame section.leftCol nav {
+      flex-grow: 1;
       padding-top: 0.8rem; }
       #frame section.leftCol nav ul {
         margin: 0;
@@ -4209,7 +4211,7 @@ header {
           #frame section.leftCol nav ul li a {
             display: flex;
             align-items: center;
-            padding: 0.8rem 1.6rem;
+            padding: 1.2rem 1.6rem;
             transition: ease 0.3s all;
             color: #417ba4;
             font-size: 18px;
@@ -4303,11 +4305,8 @@ header {
       #frame section.leftCol .wallet-type p {
         font-size: 12px; }
     #frame section.leftCol #sync-status {
-      position: absolute;
-      bottom: 0;
-      left: 0;
       width: 100%;
-      padding: 2em 1em;
+      padding: 0 1em;
       text-align: center; }
       #frame section.leftCol #sync-status .label {
         margin: 12px 0 0;

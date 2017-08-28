@@ -211,7 +211,8 @@ header {
     &.row { max-width: 100%; }
     > section { padding: 0; }
     section.leftCol {
-        position: relative;
+        display: flex;
+        flex-direction: column;
         max-width: 314px;
         background: $sidebar-bg-light;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -222,6 +223,7 @@ header {
             max-width: none;
         }
         nav {
+            flex-grow: 1;
             padding-top: 0.8rem;
 
             ul {
@@ -234,7 +236,7 @@ header {
                     a {
                         display: flex;
                         align-items: center;
-                        padding: 0.8rem 1.6rem;
+                        padding: 1.2rem 1.6rem;
                         transition: ease 0.3s all;
                         color: $primary-color;
                         font-size: 18px;
@@ -364,11 +366,8 @@ header {
         }
 
 	#sync-status {
-		position: absolute;
-		bottom: 0;
-		left: 0;
 		width: 100%;
-		padding: 2em 1em;
+		padding: 0 1em;
 		text-align: center;
 		.label {
             margin: 12px 0 0;
