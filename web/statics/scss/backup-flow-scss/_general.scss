@@ -1,16 +1,50 @@
+.balances {
+    display: none;
+}
+
 body,
 html {
     height: 100%;
 }
 
+.backup-alert-note {
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+
+    @media(max-width:639px) {
+        display: none;
+    }
+}
+
 .app {
     height: 100%;
     display: flex;
-}
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    border: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
-aside {
-    width: 315px;
-    flex-shrink: 0;
+    &:focus {
+        outline: none;
+    }
+
+    img {
+        image-rendering: pixelated;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
 }
 
 .backup-main {
@@ -21,15 +55,26 @@ aside {
     flex-grow: 1;
     padding: 16px;
 
+    @media(max-width: 1150px) {
+        justify-content: flex-start;
+        padding: 0;
+    }
+
+    #dynamic-content {
+        width: 100%;
+    }
+
     .backup-pager {
         margin-bottom: 40px;
 
         ul {
+            position: relative;
             display: flex;
             align-items: center;
             list-style: none;
             margin: 0;
             padding: 0;
+            z-index: 200;
 
             li {
                 display: flex;
@@ -89,15 +134,17 @@ aside {
     height: 65px;
     border-radius: 50%;
     margin-bottom: 20px;
+    font-size: 22px;
 }
 
 h1.backup-title {
-    margin-bottom: 30px;
-    font-size: 32px;
-    line-height: 42px;
-    font-weight: 100;
-    text-align: center;
-    max-width: 80%;
+    margin-bottom: 30px !important;
+    font-size: 32px !important;
+    line-height: 42px !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+    max-width: 80% !important;
+    text-transform: none !important;
 
     a {
         font-size: 15px;
@@ -108,6 +155,7 @@ h1.backup-title {
 
 .backup-illustration {
     margin-bottom: 50px;
+    flex-shrink: 0;
 }
 
 .backup-box-content {

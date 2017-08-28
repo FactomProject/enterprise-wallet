@@ -3,13 +3,13 @@
 {{$pageTitle := "Backup Step 2"}}
 {{$mainClass := "address-book"}}
 {{$theme := .Settings.Theme}}
-{{$activeNav := 2}}
+{{$activeNav := 4}}
 {{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 
 {{template "templateTop" $info}}
 <div id="guts">
     <div class="app">
-        <main class="backup-main">
+        <div class="backup-main">
             <div class="backup-pager">
                 <ul>
                     <li>1</li>
@@ -22,7 +22,7 @@
             {{else}}
             <!-- Array is 1 indexed to match the number given to the user-->
             <div class="backup-content backup-step-two">
-                <h1 class="backup-title">Your wallet generation seed is</h1>
+                <h1 class="backup-title">Write down your 12 word seed phrase</h1>
                 <div class="backup-box-content">
                     <div class="backup-seed-table">
                         <div>
@@ -96,7 +96,7 @@
                     <label for="checbox">
                         <span></span>
                         <div>
-                            I copied my seed on paper
+                            I copied my 12 words to paper
                         </div>
                     </label>
                 </div>
@@ -106,7 +106,7 @@
                 <a href="backup1" nav-click="true" class="backup-btn backup-btn-gray"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                 <a href="backup3" nav-click="true" class="backup-btn backup-btn-green">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i> </a>
             </div>
-        </main>
+        </div>
     </div>
 </div>
 {{template "templateBottom" ""}}

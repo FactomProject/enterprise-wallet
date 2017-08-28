@@ -195,7 +195,8 @@ header {
     }
     h1 {
 		margin-bottom: 1rem;
-        font-size: 2rem;
+        font-size: 1.8rem;
+        padding: 0 0.8rem;
         color: $purple;
         letter-spacing: 0;
         text-transform: none;
@@ -210,7 +211,8 @@ header {
     &.row { max-width: 100%; }
     > section { padding: 0; }
     section.leftCol {
-        position: relative;
+        display: flex;
+        flex-direction: column;
         max-width: 314px;
         background: $sidebar-bg-light;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -221,6 +223,9 @@ header {
             max-width: none;
         }
         nav {
+            flex-grow: 1;
+            padding-top: 0.8rem;
+
             ul {
                 margin: 0;
                 padding: 0;
@@ -229,52 +234,50 @@ header {
                     margin: 0;
                     padding: 0;
                     a {
-                        display: block;
-                        position: relative;
-                        padding: 2.25rem 0.5rem 2.25rem 8.5rem;
-                        overflow: hidden;
+                        display: flex;
+                        align-items: center;
+                        padding: 1.2rem 1.6rem;
                         transition: ease 0.3s all;
                         color: $primary-color;
                         font-size: 18px;
                         line-height: 35px;
                         font-weight: 700;
                         @include breakpoint(medium only) {
-                            padding-left: 8em;
                             font-size: 14px;
+                            padding: 0.8rem;
                         }
                         i {
-                            display: block;
-							position: absolute;
-							top: 1.5rem;
-							left: 2.75rem;
-                            width: 59px;
-                            height: 57px;
-                            text-align: center;
+                            display: flex;
+                            align-items: center;
+                            margin-right: 1.2rem;
+                            width: 35px;
+                            height: 35px;
+
                             svg, .svg {
-                                max-width: 100%;
+                                width: 100%;
+                                height: auto;
+
                                 path, rect, poly {
                                     fill: $primary-color !important;
                                     transition: ease 0.15s fill;
                                 }
                             }
                         }
-						&.address-book i { top: 1.8rem; left: 2.5rem; width: 64px; }
-						&.settings i { top: 1.5rem; left: 3rem; width: 54px; }
-						@include breakpoint(medium only) {
-							padding-left: 6rem;
-							i {
-								left: 1.75rem;
-								width: 48px;
-								height: 48px;
-							}
-							&.address-book i { top: 1.95rem; left: 1.5rem; width: 52px; height: 48px; }
-							&.settings i { top: 1.75rem; left: 2rem; width: 44px; }
-						}
                         &:hover {
 							background: darken($light-gray, 3%);
                             color: lighten($primary-color,10%);
                             svg {
                                 path, rect, poly { fill: lighten($primary-color,10%) !important; }
+                            }
+                        }
+
+                        &.never-backedup {
+                            color: #EC5840 !important;
+                            filter: none;
+                            opacity: 1;
+
+                            svg, .svg {
+                                path, rect, poly { fill: #EC5840 !important; }
                             }
                         }
                     }
@@ -287,33 +290,28 @@ header {
                     }
                 }
                 @include breakpoint(small only) {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     margin: 0;
-                    padding: 16px 0 12px;
                     text-align: center;
                     li {
-                        display: inline-block;
                         &:not(:first-child) { margin-left: 8px; }
                         a {
-                            width: 64px;
-                            height: 64px;
                             padding: 0;
 							border-radius: 50%;
                             font-size: 0;
-                            i {
-								top: 0.6rem;
-								left: 0;
-								right: 0;
-                                float: none;
-                                width: 40px;
-                                height: 40px;
-                                margin: 0 auto;
-                            }
-							&.address-book i { top: 1rem; left: 0; width: 44px; height: 44px; }
-							&.settings i { top: 0.7rem; left: 0; width: 40px; }
                         }
                         &.active a { background-color: none; }
                     }
                 }
+            }
+
+            @include breakpoint(small only) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.8rem;
             }
         }
 
@@ -331,8 +329,8 @@ header {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 60px;
-                height: 60px;
+                width: 44px;
+                height: 44px;
                 border-radius: 50%;
                 border: 1px solid #656666;
                 margin-right: 12px;
@@ -340,7 +338,7 @@ header {
                 img {
                     filter: brightness(-1);
                     opacity: 0.6;
-                    width: 26px;
+                    width: 20px;
                     height: auto;
                 }
 
@@ -359,7 +357,7 @@ header {
 
             h1 {
                 font-weight: 400;
-                font-size: 28px;
+                font-size: 22px;
             }
 
             p {
@@ -368,11 +366,8 @@ header {
         }
 
 	#sync-status {
-		position: absolute;
-		bottom: 0;
-		left: 0;
 		width: 100%;
-		padding: 2em 1em;
+		padding: 0 1em;
 		text-align: center;
 		.label {
             margin: 12px 0 0;
@@ -945,19 +940,29 @@ body.darkTheme {
             header {
                 border-bottom: $border-purple-light;
                 h1 {
-                    font-size: 2rem;
+                    font-size: 1.8rem;
+                    padding: 0 0.8rem;
                     color: $white;
                     letter-spacing: 0;
                     text-transform: none;
                 }
             }
             nav ul li {
-                border-bottom: $border-purple-light;
                 margin: 0 1.2rem;
             }
             nav ul li a {
                 opacity: 0.4;
                 filter: brightness(20);
+
+                &.never-backedup {
+                    color: #EC5840 !important;
+                    filter: none;
+                    opacity: 1;
+
+                    svg, .svg {
+                        path, rect, poly { fill: #EC5840 !important; }
+                    }
+                }
             }
             nav ul li.active a {
                 opacity: 1;

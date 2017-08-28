@@ -3,29 +3,29 @@
 {{$pageTitle := "Backup Step 1"}}
 {{$mainClass := "address-book"}}
 {{$theme := .Settings.Theme}}
-{{$activeNav := 2}}
+{{$activeNav := 4}}
 {{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 
 {{template "templateTop" $info}}
 <div id="guts">
     <div class="app">
-    <main class="backup-main">
-            <div class="backup-content backup-addresses-alert">
-                <div class="backup-icon-alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                </div>
-                <h1 class="backup-title backup-title-alert">
-                    Addresses that are not generated from your wallet's seed will not be backed up. This includes the following addresses.
-                    <a href="#">Click here to learn more.</a>
-                </h1>
-                <div class="addresses-table">
-                    {{template "addressBookInner" ""}}
-                </div>
+    <div class="backup-main">
+        <div class="backup-content backup-addresses-alert">
+            <div class="backup-icon-alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
             </div>
-            <div class="backup-footer">
-                <a href="backup1" nav-click="true" class="backup-btn backup-btn-green">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+            <h1 class="backup-title backup-title-alert">
+                Addresses that are not generated from your wallet's seed will not be backed up. This includes the following addresses.
+                <a href="#">Click here to learn more.</a>
+            </h1>
+            <div class="addresses-table">
+                {{template "addressBookInner" ""}}
             </div>
-        </main>
+        </div>
+        <div class="backup-footer">
+            <a href="backup1" nav-click="true" class="backup-btn backup-btn-green">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
     </div>
 </div>
 {{template "templateBottom" "LoadBackup0()"}}

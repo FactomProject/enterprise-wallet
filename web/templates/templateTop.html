@@ -45,11 +45,15 @@
                                 Settings
                             </a>
                         </li>
-                        <li id="settings-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}>
-                            <a href="Backup" class="settings nav-element" nav-click="true">
-                                <i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>
+                        <li id="settings-nav" {{if compareInts $activeNav 4 }} class="active" {{end}}>
+                            <a href="Backup" class="settings nav-element never-backedup" nav-click="true">
+                                <i><img src="img/nav_backup.svg" class="svg" alt="Settings"></i>
                                 Backup
                             </a>
+                            <div class="backup-alert-note">
+                                <strong>Please, be sure to back up your seed.</strong> <br>
+                                <span>This allows you to regenerate your wallet if you lose the password or the database gets corrupted.</span>
+                            </div>
                         </li>
                     </ul>
                 </nav>

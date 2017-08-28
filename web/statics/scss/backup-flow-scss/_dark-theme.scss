@@ -1,13 +1,21 @@
 @import '_variables';
 
 body.darkTheme {
+    .backup-alert-note {
+        color: $white;
+        border: $border-purple-light;
+        margin: 0;
+
+        strong {
+            color: $red;
+            font-weight: 700;
+        }
+    }
+}
+
+body.darkTheme .backup-main {
     background: $bg-body-dark;
     color: $white;
-
-    aside {
-        background: $sidebar-bg-dark;
-        box-shadow: $sidebar-box-shadow-dark;
-    }
 
     /* PAGER */
 
@@ -41,6 +49,7 @@ body.darkTheme {
 
     .backup-icon-alert {
         border: 1px solid $white;
+        color: $white;
     }
 
     /* TITLES */
@@ -87,12 +96,12 @@ body.darkTheme {
     /* FORMS */
 
     .backup-input {
-        color: $white;
-        border-bottom: $border-purple-light;
-        transition: border $hover-transition;
+        color: $white !important;
+        border-bottom: $border-purple-light !important;
+        transition: border $hover-transition !important;
 
         &:focus {
-            border-bottom: $border-yellow
+            border-bottom: $border-yellow !important;
         }
     }
 
