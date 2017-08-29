@@ -349,6 +349,24 @@ func HandleBackup3(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func HandleImportSeed(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	st := new(BackupFlow)
+	st.Settings = MasterSettings
+
+	seed, err := MasterWallet.ExportSeed()
+	if err != nil {
+		st.Error = err.Error()
+	} else {
+		st.SingleSeed = seed
+	}
+
+	templates.ExecuteTemplate(w, "importseed", st)
+	return nil
+}
+
 /*******************
  *  Edit Addresses *
  *******************/

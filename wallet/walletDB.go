@@ -29,6 +29,7 @@ import (
 	"encoding/json"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/database/mapdb"
+	"github.com/FactomProject/go-bip39"
 )
 
 // List of int to db type
@@ -901,6 +902,12 @@ func (w *WalletDB) AddExternalAddress(name string, public string) (*address.Addr
 func (w *WalletDB) ImportSeed(seed string) error {
 	seedStruct := new(wallet.DBSeed)
 	seedStruct.MnemonicSeed = seed
+
+	v := bip39.IsMnemonicValid(seed)
+	if !v {
+		return fmt.Errorf("not a valid seed")
+	}
+
 	err := w.Wallet.InsertDBSeed(seedStruct)
 	if err != nil {
 		return err

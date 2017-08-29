@@ -90,17 +90,17 @@ $(function() {
                                     ChangeNav("settings", 3)
                                     break;
                                 case "Backup":
-                                    ChangeNav("backup-main", 3, "address-book")
+                                    ChangeNav("backup-main", 4, "address-book")
                                     LoadBackup0()
                                     break;
                                 case "backup1":
-                                    ChangeNav("backup-main", 3)
+                                    ChangeNav("backup-main", 4)
                                     break;
                                 case "backup2":
-                                    ChangeNav("backup-main", 3)
+                                    ChangeNav("backup-main", 4)
                                     break;
                                 case "backup3":
-                                    ChangeNav("backup-main", 3)
+                                    ChangeNav("backup-main", 4)
                                     break;
                                 case "send-factoids":
                                     ChangeNav("send-factoids", 1)
@@ -123,6 +123,9 @@ $(function() {
                                 case "receive-factoids":
                                     ChangeNav("receive-factoids", 2)
                                     LoadRecAddresses()
+                                    break;
+                                case "import-seed":
+                                    ChangeNav("import-seed", 3)
                                     break;
                                 default:
                                     if(href.indexOf("receive-factoids?address") == 0){
