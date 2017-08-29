@@ -3523,9 +3523,6 @@ table.hover tr:nth-of-type(even):hover {
           .backup-step-three .backup-seed-table ul li:not(:last-child) {
             margin-bottom: 20px; } }
 
-.balances {
-  display: none; }
-
 body,
 html {
   height: 100%; }
