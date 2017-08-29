@@ -159,8 +159,11 @@ function ChangeNav(mainClass, activeWindow, extraClass) {
         $("#transactions-nav").addClass("active")
     } else if(activeWindow == 2) {
         $("#address-book-nav").addClass("active")
-    } else {
+    } else if(activeWindow == 3){
         $("#settings-nav").addClass("active")
+    } else {
+        $("#backup-nav").addClass("active")
+
     }
     fixUp();
     $('#guts').foundation();
