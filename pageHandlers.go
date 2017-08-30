@@ -367,6 +367,14 @@ func HandleImportSeed(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func HandleSuccessScreen(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	templates.ExecuteTemplate(w, "success-screen", NewPlaceHolderStruct())
+	return nil
+}
+
 /*******************
  *  Edit Addresses *
  *******************/

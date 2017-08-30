@@ -166,6 +166,10 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleBackup3(w, r)
 	case "/import-seed":
 		err = HandleImportSeed(w, r)
+	case "/success-screen-backup":
+		err = HandleSuccessScreen(w, r)
+	case "/success-screen-import":
+		err = HandleSuccessScreen(w, r)
 	default:
 		err = HandleNotFoundError(w, r)
 	}

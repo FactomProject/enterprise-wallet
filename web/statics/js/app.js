@@ -127,6 +127,12 @@ $(function() {
                                 case "import-seed":
                                     ChangeNav("import-seed", 3, true)
                                     break;
+                                case "success-screen-import":
+                                    ChangeNav("success-screen", 3, true)
+                                    break;
+                                case "success-screen-backup":
+                                    ChangeNav("success-screen", 4, true)
+                                    break;
                                 default:
                                     if(href.indexOf("receive-factoids?address") == 0){
                                         ChangeNav("receive-factoids", 2)

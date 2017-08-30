@@ -18,6 +18,9 @@ $("#backup-input-verify-button").on('click', function(){
 	if(inputedSeedSplit.join(" ") === seedSingle) {
 		clear()
 		$("#backup-input-verify-button").addClass("backup-btn-verified")
+		setTimeout(function() {
+			document.getElementById("link-to-success").click()
+		}, 1000);
 	} else {
 		clear()
 		$("#backup-input-verify-button").addClass("backup-btn-failed")
@@ -77,6 +80,9 @@ $("#import-input-confirm-button").on('click', function(){
 			clear()
 			$("#import-input-confirm-button").addClass("backup-btn-verified")
 	    	SetGeneralSuccess("Seed has been changed to: " + obj.Content)
+	    	setTimeout(function() {
+	    		document.getElementById("link-to-success").click()
+	    	}, 1000);
 	    } else {
 	    	clear()
 			$("#import-input-confirm-button").addClass("backup-btn-failed")

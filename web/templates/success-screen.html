@@ -1,0 +1,18 @@
+{{define "success-screen"}}
+
+{{$pageTitle := "Backup Step 1"}}
+{{$mainClass := "address-book"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 4}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+<div id="guts">
+    <div class="app">
+        <div class="backup-main">
+           Success-Screen that has a link to AddressBook and Transactions
+        </div>
+    </div>
+</div>
+{{template "templateBottom" "LoadBackup0()"}}
+{{end}}
