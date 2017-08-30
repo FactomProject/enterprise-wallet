@@ -91,7 +91,8 @@ body .backup-main {
 
     /* FORMS */
 
-    .backup-input {
+    .backup-input,
+    .import-input {
         color: $blue !important;
         border-bottom: $border-purple-light !important;
         transition: border $hover-transition !important;

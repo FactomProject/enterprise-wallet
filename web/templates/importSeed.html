@@ -8,12 +8,12 @@
 
 {{template "templateTop" $info}}
 <div id="guts">
-<div class="hide" id="given-seed" value="{{.SingleSeed}}"></div>
-  <div class="app">
+    <div class="hide" id="given-seed" value="{{.SingleSeed}}"></div>
+    <div class="app">
         <div class="backup-main">
             <form class="backup-form" id="backup-html-form" action="javascript:void(0);">
                 <div class="backup-content backup-step-three">
-                    <h1 class="backup-title">Enter the 12 word phrase to import</h1>
+                    <h1 class="backup-title">To import your seed, enter your 12 word phrase.</h1>
                     <div class="backup-box-content">
                         <div class="backup-seed-table">
                             <div>
@@ -108,9 +108,6 @@
                     </div>
                 </div>
                 <div class="backup-footer">
-                <a href="success-screen-backup" nav-click="true" style="display: none;" id="link-to-success"></a>
-                
-<!--                     <a href="backup2" nav-click="true" class="backup-btn backup-btn-gray"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
                     <button class="backup-btn backup-btn-green backup-btn-verify" id="import-input-confirm-button">
                         <span>Import</span>
                         <div class="backup-spinner">

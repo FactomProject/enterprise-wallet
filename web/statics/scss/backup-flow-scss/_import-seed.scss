@@ -1,0 +1,41 @@
+@import '_variables';
+
+.import-seed-settings-title {
+    color: $orange !important;
+}
+
+.import-seed-warning {
+    display: flex;
+    align-items: center;
+    padding: 16px 28px;
+    border: $border-gray;
+
+    > div:first-child {
+        margin-right: 20px;
+        padding-right: 20px;
+        border-right: $border-gray;
+    }
+
+    > div:last-child {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-basis: 20%;
+    }
+
+    a {
+        margin-bottom: 0 !important;
+    }
+
+    p {
+        margin-bottom: 0 !important;
+    }
+}
+
+.import-seed {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: $bg-body-dark;
+}

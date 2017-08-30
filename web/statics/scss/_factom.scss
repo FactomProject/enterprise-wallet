@@ -13,7 +13,7 @@ $purple: #302c42;
 $border-purple-light: 1px solid #4A4857;
 $border-gray-light: 1px solid #e8e8e8;
 
-$bg-dark: #13101d;
+$bg-dark: #0A0715;
 
 $sidebar-bg-dark: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
 $sidebar-bg-light: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
@@ -367,7 +367,7 @@ header {
 
 	#sync-status {
 		width: 100%;
-		padding: 0 1em;
+		padding: 0 1em 1em;
 		text-align: center;
 		.label {
             margin: 12px 0 0;
