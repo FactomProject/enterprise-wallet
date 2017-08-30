@@ -1787,6 +1787,21 @@ function LoadBackup0() {
 	LoadAddresses(false)
 }
 
+function updateBackupConfirmCheckbox() {
+	var c = $("#wrote-down-confirm-checkbox")
+	if(!c.is(':checked')) {
+		c.prop('checked', true);
+	} else {
+		c.prop('checked', false);
+	}
+
+	if(c.is(':checked')) {
+		document.getElementById("wrote-down-confirm").disabled = false;
+	} else {
+		document.getElementById("wrote-down-confirm").disabled = true;
+	}
+}
+
 // Importing
 
 $("#import-input-confirm-button").on('click', function(){
