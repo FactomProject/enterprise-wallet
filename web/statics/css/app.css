@@ -3688,6 +3688,9 @@ h1.backup-title {
     margin-right: 12px; }
   .backup-btn .fa-arrow-right {
     margin-left: 12px; }
+  .backup-btn disabled {
+    opacity: 0.3;
+    cursor: default; }
 
 .backup-btn-verify {
   position: relative;
