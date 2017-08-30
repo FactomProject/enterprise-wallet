@@ -57,30 +57,30 @@ $("#export-seed").on('click', function(){
 
 //selected = false
 // Import/Export
-$("#settings-import-file").on('click', function(e){
-	document.getElementById('settings-uploaded-file').click()
-})
+// $("#settings-import-file").on('click', function(e){
+// 	document.getElementById('settings-uploaded-file').click()
+// })
 
 
-$("#settings-uploaded-file").on('change', function(){
-	input = document.getElementById('settings-uploaded-file');
-	if (!input) {
-		SetGeneralError("Error: Couldn't find the fileinput element.")
-	}
-	else if (!input.files) {
-		SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
-	}
-	else if (!input.files[0]) {
-		SetGeneralError("Please select a file before clicking 'Import From File'")
-	}
-	else {
-	file = input.files[0];
-	fr = new FileReader();
-	fr.onload = receivedText;
-	fr.readAsText(file);
-	//fr.readAsDataURL(file);
-	}
-})
+// $("#settings-uploaded-file").on('change', function(){
+// 	input = document.getElementById('settings-uploaded-file');
+// 	if (!input) {
+// 		SetGeneralError("Error: Couldn't find the fileinput element.")
+// 	}
+// 	else if (!input.files) {
+// 		SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
+// 	}
+// 	else if (!input.files[0]) {
+// 		SetGeneralError("Please select a file before clicking 'Import From File'")
+// 	}
+// 	else {
+// 	file = input.files[0];
+// 	fr = new FileReader();
+// 	fr.onload = receivedText;
+// 	fr.readAsText(file);
+// 	//fr.readAsDataURL(file);
+// 	}
+// })
 
 // Do action with imported transaction
 function receivedText() {
