@@ -90,17 +90,17 @@ $(function() {
                                     ChangeNav("settings", 3)
                                     break;
                                 case "Backup":
-                                    ChangeNav("backup-main", 4, "address-book")
+                                    ChangeNav("backup-main", 4, "address-book", true)
                                     LoadBackup0()
                                     break;
                                 case "backup1":
-                                    ChangeNav("backup-main", 4)
+                                    ChangeNav("backup-main", 4, true)
                                     break;
                                 case "backup2":
-                                    ChangeNav("backup-main", 4)
+                                    ChangeNav("backup-main", 4, true)
                                     break;
                                 case "backup3":
-                                    ChangeNav("backup-main", 4)
+                                    ChangeNav("backup-main", 4, true)
                                     break;
                                 case "send-factoids":
                                     ChangeNav("send-factoids", 1)
@@ -125,7 +125,7 @@ $(function() {
                                     LoadRecAddresses()
                                     break;
                                 case "import-seed":
-                                    ChangeNav("import-seed", 3)
+                                    ChangeNav("import-seed", 3, true)
                                     break;
                                 default:
                                     if(href.indexOf("receive-factoids?address") == 0){
@@ -151,8 +151,23 @@ $(function() {
     } // otherwise, history is not supported, so nothing fancy here.    
 });
 
-function ChangeNav(mainClass, activeWindow, extraClass) {
+function ChangeNav(mainClass, activeWindow, extraClass, hideBalances) {
     $("main").removeClass()
+
+    if(extraClass === undefined) {
+        hideBalances = false
+    }
+
+    if(extraClass === true || extraClass === false) {
+        hideBalances = extraClass
+        extraClass = undefined
+    }
+
+    if(hideBalances) {
+        $(".balances").hide()
+    } else {
+        $(".balances").show()
+    }
 
     $("main").addClass(mainClass)
     if(extraClass !== undefined) {
