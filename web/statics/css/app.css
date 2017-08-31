@@ -3491,8 +3491,7 @@ table.hover tr:nth-of-type(even):hover {
 /* DARK THEME */
 /* LIGHT THEME */
 .backup-step-one .backup-box-content {
-  display: flex;
-  align-items: center; }
+  display: flex; }
   @media (max-width: 991px) {
     .backup-step-one .backup-box-content {
       display: block; } }
