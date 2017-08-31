@@ -3612,7 +3612,7 @@ main.backup-main, main.success-screen {
     display: block;
     position: absolute;
     top: -6px;
-    left: 39px;
+    left: 32px;
     width: 10px;
     height: 10px;
     transform: rotate(45deg); }
@@ -4280,8 +4280,7 @@ body {
   color: #656666; }
 
 header {
-  min-height: 150px;
-  padding: 32px 0 22px;
+  padding: 16px 0;
   text-align: center;
   border-bottom: 1px solid #e8e8e8; }
   @media screen and (min-width: 0em) and (max-width: 39.9375em) {
@@ -4294,7 +4293,6 @@ header {
     max-width: 92px;
     margin-bottom: 8px; }
   header h1 {
-    margin-bottom: 1rem;
     font-size: 1.8rem;
     padding: 0 0.8rem;
     color: #302c42;
@@ -4337,7 +4335,7 @@ header {
           #frame section.leftCol nav ul li a {
             display: flex;
             align-items: center;
-            padding: 1.2rem 1.6rem;
+            padding: 0.8rem 1.2rem;
             transition: ease 0.3s all;
             color: #417ba4;
             font-size: 18px;

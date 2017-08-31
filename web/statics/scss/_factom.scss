@@ -179,8 +179,7 @@ html, body {
 body { color: $text-color; }
 
 header {
-    min-height: 150px;
-    padding: 32px 0 22px;
+    padding: 16px 0;
     text-align: center;
     border-bottom: $border-gray-light;
 
@@ -194,7 +193,6 @@ header {
 		margin-bottom: 8px;
     }
     h1 {
-		margin-bottom: 1rem;
         font-size: 1.8rem;
         padding: 0 0.8rem;
         color: $purple;
@@ -236,7 +234,7 @@ header {
                     a {
                         display: flex;
                         align-items: center;
-                        padding: 1.2rem 1.6rem;
+                        padding: 0.8rem 1.2rem;
                         transition: ease 0.3s all;
                         color: $primary-color;
                         font-size: 18px;
