@@ -3,10 +3,50 @@ html {
     height: 100%;
 }
 
+main {
+    &.backup-main,
+    &.success-screen {
+        padding: 0 !important;
+    }
+}
+
+.backup-main,
+.success-screen {
+    height: 100%;
+    width: 100%;
+
+    #dynamic-content {
+        height: 100%;
+        width: 100%;
+
+        #guts {
+            height: 100%;
+            width: 100%;
+
+            .app {
+                height: 100%;
+                width: 100%;
+            }
+        }
+    }
+}
+
 .backup-alert-note {
+    position: relative;
     padding: 8px;
     border-radius: 6px;
     font-size: 14px;
+
+    &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -6px;
+        left: 39px;
+        width: 10px;
+        height: 10px;
+        transform: rotate(45deg);
+    }
 
     @media(max-width:639px) {
         display: none;
@@ -139,7 +179,7 @@ h1.backup-title {
     line-height: 42px !important;
     font-weight: 400 !important;
     text-align: center !important;
-    max-width: 80% !important;
+    max-width: 95% !important;
     text-transform: none !important;
 
     a {
@@ -158,6 +198,12 @@ h1.backup-title {
     width: 100%;
     padding: 20px;
     border-radius: 6px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .backup-seed-order {

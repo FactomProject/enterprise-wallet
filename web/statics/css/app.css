@@ -3484,8 +3484,7 @@ table.hover tr:nth-of-type(even):hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  background: #0A0715; }
+  height: 100%; }
 
 /* GENERAL */
 /* DARK THEME */
@@ -3514,14 +3513,6 @@ table.hover tr:nth-of-type(even):hover {
   position: relative;
   padding: 32px;
   margin-bottom: 30px; }
-  .backup-step-two .backup-box-content::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0; }
 .backup-step-two .backup-seed-table {
   display: flex; }
   .backup-step-two .backup-seed-table > div {
@@ -3598,10 +3589,40 @@ body,
 html {
   height: 100%; }
 
+main.backup-main, main.success-screen {
+  padding: 0 !important; }
+
+.backup-main,
+.success-screen {
+  height: 100%;
+  width: 100%; }
+  .backup-main #dynamic-content,
+  .success-screen #dynamic-content {
+    height: 100%;
+    width: 100%; }
+    .backup-main #dynamic-content #guts,
+    .success-screen #dynamic-content #guts {
+      height: 100%;
+      width: 100%; }
+      .backup-main #dynamic-content #guts .app,
+      .success-screen #dynamic-content #guts .app {
+        height: 100%;
+        width: 100%; }
+
 .backup-alert-note {
+  position: relative;
   padding: 8px;
   border-radius: 6px;
   font-size: 14px; }
+  .backup-alert-note::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -6px;
+    left: 39px;
+    width: 10px;
+    height: 10px;
+    transform: rotate(45deg); }
   @media (max-width: 639px) {
     .backup-alert-note {
       display: none; } }
@@ -3700,7 +3721,7 @@ h1.backup-title {
   line-height: 42px !important;
   font-weight: 400 !important;
   text-align: center !important;
-  max-width: 80% !important;
+  max-width: 95% !important;
   text-transform: none !important; }
   h1.backup-title a {
     font-size: 15px;
@@ -3714,7 +3735,13 @@ h1.backup-title {
 .backup-box-content {
   width: 100%;
   padding: 20px;
-  border-radius: 6px; }
+  border-radius: 6px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
 
 .backup-seed-order {
   display: flex;
@@ -3830,7 +3857,7 @@ h1.backup-title {
   .backup-checkbox input[type="checkbox"] {
     display: none; }
   .backup-checkbox input[type="checkbox"] + label {
-    opacity: 0.7;
+    opacity: 0.3;
     transition: opacity 0.3s ease; }
   .backup-checkbox input[type="checkbox"]:checked + label {
     opacity: 1; }
@@ -3901,10 +3928,17 @@ h1.backup-title {
 body.darkTheme .backup-alert-note {
   color: #FFF;
   border: 1px solid #4A4857;
+  background: #302c42;
   margin: 0; }
+  body.darkTheme .backup-alert-note:before {
+    border-top: 1px solid #4A4857;
+    border-left: 1px solid #4A4857;
+    background: #302c42; }
   body.darkTheme .backup-alert-note strong {
     color: #EC5840;
     font-weight: 700; }
+body.darkTheme .import-seed {
+  background: #0A0715; }
 
 body.darkTheme .backup-main {
   background: #0A0715;
@@ -3955,6 +3989,8 @@ body.darkTheme .backup-main {
     width: 280px;
     height: 215px;
     background-repeat: no-repeat; }
+  body.darkTheme .backup-main .backup-checkbox label {
+    color: #FFF; }
   body.darkTheme .backup-main .backup-input,
   body.darkTheme .backup-main .import-input {
     color: #FFF !important;
@@ -4004,7 +4040,11 @@ body.darkTheme .backup-main {
 .backup-alert-note {
   color: #000;
   border: 1px solid #4A4857;
-  margin: 0 12px; }
+  background: #FFF; }
+  .backup-alert-note:before {
+    border-top: 1px solid #4A4857;
+    border-left: 1px solid #4A4857;
+    background: #FFF; }
   .backup-alert-note strong {
     color: #EC5840;
     font-weight: 700; }
@@ -4056,6 +4096,8 @@ body .backup-main {
     width: 280px;
     height: 215px;
     background-repeat: no-repeat; }
+  body .backup-main .backup-checkbox label {
+    color: #000; }
   body .backup-main .backup-input,
   body .backup-main .import-input {
     color: #407BA4 !important;
@@ -4291,7 +4333,7 @@ header {
         padding: 0;
         list-style: none; }
         #frame section.leftCol nav ul li {
-          margin: 0;
+          margin: 0 1.2rem;
           padding: 0; }
           #frame section.leftCol nav ul li a {
             display: flex;

@@ -4,12 +4,23 @@ body.darkTheme {
     .backup-alert-note {
         color: $white;
         border: $border-purple-light;
+        background: $purple;
         margin: 0;
+
+        &:before {
+            border-top: $border-purple-light;
+            border-left: $border-purple-light;
+            background: $purple;
+        }
 
         strong {
             color: $red;
             font-weight: 700;
         }
+    }
+
+    .import-seed {
+        background: $bg-body-dark;
     }
 }
 
@@ -94,6 +105,12 @@ body.darkTheme .backup-main {
     }
 
     /* FORMS */
+
+    .backup-checkbox {
+        label {
+            color: $white;
+        }
+    }
 
     .backup-input,
     .import-input {

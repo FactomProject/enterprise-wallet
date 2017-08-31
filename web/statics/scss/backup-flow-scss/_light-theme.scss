@@ -3,7 +3,13 @@
 .backup-alert-note {
     color: $black;
     border: $border-purple-light;
-    margin: 0 12px;
+    background: $white;
+
+    &:before {
+        border-top: $border-purple-light;
+        border-left: $border-purple-light;
+        background: $white;
+    }
 
     strong {
         color: $red;
@@ -90,6 +96,12 @@ body .backup-main {
     }
 
     /* FORMS */
+
+    .backup-checkbox {
+        label {
+            color: $black;
+        }
+    }
 
     .backup-input,
     .import-input {
