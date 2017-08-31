@@ -4930,8 +4930,10 @@ body.darkTheme {
     body.darkTheme #frame section.leftCol nav ul li {
       margin: 0 1.2rem; }
     body.darkTheme #frame section.leftCol nav ul li a {
-      opacity: 0.4;
-      filter: brightness(20); }
+      color: #fff;
+      opacity: 0.5; }
+      body.darkTheme #frame section.leftCol nav ul li a svg path, body.darkTheme #frame section.leftCol nav ul li a svg rect, body.darkTheme #frame section.leftCol nav ul li a svg poly, body.darkTheme #frame section.leftCol nav ul li a .svg path, body.darkTheme #frame section.leftCol nav ul li a .svg rect, body.darkTheme #frame section.leftCol nav ul li a .svg poly {
+        fill: #fff !important; }
       body.darkTheme #frame section.leftCol nav ul li a.never-backedup {
         color: #EC5840 !important;
         filter: none;
@@ -4940,7 +4942,6 @@ body.darkTheme {
           fill: #EC5840 !important; }
     body.darkTheme #frame section.leftCol nav ul li.active a {
       opacity: 1;
-      filter: none;
       background: transparent;
       color: #e8b521; }
       body.darkTheme #frame section.leftCol nav ul li.active a svg path, body.darkTheme #frame section.leftCol nav ul li.active a svg rect, body.darkTheme #frame section.leftCol nav ul li.active a svg poly, body.darkTheme #frame section.leftCol nav ul li.active a .svg path, body.darkTheme #frame section.leftCol nav ul li.active a .svg rect, body.darkTheme #frame section.leftCol nav ul li.active a .svg poly {

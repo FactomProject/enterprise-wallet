@@ -951,8 +951,12 @@ body.darkTheme {
                 margin: 0 1.2rem;
             }
             nav ul li a {
-                opacity: 0.4;
-                filter: brightness(20);
+                color: #fff;
+                opacity: 0.5;
+
+                svg, .svg {
+                    path, rect, poly { fill: #fff !important; }
+                }
 
                 &.never-backedup {
                     color: #EC5840 !important;
@@ -966,7 +970,6 @@ body.darkTheme {
             }
             nav ul li.active a {
                 opacity: 1;
-                filter: none;
                 background: transparent;
                 color: $tertiary-color;
                 svg, .svg {
