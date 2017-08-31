@@ -173,8 +173,10 @@ function ChangeNav(mainClass, activeWindow, extraClass, hideBalances) {
 
     if(hideBalances) {
         $(".balances").hide()
+        $("#synced-indicator").hide()
     } else {
         $(".balances").show()
+        $("#synced-indicator").show()
     }
 
     $("main").addClass(mainClass)

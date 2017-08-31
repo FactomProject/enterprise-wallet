@@ -1769,6 +1769,7 @@ $("#backup-input-verify-button").on('click', function(){
 		$("#backup-input-verify-button").removeClass("backup-btn-failed")
 		$("#backup-input-verify-button").removeClass("backup-btn-checking")
 		$("#backup-input-verify-button").removeClass("backup-btn-verified")
+		$("#backup-error-message").removeClass("active")
 	}
 
 	if(inputedSeedSplit.join(" ") === seedSingle) {
@@ -1780,6 +1781,7 @@ $("#backup-input-verify-button").on('click', function(){
 	} else {
 		clear()
 		$("#backup-input-verify-button").addClass("backup-btn-failed")
+		$("#backup-error-message").addClass("active")
 		setTimeout(clear, 3000);
 	}
 })
@@ -1822,6 +1824,7 @@ $("#import-input-confirm-button").on('click', function(){
 		$("#import-input-confirm-button").removeClass("backup-btn-failed")
 		$("#import-input-confirm-button").removeClass("backup-btn-checking")
 		$("#import-input-confirm-button").removeClass("backup-btn-verified")
+		$("#backup-error-message").removeClass("active")
 	}
 
 
@@ -1842,7 +1845,7 @@ $("#import-input-confirm-button").on('click', function(){
 	    } else {
 	    	clear()
 			$("#import-input-confirm-button").addClass("backup-btn-failed")
-	    	SetGeneralError("Error: " + obj.Error)
+	    	$("#backup-error-message").addClass("active")
 	    	setTimeout(clear, 3000);
 	    }
 	})
