@@ -34,6 +34,7 @@ main {
 .backup-alert-note {
     position: relative;
     padding: 8px;
+    margin: 0 -10px;
     border-radius: 6px;
     font-size: 14px;
 
@@ -42,7 +43,7 @@ main {
         display: block;
         position: absolute;
         top: -6px;
-        left: 32px;
+        left: 42px;
         width: 10px;
         height: 10px;
         transform: rotate(45deg);

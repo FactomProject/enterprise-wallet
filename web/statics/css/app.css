@@ -3605,6 +3605,7 @@ main.backup-main, main.success-screen {
 .backup-alert-note {
   position: relative;
   padding: 8px;
+  margin: 0 -10px;
   border-radius: 6px;
   font-size: 14px; }
   .backup-alert-note::before {
@@ -3612,7 +3613,7 @@ main.backup-main, main.success-screen {
     display: block;
     position: absolute;
     top: -6px;
-    left: 32px;
+    left: 42px;
     width: 10px;
     height: 10px;
     transform: rotate(45deg); }
@@ -3927,8 +3928,7 @@ h1.backup-title {
 body.darkTheme .backup-alert-note {
   color: #FFF;
   border: 1px solid #4A4857;
-  background: #302c42;
-  margin: 0; }
+  background: #302c42; }
   body.darkTheme .backup-alert-note:before {
     border-top: 1px solid #4A4857;
     border-left: 1px solid #4A4857;
