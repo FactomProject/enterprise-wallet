@@ -3439,6 +3439,7 @@ table.hover tr:nth-of-type(even):hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 60px;
   height: 60px;
   border: 1px solid #51C983;
@@ -3541,7 +3542,7 @@ table.hover tr:nth-of-type(even):hover {
         .backup-step-two .backup-seed-table ul li {
           display: flex;
           align-items: center;
-          margin: 0; } }
+          margin: 0 0 20px 0; } }
 
 /* GENERAL */
 /* DARK THEME */
@@ -3575,7 +3576,7 @@ table.hover tr:nth-of-type(even):hover {
         .backup-step-three .backup-seed-table ul li {
           display: flex;
           align-items: center;
-          margin: 0; } }
+          margin: 0 0 20px 0; } }
 
 body,
 html {
@@ -3656,7 +3657,8 @@ main.backup-main, main.success-screen {
   .backup-main #dynamic-content {
     width: 100%; }
   .backup-main .backup-pager {
-    margin-bottom: 40px; }
+    margin: 30px 0;
+    flex-shrink: 0; }
     .backup-main .backup-pager ul {
       position: relative;
       display: flex;
@@ -3685,10 +3687,12 @@ main.backup-main, main.success-screen {
     justify-content: center;
     align-items: center;
     flex-grow: 1;
+    flex-shrink: 0;
     width: 95%; }
   .backup-main .backup-footer {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     padding: 16px 0; }
   .backup-main p, .backup-main li {
     line-height: 22px; }
@@ -3701,6 +3705,7 @@ main.backup-main, main.success-screen {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 65px;
   height: 65px;
   border-radius: 50%;
@@ -3844,6 +3849,7 @@ h1.backup-title {
     display: flex;
     align-items: center;
     font-size: 22px;
+    line-height: 22px;
     font-weight: 700;
     cursor: pointer;
     color: #BEBEBE; }

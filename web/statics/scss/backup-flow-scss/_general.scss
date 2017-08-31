@@ -101,7 +101,8 @@ main {
     }
 
     .backup-pager {
-        margin-bottom: 40px;
+        margin: 30px 0;
+        flex-shrink: 0;
 
         ul {
             position: relative;
@@ -140,12 +141,14 @@ main {
         justify-content: center;
         align-items: center;
         flex-grow: 1;
+        flex-shrink: 0;
         width: 95%;
     }
 
     .backup-footer {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         padding: 16px 0;
     }
 
@@ -166,6 +169,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     width: 65px;
     height: 65px;
     border-radius: 50%;
