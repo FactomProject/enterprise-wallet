@@ -128,7 +128,7 @@ function execWalletd(password) {
           "error, please reach out on our Factom Community slack."
         } else {
           var n = s.indexOf("Error in starting wallet");
-          errormessage = "There was an error launching the EnterpriseWallet, but that reason was not" +
+          errormessage = "There was an error launching the Enterprise Wallet, but that reason was not" +
           "able to be deducted. Below is the error message that was generated.\n\n"+ s.substring(n,s.length)
         }
         sendMsgToLoading(errormessage, function() {
@@ -229,7 +229,7 @@ function ChooseWalletType(witherror) {
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
     resizable: false,
-    title: 'EnterpriseWallet',
+    title: 'Enterprise Wallet',
     // transparent: true
   })
 
@@ -274,7 +274,7 @@ function loadMainWindow() {
     minWidth: 600,
     minHeight: 600,
     center: true,
-    title: 'EnterpriseWallet'
+    title: 'Enterprise Wallet'
   })
 
   if(loadingWindow !== null) {
@@ -355,7 +355,7 @@ function createLoadingWindow() {
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
     resizable: false,
-    title: 'EnterpriseWallet',
+    title: 'Enterprise Wallet',
     // transparent: true
   })
 

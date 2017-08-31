@@ -129,9 +129,11 @@ $(function() {
                                     break;
                                 case "success-screen-import":
                                     ChangeNav("success-screen", 3, true)
+                                    $("#backup-import-success-message").text("Your seed has been successfully imported!")
                                     break;
                                 case "success-screen-backup":
                                     ChangeNav("success-screen", 4, true)
+                                    $("#backup-import-success-message").text("Your seed has been successfully backed up!")
                                     break;
                                 default:
                                     if(href.indexOf("receive-factoids?address") == 0){
