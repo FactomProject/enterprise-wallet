@@ -1,6 +1,14 @@
 @import '_variables';
 
 body.darkTheme {
+    .import-success {
+        background: $bg-body-dark;
+
+        .import-success-message {
+            color: $yellow;
+        }
+    }
+
     .backup-alert-note {
         color: $white;
         border: $border-purple-light;

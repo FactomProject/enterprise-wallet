@@ -3432,8 +3432,7 @@ table.hover tr:nth-of-type(even):hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  background: #0A0715; }
+  height: 100%; }
 
 .backup-success-icon {
   display: flex;
@@ -3454,7 +3453,7 @@ table.hover tr:nth-of-type(even):hover {
   line-height: 42px;
   font-weight: 400;
   text-align: center;
-  color: #EDB820; }
+  color: #DA8141; }
 
 /* GENERAL */
 /* DARK THEME */
@@ -3924,6 +3923,10 @@ h1.backup-title {
 /* GENERAL */
 /* DARK THEME */
 /* LIGHT THEME */
+body.darkTheme .import-success {
+  background: #0A0715; }
+  body.darkTheme .import-success .import-success-message {
+    color: #EDB820; }
 body.darkTheme .backup-alert-note {
   color: #FFF;
   border: 1px solid #4A4857;
