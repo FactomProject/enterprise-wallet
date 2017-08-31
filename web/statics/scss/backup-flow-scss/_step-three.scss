@@ -8,44 +8,33 @@
 
     .backup-seed-table {
         display: flex;
-
-        @media(max-width: 1150px) {
-            flex-direction: column;
-        }
-
-        > div {
-            margin: 0 10px;
-            flex-basis: 25%;
-
-            &:first-child {
-                margin-left: 0;
-            }
-
-            &:last-child {
-                margin-right: 0;
-            }
-        }
+        flex-direction: column;
 
         ul {
+            display: flex;
             list-style: none;
+
+            @media(max-width: 1150px) {
+                flex-direction: column;
+            }
 
             li {
                 display: flex;
                 align-items: center;
+                margin: 0 10px;
 
-                &:not(:last-child) {
-                    margin-bottom: 30px;
+                &:first-child {
+                    margin-left: 0;
+                }
+
+                &:last-child {
+                    margin-right: 0;
                 }
             }
         }
 
         @media(max-width: 1150px) {
             flex-direction: column;
-
-            > div {
-                margin: 0 0 20px 0;
-                flex-basis: 100%;
-            }
 
             ul {
                 list-style: none;
@@ -54,10 +43,7 @@
                 li {
                     display: flex;
                     align-items: center;
-
-                    &:not(:last-child) {
-                        margin-bottom: 20px;
-                    }
+                    margin: 0;
                 }
             }
         }
