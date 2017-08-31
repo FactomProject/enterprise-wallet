@@ -2,8 +2,19 @@
 
 .backup-step-two {
     .backup-box-content {
+        position: relative;
         padding: 32px;
         margin-bottom: 30px;
+
+        &::before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
     }
 
     .backup-seed-table {

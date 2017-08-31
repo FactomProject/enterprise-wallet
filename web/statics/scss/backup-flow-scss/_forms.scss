@@ -7,6 +7,17 @@
     height: 100%;
 }
 
+.backup-error-message {
+    color: $red;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity $hover-transition;
+
+    &.active {
+        opacity: 1;
+    }
+}
+
 .backup-btn {
     background: transparent;
     display: flex;
@@ -89,6 +100,7 @@
     }
 
     &.backup-btn-failed {
+        position: relative;
         background: $red !important;
         border: 1px solid $red !important;
 
@@ -159,8 +171,8 @@
             width: 9px;
             height: 5px;
             position: absolute;
-            top: 3px;
-            left: 2px;
+            top: 4px;
+            left: 3px;
             border: 2px solid $yellow;
             border-top: none;
             border-right: none;

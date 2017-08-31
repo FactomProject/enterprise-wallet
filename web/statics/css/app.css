@@ -3511,8 +3511,17 @@ table.hover tr:nth-of-type(even):hover {
 /* DARK THEME */
 /* LIGHT THEME */
 .backup-step-two .backup-box-content {
+  position: relative;
   padding: 32px;
   margin-bottom: 30px; }
+  .backup-step-two .backup-box-content::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0; }
 .backup-step-two .backup-seed-table {
   display: flex; }
   .backup-step-two .backup-seed-table > div {
@@ -3730,6 +3739,14 @@ h1.backup-title {
   align-items: center;
   height: 100%; }
 
+.backup-error-message {
+  color: #EC5840;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s ease; }
+  .backup-error-message.active {
+    opacity: 1; }
+
 .backup-btn {
   background: transparent;
   display: flex;
@@ -3784,6 +3801,7 @@ h1.backup-title {
     .backup-btn-verify.backup-btn-verified .fa-check {
       transform: translateY(0); }
   .backup-btn-verify.backup-btn-failed {
+    position: relative;
     background: #EC5840 !important;
     border: 1px solid #EC5840 !important; }
     .backup-btn-verify.backup-btn-failed .backup-spinner,
@@ -3835,8 +3853,8 @@ h1.backup-title {
       width: 9px;
       height: 5px;
       position: absolute;
-      top: 3px;
-      left: 2px;
+      top: 4px;
+      left: 3px;
       border: 2px solid #EDB820;
       border-top: none;
       border-right: none;
