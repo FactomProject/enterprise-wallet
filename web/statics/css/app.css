@@ -3645,7 +3645,6 @@ main.backup-main, main.success-screen {
 .backup-main {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   flex-grow: 1;
   padding: 16px; }
