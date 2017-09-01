@@ -1795,6 +1795,11 @@ $("#backup-input-verify-button").on('click', function(){
 	}
 })
 
+$(".external-link").on('click', function(e){
+	e.preventDefault()
+	require('electron').shell.openExternal($(this).attr("href"))
+})
+
 $("#backup-html-form").on("submit",function(event){event.preventDefault()})
 
 function LoadBackup0() {
