@@ -31,6 +31,10 @@ var COMPILED_STATICS = true
 
 func SaveSettings() error {
 	err := MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+	if err != nil {
+		return err
+	}
+	err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("backed-up"), &BoolHolder{MasterSettings.BackedUp})
 	return err
 }
 

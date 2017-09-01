@@ -156,6 +156,14 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	// We always need to load transactions, even if in database. So let's start as not synced
 	MasterSettings.Synced = false
 
+	bh := new(BoolHolder)
+	old, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("backed-up"), bh)
+	if old == nil || err != nil {
+		MasterSettings.BackedUp = false
+	} else {
+		MasterSettings.BackedUp = bh.Value
+	}
+
 	// For Testing adds random addresses
 	if ADD_RANDOM_ADDRESSES {
 		addRandomAddresses()

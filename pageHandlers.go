@@ -47,6 +47,7 @@ type SettingsStruct struct {
 	ControlPanelPort int
 	Synced           bool
 	Encrypted        bool
+	BackedUp         bool
 }
 
 // Refresh refreshes the "synced" flag, and anything else that needs to be done
@@ -370,6 +371,8 @@ func HandleImportSeed(w http.ResponseWriter, r *http.Request) error {
 func HandleSuccessScreen(w http.ResponseWriter, r *http.Request) error {
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
+
+	MasterSettings.BackedUp = true
 
 	templates.ExecuteTemplate(w, "success-screen", NewPlaceHolderStruct())
 	return nil

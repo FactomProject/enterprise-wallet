@@ -2,7 +2,27 @@ package main
 
 import (
 	"fmt"
+
+	"encoding/json"
 )
+
+type BoolHolder struct {
+	Value bool
+}
+
+func (b *BoolHolder) MarshalBinary() ([]byte, error) {
+	return json.Marshal(b)
+}
+
+func (b *BoolHolder) UnmarshalBinaryData(data []byte) (newdata []byte, err error) {
+	err = json.Unmarshal(data, b)
+	return
+}
+
+func (b *BoolHolder) UnmarshalBinary(data []byte) (err error) {
+	_, err = b.UnmarshalBinaryData(data)
+	return
+}
 
 func MarshalStringToBytes(str string, maxlength int) ([]byte, error) {
 	if len(str) > maxlength {

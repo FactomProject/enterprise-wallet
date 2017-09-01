@@ -50,10 +50,13 @@
                                 <i><img src="img/nav_backup.svg" class="svg" alt="Settings"></i>
                                 Backup
                             </a>
-                            <div class="backup-alert-note">
-                                <strong>Please be sure to back up your seed.</strong> <br>
-                                <span>Allowing you to restore your seed in the case of lost password or database corruption.</span>
-                            </div>
+                            {{ if $settings.BackedUp }}
+                            {{ else }}
+                                <div id="backup-message" class="backup-alert-note">
+                                    <strong>Please be sure to back up your seed.</strong> <br>
+                                    <span>Allowing you to restore your seed in the case of lost password or database corruption.</span>
+                                </div>
+                            {{ end }}
                         </li>
                     </ul>
                 </nav>
