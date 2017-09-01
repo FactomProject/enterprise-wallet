@@ -7,10 +7,12 @@ function LoadInitialAddresses(showSeeded){
 		showSeeded = true
 	}
 	resp = getRequest("addresses-no-bal",function(resp){
+		var count = 0
 		obj = JSON.parse(resp)
 		
 		if(obj.FactoidAddresses.List != null) {
 			obj.FactoidAddresses.List.forEach(function(address){
+				if(!address.Seeded ) { count++ }
 				if(!address.Seeded || showSeeded) {
 					$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", true));
 				}
@@ -18,6 +20,7 @@ function LoadInitialAddresses(showSeeded){
 		}
 		if(obj.EntryCreditAddresses.List != null) {
 			obj.EntryCreditAddresses.List.forEach(function(address){
+				if(!address.Seeded ) { count++ }
 				if(!address.Seeded || showSeeded) {
 					$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", true));
 				}
@@ -29,6 +32,12 @@ function LoadInitialAddresses(showSeeded){
 			})
 		}
 		sortNames(true)
+
+		if(!showSeeded && count === 0) {
+			// This means we only need to show if there are not seeded addresses
+			$(".not-all-backed-up").hide()
+			$(".all-backed-up").show()
+		}
  	})
 }
 
