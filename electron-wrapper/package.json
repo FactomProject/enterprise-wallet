@@ -33,12 +33,12 @@
   },
   "build": {
     "appId": "factom.enterprisewallet",
-    "productName": "EnterpriseWallet",
+    "productName": "Enterprise Wallet",
     "mac": {
       "asarUnpack": "bin/*"
     },
     "dmg": {
-      "title": "EnterpriseWallet",
+      "title": "Enterprise Wallet",
       "background": "build/background.png",
       "icon": "build/icon.icns",
       "iconSize": 128,
