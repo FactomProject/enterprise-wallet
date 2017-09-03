@@ -153,6 +153,10 @@ body.darkTheme .backup-main {
                 color: $gray;
             }
         }
+
+        &:focus {
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.5) !important;
+        }
     }
 
     .backup-btn-green {
@@ -181,6 +185,10 @@ body.darkTheme .backup-main {
                 color: $gray;
                 background: transparent;
             }
+        }
+
+        &:focus {
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.5) !important;
         }
     }
 

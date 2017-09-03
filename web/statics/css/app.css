@@ -4013,6 +4013,8 @@ body.darkTheme .backup-main {
       body.darkTheme .backup-main .backup-btn-gray:disabled:hover, body.darkTheme .backup-main .backup-btn-gray:disabled:active {
         border: 1px solid #BEBEBE;
         color: #BEBEBE; }
+    body.darkTheme .backup-main .backup-btn-gray:focus {
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.5) !important; }
   body.darkTheme .backup-main .backup-btn-green {
     border: 1px solid #51C983;
     color: #51C983;
@@ -4031,6 +4033,8 @@ body.darkTheme .backup-main {
         border: 1px solid #BEBEBE;
         color: #BEBEBE;
         background: transparent; }
+    body.darkTheme .backup-main .backup-btn-green:focus {
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.5) !important; }
   body.darkTheme .backup-main .backup-spinner > div {
     background: #FFF; }
 
@@ -4120,6 +4124,8 @@ body .backup-main {
       body .backup-main .backup-btn-gray:disabled:hover, body .backup-main .backup-btn-gray:disabled:active {
         border: 1px solid #BEBEBE;
         color: #BEBEBE; }
+    body .backup-main .backup-btn-gray:focus {
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.2) !important; }
   body .backup-main .backup-btn-green {
     border: 1px solid #51C983;
     color: #FFF;
@@ -4137,6 +4143,8 @@ body .backup-main {
         border: 1px solid #BEBEBE;
         color: #BEBEBE;
         background: transparent; }
+    body .backup-main .backup-btn-green:focus {
+      box-shadow: 0 0 16px rgba(232, 181, 33, 0.6) !important; }
   body .backup-main .backup-spinner > div {
     background: #FFF; }
 
