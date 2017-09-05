@@ -12,6 +12,13 @@
     }
 
     strong {
+        color: $black;
+        font-weight: 700;
+    }
+}
+
+.never-backedup ~ .backup-alert-note {
+    strong {
         color: $red;
         font-weight: 700;
     }

@@ -3935,8 +3935,11 @@ body.darkTheme .backup-alert-note {
     border-left: 1px solid #4A4857;
     background: #302c42; }
   body.darkTheme .backup-alert-note strong {
-    color: #EC5840;
+    color: #FFF;
     font-weight: 700; }
+body.darkTheme .never-backedup ~ .backup-alert-note strong {
+  color: #EC5840;
+  font-weight: 700; }
 body.darkTheme .import-seed {
   background: #0A0715; }
 
@@ -4050,8 +4053,12 @@ body.darkTheme .backup-main {
     border-left: 1px solid #4A4857;
     background: #FFF; }
   .backup-alert-note strong {
-    color: #EC5840;
+    color: #000;
     font-weight: 700; }
+
+.never-backedup ~ .backup-alert-note strong {
+  color: #EC5840;
+  font-weight: 700; }
 
 body .backup-main {
   /* PAGER */
