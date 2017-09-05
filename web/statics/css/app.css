@@ -3854,7 +3854,7 @@ h1.backup-title {
   .backup-checkbox input[type="checkbox"] {
     display: none; }
   .backup-checkbox input[type="checkbox"] + label {
-    opacity: 0.3;
+    opacity: 0.5;
     transition: opacity 0.3s ease; }
   .backup-checkbox input[type="checkbox"]:checked + label {
     opacity: 1; }
