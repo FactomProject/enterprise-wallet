@@ -373,6 +373,7 @@ func HandleSuccessScreen(w http.ResponseWriter, r *http.Request) error {
 	defer TemplateMutex.Unlock()
 
 	MasterSettings.BackedUp = true
+	SaveSettings()
 
 	templates.ExecuteTemplate(w, "success-screen", NewPlaceHolderStruct())
 	return nil

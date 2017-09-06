@@ -352,10 +352,14 @@ function loadMainWindow() {
 }
 
 function createLoadingWindow() {
+  var height = 500
+  if(isWin) {
+    height = 525
+  }
   // Create the browser window.
   loadingWindow = new BrowserWindow({
     width: 1000, 
-    height: 500,
+    height: height,
     center: true,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',

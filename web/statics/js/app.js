@@ -1,3 +1,4 @@
+var HideSyncError = false
 
 $(document).ready(function () {
     fixUp()
@@ -130,11 +131,13 @@ $(function() {
                                 case "success-screen-import":
                                     ChangeNav("success-screen", 3, true)
                                     $("#backup-message").hide()
-                                    $("#backup-import-success-message").text("Your seed has been successfully imported!")
+                                    $("#backup-nav-item").removeClass("never-backedup")
+                                    $("#backup-import-success-message").text("Your seed has been successfully restored!")
                                     break;
                                 case "success-screen-backup":
                                     ChangeNav("success-screen", 4, true)
                                     $("#backup-message").hide()
+                                    $("#backup-nav-item").removeClass("never-backedup")
                                     $("#backup-import-success-message").text("Your seed has been successfully backed up!")
                                     break;
                                 default:
@@ -174,11 +177,13 @@ function ChangeNav(mainClass, activeWindow, extraClass, hideBalances) {
     }
 
     if(hideBalances) {
+        HideSyncError = true
         $(".balances").hide()
         $("#synced-indicator").hide()
     } else {
         $(".balances").show()
-        $("#synced-indicator").show()
+        HideSyncError = false
+        //$("#synced-indicator").show()
     }
 
     $("main").addClass(mainClass)

@@ -46,7 +46,7 @@
                             </a>
                         </li>
                         <li id="backup-nav" {{if compareInts $activeNav 4 }} class="active" {{end}}>
-                            <a href="Backup" class="settings nav-element never-backedup" nav-click="true">
+                            <a href="Backup" id="backup-nav-item" class="settings nav-element {{ if $settings.BackedUp }} {{ else }} never-backedup {{end}}" nav-click="true">
                                 <i><img src="img/nav_backup.svg" class="svg" alt="Settings"></i>
                                 Backup
                             </a>
@@ -100,7 +100,7 @@
                         </div>
                     </div>
                 </section>
-                <section id="synced-indicator" class="loading callout alert" {{if $settings.Synced}} style="display:none" {{else}}{{end}}><div class="column text-center">Warning: The Wallet is still loading the blockchain. Until it is fully synced, balances and fees may not be correct.</div></section>
+                <section id="synced-indicator" class="loading callout alert" style="display:none"{{if $settings.Synced}} {{else}}{{end}}><div class="column text-center">Warning: The Wallet is syncing the blockchain. Until this is complete, transactions may be missing and balances or fees may be incorrect.</div></section>
                 <main class="{{$mainClass}}">
                 <section id="dynamic-content">
 {{end}}
