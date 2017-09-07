@@ -1,0 +1,35 @@
+/* GENERAL */
+
+$white: #FFF;
+$black: #000;
+$gray: #BEBEBE;
+$gray-dark: #777777;
+$gray-light: #FBFBFB;
+$blue: #407BA4;
+$purple: #302c42;
+$yellow: #EDB820;
+$orange: #DA8141;
+$red: #EC5840;
+$green: #51C983;
+
+$border-white: 1px solid $white;
+$border-gray: 1px solid $gray;
+$border-green: 1px solid $green;
+$border-yellow: 1px solid $yellow;
+
+$hover-transition: .3s ease;
+
+
+/* DARK THEME */
+
+$sidebar-bg-dark: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
+$bg-body-dark: #0A0715;
+$sidebar-box-shadow-dark: 0 0 16px $black;
+
+$border-purple-light: 1px solid #4A4857;
+$border-gray-light: 1px solid #e8e8e8;
+
+/* LIGHT THEME */
+
+$sidebar-bg-light: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
+$sidebar-box-shadow-light: 0 0 16px #c3c3c3;

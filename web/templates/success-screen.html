@@ -1,0 +1,28 @@
+{{define "success-screen"}}
+
+{{$pageTitle := "Backup Step 1"}}
+{{$mainClass := "address-book"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 4}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+<div id="guts">
+    <div class="app">
+        <div class="backup-main backup-success">
+            <div class="backup-content">
+                <div class="backup-success-icon">
+                   <i class="fa fa-check" aria-hidden="true"></i>
+                </div>
+                <div id="backup-import-success-message" class="backup-success-message">Your seed has been successfully restored!</div>
+                <!-- <div class="backup-success-message">Your seed has been successfully backed up!</div> -->
+            </div>
+            <div class="backup-footer">
+                <a href="/" nav-click="true" class="backup-btn backup-btn-gray">Transactions</a>
+                <a href="AddressBook" nav-click="true" class="backup-btn backup-btn-gray">Address Book</a>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "templateBottom" "LoadBackup0()"}}
+{{end}}

@@ -1,6 +1,10 @@
 hash: 12f5cef5a25ca3e241d4f5e2887029d519056425a27805d37efa92266484b36f
-updated: 2017-03-31T16:32:39.888364994-05:00
+updated: 2017-07-27T12:47:57.317529314-05:00
 imports:
+- name: github.com/beorn7/perks
+  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  subpackages:
+  - quantile
 - name: github.com/btcsuitereleases/btcutil
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
   subpackages:
@@ -28,7 +32,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: cceac7c3e8611bff774b218d65b4215b2498cd5c
+  version: 08500616ce183ef271faa0f133bc220886061d6f
   subpackages:
   - wallet
   - wallet/wsapi
@@ -37,7 +41,7 @@ imports:
   subpackages:
   - controlpanel
 - name: github.com/FactomProject/factomd
-  version: 9f119afafe95d0961b72331ee7cfad546ad909ef
+  version: a6521e702b0fe8896b400333a130dda817522535
   subpackages:
   - anchor
   - common/adminBlock
@@ -71,7 +75,7 @@ imports:
   subpackages:
   - spew
 - name: github.com/FactomProject/goleveldb
-  version: 9d147f2b8f767adca2a29f9728658681081b03a8
+  version: e7800c6976c5d75f0a9c5e9e0e2ff8086940e58f
   subpackages:
   - leveldb
   - leveldb/cache
@@ -85,10 +89,36 @@ imports:
   - leveldb/storage
   - leveldb/table
   - leveldb/util
+- name: github.com/FactomProject/logrus
+  version: 202f25545ea4cf9b191ff7f846df5d87c9382c2b
 - name: github.com/FactomProject/netki-go-partner-client
   version: 426acb535e66cc2f9e6226ae254555e3572fd142
 - name: github.com/FactomProject/snappy-go
   version: f2f83b22c29e5abc60e3a95062ce1491d3b95371
+- name: github.com/golang/protobuf
+  version: 1f49d83d9aa00e6ce4fc8258c71cc7786aec968a
+  subpackages:
+  - proto
+- name: github.com/matttproud/golang_protobuf_extensions
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  subpackages:
+  - pbutil
+- name: github.com/prometheus/client_golang
+  version: c5b7fccd204277076155f10851dad72b76a49317
+  subpackages:
+  - prometheus
+- name: github.com/prometheus/client_model
+  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  subpackages:
+  - go
+- name: github.com/prometheus/common
+  version: 616e90af75cc300730196d04f3676f838d70414f
+  subpackages:
+  - expfmt
+  - internal/bitbucket.org/ww/goautoneg
+  - model
+- name: github.com/prometheus/procfs
+  version: abf152e5f3e97f2fafac028d2cc06c1feb87ffa5
 - name: golang.org/x/crypto
   version: bed12803fa9663d7aa2c2346b0c634ad2dcd43b7
   subpackages:

@@ -142,6 +142,7 @@ function checkSynced(){
     } else {
       percent = fBlockPercent
       if(percent > 98) {
+        $("#synced-indicator").slideUp(100)
         $("#sync-bar").removeClass("alert")
       } else {
         $("#sync-bar").addClass("alert")
@@ -150,7 +151,11 @@ function checkSynced(){
     }
 
     // Remove error message
-    if (obj.Content.Synced == true) {
+    if (obj.Content.Synced === false && percent < 98) {
+      if(!HideSyncError) {
+        $("#synced-indicator").slideDown(100)
+      }
+    } else if (obj.Content.Synced === true) {
       $("#synced-indicator").slideUp(100)
     }
   })

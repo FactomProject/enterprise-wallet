@@ -16,3 +16,4 @@ cat ${rootPath}statics/js/settings.js >> $allFile
 cat ${rootPath}statics/js/recieve-factoids.js >> $allFile
 cat ${rootPath}statics/js/new-address.js >> $allFile
 cat ${rootPath}statics/js/edit-address.js >> $allFile
+cat ${rootPath}statics/js/backup.js >> $allFile

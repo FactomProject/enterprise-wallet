@@ -2,18 +2,28 @@
     LoadAddresses()
 });*/
 
-function LoadInitialAddresses(){
+function LoadInitialAddresses(showSeeded){
+	if(showSeeded === undefined) {
+		showSeeded = true
+	}
 	resp = getRequest("addresses-no-bal",function(resp){
+		var count = 0
 		obj = JSON.parse(resp)
 		
 		if(obj.FactoidAddresses.List != null) {
 			obj.FactoidAddresses.List.forEach(function(address){
-				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", true));
+				if(!address.Seeded ) { count++ }
+				if(!address.Seeded || showSeeded) {
+					$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", true));
+				}
 			})
 		}
 		if(obj.EntryCreditAddresses.List != null) {
 			obj.EntryCreditAddresses.List.forEach(function(address){
-				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", true));
+				if(!address.Seeded ) { count++ }
+				if(!address.Seeded || showSeeded) {
+					$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", true));
+				}
 			})
 		}
 		if(obj.ExternalAddresses.List != null) {
@@ -22,11 +32,20 @@ function LoadInitialAddresses(){
 			})
 		}
 		sortNames(true)
+
+		if(!showSeeded && count === 0) {
+			// This means we only need to show if there are not seeded addresses
+			$(".not-all-backed-up").hide()
+			$(".all-backed-up").show()
+		}
  	})
 }
 
-function LoadAddresses(){
-	LoadInitialAddresses()
+function LoadAddresses(showSeeded){
+	if(showSeeded === undefined) {
+		showSeeded = true
+	}
+	LoadInitialAddresses(showSeeded)
 	resp = getRequest("addresses",function(resp){
 		obj = JSON.parse(resp)
 		//console.log(resp)
@@ -34,13 +53,17 @@ function LoadAddresses(){
 		if(obj.FactoidAddresses.List != null) {
 			$('#factoid-addresses-table tbody').html("")
 			obj.FactoidAddresses.List.forEach(function(address){
-				$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", false));
+				if(!address.Seeded || showSeeded) {
+					$('#factoid-addresses-table tbody').append(addressTableRow(address, "factoid", false));
+				}
 			})
 		}
 		if(obj.EntryCreditAddresses.List != null) {
 			$('#credit-addresses-table tbody').html("")
 			obj.EntryCreditAddresses.List.forEach(function(address){
-				$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", false));
+				if(!address.Seeded || showSeeded) {
+					$('#credit-addresses-table tbody').append(addressTableRow(address, "entry-credits", false));
+				}
 			})
 		}
 		if(obj.ExternalAddresses.List != null) {
@@ -314,9 +337,7 @@ function LoadTransactions() {
 		Transactions = obj.Content
 
 		if(obj.Content.length > 0 && obj.Content[0].TxID == "empty") {
-			SetGeneralError("Your addresses do not have any transactions in the blockchain. " +
-				"It could be the blockchain is not fully synced, the Control Panel will inform you of your current height. " +
-				"Please try again in a few minutes.")
+			SetGeneralError("No transactions found for your addresses.")
 			return
 		} else if(obj.Content.length == 0) {
 			return
@@ -1312,30 +1333,30 @@ $("#export-seed").on('click', function(){
 
 //selected = false
 // Import/Export
-$("#settings-import-file").on('click', function(e){
-	document.getElementById('settings-uploaded-file').click()
-})
+// $("#settings-import-file").on('click', function(e){
+// 	document.getElementById('settings-uploaded-file').click()
+// })
 
 
-$("#settings-uploaded-file").on('change', function(){
-	input = document.getElementById('settings-uploaded-file');
-	if (!input) {
-		SetGeneralError("Error: Couldn't find the fileinput element.")
-	}
-	else if (!input.files) {
-		SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
-	}
-	else if (!input.files[0]) {
-		SetGeneralError("Please select a file before clicking 'Import From File'")
-	}
-	else {
-	file = input.files[0];
-	fr = new FileReader();
-	fr.onload = receivedText;
-	fr.readAsText(file);
-	//fr.readAsDataURL(file);
-	}
-})
+// $("#settings-uploaded-file").on('change', function(){
+// 	input = document.getElementById('settings-uploaded-file');
+// 	if (!input) {
+// 		SetGeneralError("Error: Couldn't find the fileinput element.")
+// 	}
+// 	else if (!input.files) {
+// 		SetGeneralError("This browser doesn't seem to support the `files` property of file inputs.")
+// 	}
+// 	else if (!input.files[0]) {
+// 		SetGeneralError("Please select a file before clicking 'Import From File'")
+// 	}
+// 	else {
+// 	file = input.files[0];
+// 	fr = new FileReader();
+// 	fr.onload = receivedText;
+// 	fr.readAsText(file);
+// 	//fr.readAsDataURL(file);
+// 	}
+// })
 
 // Do action with imported transaction
 function receivedText() {
@@ -1739,4 +1760,144 @@ $("#copy-to-clipboard").on('click', function(){
 	aux.select();
 	document.execCommand("copy");
 	document.body.removeChild(aux);
+})
+$("#backup-input-verify-button").on('click', function(){
+	$("#backup-input-verify-button").addClass("backup-btn-checking")
+
+	var seedSingle = $("#given-seed").attr("value");
+	var inputedSeedSplit = new Array(12);
+
+	$(".backup-input").each(function(){
+		var i = Number($(this).attr("index"))
+		inputedSeedSplit[i-1] = $(this).val()
+	})
+
+	var clear = function() {
+		$("#backup-input-verify-button").removeClass("backup-btn-failed")
+		$("#backup-input-verify-button").removeClass("backup-btn-checking")
+		$("#backup-input-verify-button").removeClass("backup-btn-verified")
+		$("#backup-error-message").removeClass("active")
+	}
+
+	if(inputedSeedSplit.join(" ") === seedSingle) {
+		clear()
+		$("#backup-input-verify-button").addClass("backup-btn-verified")
+		setTimeout(function() {
+			document.getElementById("link-to-success").click()
+		}, 1000);
+	} else {
+		clear()
+		$("#backup-input-verify-button").addClass("backup-btn-failed")
+		$("#backup-error-message").addClass("active")
+		setTimeout(clear, 3000);
+	}
+})
+
+$(".external-link").on('click', function(e){
+	e.preventDefault()
+	require('electron').shell.openExternal($(this).attr("href"))
+})
+
+$("#backup-html-form").on("submit",function(event){event.preventDefault()})
+
+function LoadBackup0() {
+	LoadAddresses(false)
+}
+
+function updateBackupConfirmCheckbox() {
+	var c = $("#wrote-down-confirm-checkbox")
+	if(!c.is(':checked')) {
+		c.prop('checked', true);
+	} else {
+		c.prop('checked', false);
+	}
+
+	if(c.is(':checked')) {
+		document.getElementById("wrote-down-confirm").disabled = false;
+	} else {
+		document.getElementById("wrote-down-confirm").disabled = true;
+	}
+}
+
+// Importing
+
+$("#import-input-confirm-button").on('click', function(){
+	$("#import-input-confirm-button").addClass("backup-btn-checking")
+
+	var seedSingle = $("#given-seed").attr("value");
+	var inputedSeedSplit = new Array(12);
+
+	$(".import-input").each(function(){
+		var i = Number($(this).attr("index"))
+		inputedSeedSplit[i-1] = $(this).val()
+	})
+
+	var clear = function() {
+		$("#import-input-confirm-button").removeClass("backup-btn-failed")
+		$("#import-input-confirm-button").removeClass("backup-btn-checking")
+		$("#import-input-confirm-button").removeClass("backup-btn-verified")
+		$("#backup-error-message").removeClass("active")
+	}
+
+
+	seed = inputedSeedSplit.join(" ")
+	var SeedStruct  = {
+    	Seed:seed,
+  	}
+  	j = JSON.stringify(SeedStruct)
+	postRequest("import-seed", j, function(resp) {
+		obj = JSON.parse(resp)
+		if(obj.Error == "none") {
+			clear()
+			$("#import-input-confirm-button").addClass("backup-btn-verified")
+	    	SetGeneralSuccess("Seed has been changed to: " + obj.Content)
+	    	setTimeout(function() {
+	    		document.getElementById("link-to-success").click()
+	    	}, 1000);
+	    } else {
+	    	clear()
+			$("#import-input-confirm-button").addClass("backup-btn-failed")
+	    	$("#backup-error-message").addClass("active")
+	    	setTimeout(clear, 3000);
+	    }
+	})
+
+	/*if(inputedSeedSplit.join(" ") === seedSingle) {
+		clear()
+		$("#import-input-confirm-button").addClass("backup-btn-verified")
+	} else {
+		clear()
+		$("#import-input-confirm-button").addClass("backup-btn-failed")
+		setTimeout(clear, 3000);
+	}*/
+})
+
+
+// Do action with imported transaction
+function receivedText() {
+	is = fr.result
+	len = is.split(" ")
+	if(len.length != 12) {
+		SetGeneralError("Seed must be 12 words");
+		return
+	}
+	document.getElementById('data-expand').click()
+	$("#import-seed-reveal-text").text(fr.result)
+	$("#import-seed-reveal-cancel").click()
+}
+
+$("#import-seed-reveal-confirm").on('click', function(){
+	seed = $("#import-seed-reveal-text").text()
+	var SeedStruct  = {
+    	Seed:seed,
+  	}
+  	j = JSON.stringify(SeedStruct)
+	postRequest("import-seed", j, function(resp) {
+		obj = JSON.parse(resp)
+		if(obj.Error == "none") {
+	    	SetGeneralSuccess("Seed has been changed to: " + obj.Content)
+	    } else {
+	    	SetGeneralError("Error: " + obj.Error)
+	    }
+	})
 })

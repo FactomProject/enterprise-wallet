@@ -13,7 +13,7 @@ func Start() (*WalletDB, error) {
 	// Should read from config
 	factom.SetFactomdServer("localhost:8088")
 
-	wal, err := LoadWalletDB(false)
+	wal, err := LoadWalletDB(false, "")
 	if err != nil {
 		return nil, err
 	}

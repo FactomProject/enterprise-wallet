@@ -14,7 +14,7 @@ func init() {
 }
 
 func TestMarshal(t *testing.T) {
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 100; i++ {
 		str := random.RandomString()
 		max := random.RandIntBetween(0, 100)
 		if max < len(str) {
@@ -38,6 +38,8 @@ func TestMarshal(t *testing.T) {
 		if len(data) != 0 {
 			t.Error("Unmarshal Return Data")
 		}
+		t.Log("ASD")
+
 	}
 
 	str := "123456"
@@ -56,4 +58,21 @@ func TestMarshal(t *testing.T) {
 	if err == nil {
 		t.Error("should error")
 	}
+
+	b := &BoolHolder{true}
+	data, err = b.MarshalBinary()
+	if err != nil {
+		t.Error(err)
+	}
+
+	a := new(BoolHolder)
+	err = a.UnmarshalBinary(data)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if a.Value != b.Value {
+		t.Errorf("Should be same")
+	}
+
 }
