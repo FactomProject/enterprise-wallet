@@ -158,7 +158,6 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 
 	bh := new(BoolHolder)
 	old, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("backed-up"), bh)
-	fmt.Println("OOOOLLLDDD", bh)
 	if old == nil || err != nil {
 		MasterSettings.BackedUp = false
 	} else {
