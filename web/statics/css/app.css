@@ -3798,12 +3798,10 @@ h1.backup-title {
   position: relative;
   width: 100px;
   flex-direction: column;
-  transition: all 0.3s ease;
   overflow: hidden; }
-  .backup-btn-verify > * {
+  .backup-btn-verify > div, .backup-btn-verify > i {
     position: absolute;
-    transition: all 0.3s ease;
-    transition-delay: .2s; }
+    transition: all 0.3s ease; }
   .backup-btn-verify i {
     color: #FFF;
     font-size: 20px;
