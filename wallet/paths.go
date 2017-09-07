@@ -3,8 +3,8 @@ package wallet
 var (
 	WalletBoltV1Path = "/.factom/factoid_wallet_bolt.db"
 
-	/* M2 Fodler Paths, uses '/wallet/'' */
-	walletLDBPath  = "/.factom/wallet/factoid_wallet_ldb.db"
+	/* M2 Folder Paths, uses '/wallet/'' */
+	walletLDBPath  = "/.factom/wallet/factom_wallet.ldb"
 	walletBoltPath = "/.factom/wallet/factom_wallet.db"
 
 	guiLDBPath  = "/.factom/wallet/factoid_gui_ldb.db"
