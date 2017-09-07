@@ -3,7 +3,7 @@
 #
 sh concatJs.sh
 # Minifies static files
-if [ "$1" == "closure" ] # Closure compile by google
+if [ "$1" = "closure" ] # Closure compile by google
 	then
 	sh min-file.sh closure
 else 
