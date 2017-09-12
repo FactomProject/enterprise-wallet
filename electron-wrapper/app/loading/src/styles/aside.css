@@ -1,0 +1,99 @@
+aside {
+    display: flex;
+    flex-direction: column;
+
+    & header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 150px;
+
+        & img {
+            width: 50px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        & h1 {
+            margin-bottom: 0;
+        }
+    }
+
+    & nav {
+        flex-grow: 1;
+        padding: 0 16px;
+
+        & ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            & li {
+
+                & a {
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    padding: 20px 0;
+                    font-size: 20px;
+                    font-weight: 700;
+                    opacity: 0.5;
+                    transition: opacity var(--hover-transition);
+
+                    & img {
+                        width: 25px;
+                        height: auto;
+                        margin: 12px;
+                    }
+                }
+            }
+        }
+    }
+
+    & footer {
+        flex-direction: column;
+
+        & .wallet-type {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-top: var(--border-purple-light);
+            border-bottom: var(--border-purple-light);
+
+            & .wallet-icon {
+                width: 50px;
+                height: 50px;
+
+                &.icon-not-secure {
+                    & img {
+                        margin-left: -2px;
+                    }
+                }
+            }
+
+            & h1 {
+                font-size: 22px;
+            }
+        }
+
+        & .version {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        & .sync {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            height: 30px;
+            border-radius: 15px;
+            margin: 12px 0 20px;
+            border: var(--border-red);
+            font-size: 13px;
+        }
+    }
+}
