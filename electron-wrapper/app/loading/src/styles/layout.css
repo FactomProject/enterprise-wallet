@@ -16,7 +16,7 @@
     width: 1000px;
     height: 500px;
     overflow: hidden;
-    background: color(var(--black) alpha(0.02));
+    background: var(--bg-gradient);
 }
 
 .wallet {
@@ -60,7 +60,7 @@ header {
         align-items: center;
         text-align: center;
         margin: 20px 0 5px;
-        color: var(--purple);
+        color: var(--white);
 
         & h1 {
             margin-bottom: 10px;
@@ -126,11 +126,6 @@ footer {
     }
 
     &.footer-terms {
-        color: var(--black);
         width: 100%;
-
-        & .logo-footer {
-            filter: brightness(-1);
-        }
     }
 }

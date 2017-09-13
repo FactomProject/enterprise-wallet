@@ -118,7 +118,8 @@ p:not(:last-child) {
     width: 1000px;
     height: 500px;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.02);
+    background: -webkit-gradient(linear, left bottom, left top, from(#1F1B2F), to(#434058));
+    background: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
 }
 .wallet {
     display: -webkit-box;
@@ -173,7 +174,7 @@ header.terms-header {
             align-items: center;
     text-align: center;
     margin: 20px 0 5px;
-    color: #302c42
+    color: #FFF
 }
 header.terms-header h1 {
     margin-bottom: 10px;
@@ -259,12 +260,7 @@ footer span {
     margin-right: 10px;
 }
 footer.footer-terms {
-    color: #000;
-    width: 100%
-}
-footer.footer-terms .logo-footer {
-    -webkit-filter: brightness(-1);
-            filter: brightness(-1);
+    width: 100%;
 }
 .select-wallet {
     display: -webkit-box;
@@ -884,7 +880,7 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     -webkit-box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
             box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
-    background: #FFF;
+    background: rgb(247, 247, 247);
 }
 .terms p {
         font-size: 13px;
