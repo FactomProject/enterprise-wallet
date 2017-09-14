@@ -165,14 +165,14 @@ header.terms-header {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
     -webkit-box-align: center;
         -ms-flex-align: center;
             align-items: center;
-    text-align: center;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    width: 100%;
+    padding: 0 32px;
     margin: 20px 0 5px;
     color: #FFF
 }
@@ -180,10 +180,18 @@ header.terms-header h1 {
     margin-bottom: 10px;
 }
 header.terms-header .logo {
-    margin-bottom: 10px
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin-bottom: 10px;
+    font-size: 16px
 }
 header.terms-header .logo img {
-    width: 40px;
+    margin-left: 16px;
+    width: 30px;
     height: auto;
 }
 header.section {
@@ -871,22 +879,27 @@ aside.light-theme footer .wallet-type .wallet-icon img {
   }
 }
 .terms {
-    height: 346px;
-    margin: auto -20px;
+    position: relative;
+    height: 344px;
+    margin: auto -14px;
     overflow: scroll;
-    padding: 24px 40px;
+    padding: 24px 80px 24px 40px;
     color: #000;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
     background: rgb(247, 247, 247);
 }
 .terms p {
         font-size: 13px;
         line-height: 24px;
     }
-.terms .accept-terms {
+.terms-wrapper .accept-terms {
+    height: 52px;
+    margin: auto -14px;
+    padding: 0 40px;
+    background: rgb(247, 247, 247);
+    border-top: 1px solid #F5E3AF;
+    overflow: hidden
+}
+.terms-wrapper .accept-terms > div {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -900,31 +913,91 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     -webkit-box-pack: center;
         -ms-flex-pack: center;
             justify-content: center;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-transform: translateY(-36px);
+            transform: translateY(-36px);
+    -webkit-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    -webkit-transition-delay: 0.5s;
+            transition-delay: 0.5s
 }
-.terms .checkbox {
-    margin-bottom: 16px;
+.terms-wrapper .accept-terms > div.scrolled {
+    -webkit-transform: translateY(11px);
+            transform: translateY(11px);
+}
+.terms-wrapper .accept-terms .scroll-bounce {
+    -ms-flex-negative: 0;
+        flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    border-radius: 50%;
+    color: #302c42;
+    border: 1px solid #EDB820;
+    -webkit-animation: bounce 1s ease infinite;
+            animation: bounce 1s ease infinite;
+    cursor: pointer;
+    -webkit-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out
+}
+.terms-wrapper .accept-terms .scroll-bounce img {
+    width: 20px;
+}
+.terms-wrapper .accept-terms .scroll-bounce:hover {
+    background: #FFF;
+}
+.terms-wrapper .accept-terms .scroll-bounce.scrolled {
+    -webkit-transform: translateY(40px);
+            transform: translateY(40px);
+    -webkit-animation: none;
+            animation: none;
+}
+.terms-wrapper .accept-form {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    margin-bottom: 20px;
+}
+.terms-wrapper .checkbox {
     position: relative;
+    color: #000;
 }
-.terms .checkbox label {
+.terms-wrapper .checkbox label {
             display: -webkit-box;
             display: -ms-flexbox;
             display: flex;
             font-weight: 700;
             cursor: pointer;
 }
-.terms .checkbox input[type="checkbox"] {
+.terms-wrapper .checkbox input[type="checkbox"] {
             opacity: 0;
             position: absolute;
 }
-.terms .checkbox input[type="checkbox"] + label {
+.terms-wrapper .checkbox input[type="checkbox"] + label {
             opacity: 0.5;
             -webkit-transition: opacity 0.2s ease-in-out;
             transition: opacity 0.2s ease-in-out;
 }
-.terms .checkbox input[type="checkbox"]:checked + label {
+.terms-wrapper .checkbox input[type="checkbox"]:checked + label {
             opacity: 1;
 }
-.terms .checkbox input[type="checkbox"] + label span {
+.terms-wrapper .checkbox input[type="checkbox"] + label span {
             -ms-flex-negative: 0;
                 flex-shrink: 0;
             position: relative;
@@ -939,15 +1012,15 @@ aside.light-theme footer .wallet-type .wallet-icon img {
             -webkit-transition: all 0.2s ease-in-out;
             transition: all 0.2s ease-in-out;
 }
-.terms .checkbox input[type="checkbox"]:focus + label span {
+.terms-wrapper .checkbox input[type="checkbox"]:focus + label span {
             border: 2px solid #EDB820;
             -webkit-box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
                     box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
-.terms .checkbox input[type="checkbox"]:checked + label span {
+.terms-wrapper .checkbox input[type="checkbox"]:checked + label span {
             border: 2px solid #EDB820
 }
-.terms .checkbox input[type="checkbox"]:checked + label span::before {
+.terms-wrapper .checkbox input[type="checkbox"]:checked + label span::before {
     content: '';
     width: 9px;
     height: 5px;
@@ -961,7 +1034,7 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     -webkit-transform: rotate(-45deg);
             transform: rotate(-45deg);
 }
-.terms button {
+.terms-wrapper button {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -969,8 +1042,8 @@ aside.light-theme footer .wallet-type .wallet-icon img {
         -ms-flex-align: center;
             align-items: center;
     height: 30px;
-    margin: 0 auto;
     padding: 0 16px;
+    margin-left: 20px;
     background: none;
     font-family: 'Open Sans', sans-serif;
     color: #302c42;
@@ -981,16 +1054,26 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     -webkit-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out
 }
-.terms button:focus {
+.terms-wrapper button:focus {
     -webkit-box-shadow: 0 0 10px rgba(237, 184, 32, 0.4);
             box-shadow: 0 0 10px rgba(237, 184, 32, 0.4);
 }
-.terms button:hover {
+.terms-wrapper button:hover {
     color: #FFF;
     background: #302c42;
 }
-.terms button:disabled {
+.terms-wrapper button:disabled {
     background: rgba(0, 0, 0, 0.1);
     color: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(0, 0, 0, 0.1);
+}
+@-webkit-keyframes bounce {
+    0% { -webkit-transform: translateY(-8px); transform: translateY(-8px); }
+    50% { -webkit-transform: translateY(-4px); transform: translateY(-4px); }
+    100% { -webkit-transform: translateY(-8px); transform: translateY(-8px); }
+}
+@keyframes bounce {
+    0% { -webkit-transform: translateY(-8px); transform: translateY(-8px); }
+    50% { -webkit-transform: translateY(-4px); transform: translateY(-4px); }
+    100% { -webkit-transform: translateY(-8px); transform: translateY(-8px); }
 }

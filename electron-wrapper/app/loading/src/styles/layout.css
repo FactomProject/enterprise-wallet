@@ -56,9 +56,10 @@ header {
 
     &.terms-header {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        text-align: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 32px;
         margin: 20px 0 5px;
         color: var(--white);
 
@@ -67,10 +68,14 @@ header {
         }
 
         & .logo {
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
+            font-size: 16px;
 
             & img {
-                width: 40px;
+                margin-left: 16px;
+                width: 30px;
                 height: auto;
             }
         }

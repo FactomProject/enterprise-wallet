@@ -1,29 +1,82 @@
 .terms {
-    height: 346px;
-    margin: auto -20px;
+    position: relative;
+    height: 344px;
+    margin: auto -14px;
     overflow: scroll;
-    padding: 24px 40px;
+    padding: 24px 80px 24px 40px;
     color: var(--black);
-    border-top: var(--border-gray);
-    border-bottom: var(--border-gray);
-    box-shadow: inset 0 0 8px color(var(--black) alpha(0.1));
     background: color(var(--white) lightness(-3%));
 
     p {
         font-size: 13px;
         line-height: 24px;
     }
+}
 
+.terms-wrapper {
     & .accept-terms {
+        height: 52px;
+        margin: auto -14px;
+        padding: 0 40px;
+        background: color(var(--white) lightness(-3%));
+        border-top: 1px solid var(--yellow-light);
+        overflow: hidden;
+
+        & > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            justify-content: space-between;
+            transform: translateY(-36px);
+            transition: all var(--hover-transition);
+            transition-delay: 0.5s;
+
+            &.scrolled {
+                transform: translateY(11px);
+            }
+        }
+
+
+        & .scroll-bounce {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--purple);
+            border: 1px solid var(--yellow);
+            animation: bounce 1s ease infinite;
+            cursor: pointer;
+            transition: all var(--hover-transition);
+
+            & img {
+                width: 20px;
+            }
+
+            &:hover {
+                background: var(--white);
+            }
+
+            &.scrolled {
+                transform: translateY(40px);
+                animation: none;
+            }
+        }
+    }
+
+    & .accept-form {
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
+        margin-bottom: 20px;
     }
 
     & .checkbox {
-        margin-bottom: 16px;
         position: relative;
+        color: var(--black);
 
         label {
             display: flex;
@@ -87,8 +140,8 @@
         display: flex;
         align-items: center;
         height: 30px;
-        margin: 0 auto;
         padding: 0 16px;
+        margin-left: 20px;
         background: none;
         font-family: var(--open-sans);
         color: var(--purple);
@@ -113,4 +166,10 @@
             border: 1px solid color(var(--black) alpha(0.1));
         }
     }
+}
+
+@keyframes bounce {
+    0% { transform: translateY(-8px); }
+    50% { transform: translateY(-4px); }
+    100% { transform: translateY(-8px); }
 }

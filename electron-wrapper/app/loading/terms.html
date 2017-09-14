@@ -14,10 +14,11 @@
 
     <div class="terms-wrapper">
         <header class="terms-header">
+            <h3>Read terms before you continue</h3>
             <div class="logo">
+                Enterprise Wallet
                 <img src="images/factom-isologo.svg" alt="Enterprise Wallet by Factom">
             </div>
-            <h3>Read terms before you continue</h3>
         </header>
         <main>
             <div class="terms">
@@ -34,17 +35,24 @@
                 <p>
                     Phasellus enim ipsum, dapibus vel mi vel, rutrum facilisis mauris. Donec sit amet aliquam arcu. Nam eget velit eleifend odio dictum convallis eget sed metus. Proin velit nisl, blandit non egestas malesuada, maximus ac nibh. Vivamus sagittis vel ipsum tempor ultrices. Proin facilisis eros et lacus hendrerit tincidunt. Cras id mattis est. Donec pellentesque erat ac fringilla pharetra. Maecenas ultricies consectetur arcu. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec laoreet mi. Nam vitae mauris in orci auctor finibus id eget ante. Pellentesque sed purus dictum, ornare justo a, tristique purus. Duis consectetur congue auctor.
                 </p>
-                <div class="accept-terms">
-                    <div class="checkbox">
-                        <input type="checkbox" id="checkbox" onclick="updateCheckbox()" tabindex="1"/>
-                        <label for="checkbox">
-                            <span></span>
-                            <div>
-                                I read and accept the terms.
-                            </div>
-                        </label>
+            </div>
+            <div class="accept-terms">
+                <div>
+                    <form action="" class="accept-form">
+                        <div class="checkbox">
+                            <input type="checkbox" id="checkbox" onclick="updateCheckbox()" tabindex="1"/>
+                            <label for="checkbox">
+                                <span></span>
+                                <div>
+                                    I read and accept the terms.
+                                </div>
+                            </label>
+                        </div>
+                        <button id="accept-button" disabled tabindex="2">Continue</button>
+                    </form>
+                    <div class="scroll-bounce">
+                        <img src="images/arrow-purple.svg" alt="">
                     </div>
-                    <button id="accept-button" disabled tabindex="2">Continue</button>
                 </div>
             </div>
         </main>
