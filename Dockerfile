@@ -24,7 +24,7 @@ COPY . .
 
 ARG GOOS=linux
 
-
+RUN echo "1"
 RUN cat /go/src/github.com/FactomProject/enterprise-wallet/vendor/github.com/FactomProject/factomd/common/constants/constants.go
 
 RUN cat /go/src/github.com/FactomProject/enterprise-wallet/vendor/github.com/FactomProject/factomd/common/constants/checkpoints.go
