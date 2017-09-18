@@ -11,6 +11,9 @@ RUN go get github.com/Masterminds/glide
 # Where enterprise-wallet sources will live
 WORKDIR $GOPATH/src/github.com/FactomProject/enterprise-wallet
 
+#clear cache
+RUN glide cc
+
 # Get the dependencies
 COPY glide.yaml glide.lock ./
 
