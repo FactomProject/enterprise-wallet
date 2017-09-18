@@ -1,5 +1,7 @@
 FROM golang:1.8.3
 
+RUN pwd
+
 # Get git
 RUN apt-get update \
     && apt-get -y install curl git \
