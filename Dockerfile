@@ -30,7 +30,7 @@ RUN cat /go/src/github.com/FactomProject/enterprise-wallet/vendor/github.com/Fac
 RUN cat /go/src/github.com/FactomProject/enterprise-wallet/vendor/github.com/FactomProject/factomd/common/constants/checkpoints.go
 
 # Build and install enterprise-wallet
-RUN go install
+RUN go install -v
 
 ENTRYPOINT ["/go/bin/enterprise-wallet"]
 
