@@ -1,0 +1,205 @@
+@import '_variables';
+
+body.darkTheme {
+    .import-success {
+        background: $bg-body-dark;
+
+        .import-success-message {
+            color: $yellow;
+        }
+    }
+
+    .backup-alert-note {
+        color: $white;
+        border: $border-purple-light;
+        background: $purple;
+
+        &:before {
+            border-top: $border-purple-light;
+            border-left: $border-purple-light;
+            background: $purple;
+        }
+
+        strong {
+            color: $white;
+            font-weight: 700;
+        }
+    }
+
+    .never-backedup ~ .backup-alert-note {
+        strong {
+            color: $red;
+            font-weight: 700;
+        }
+    }
+
+    .import-seed {
+        background: $bg-body-dark;
+    }
+}
+
+body.darkTheme .backup-main {
+    background: $bg-body-dark;
+    color: $white;
+
+    /* PAGER */
+
+    .backup-pager {
+        position: relative;
+
+        ul::before {
+            content: '';
+            position: absolute;
+            display: flex;
+            align-items: center;
+            height: 1px;
+            width: 100%;
+            background: white;
+            z-index: -1;
+        }
+
+        li {
+            border: $border-gray;
+            color: $gray;
+            background: $bg-body-dark;
+
+            &.active {
+                background: $white;
+                color: $bg-body-dark;
+            }
+        }
+    }
+
+    /* ADDRESSES ALERT */
+
+    .backup-icon-alert {
+        border: 1px solid $white;
+        color: $white;
+    }
+
+    /* TITLES */
+
+    h1 {
+        color: $yellow;
+
+        &.backup-title-alert {
+            color: $red;
+
+            a {
+                color: $white;
+            }
+        }
+    }
+
+    .backup-step-one h1 {
+        color: $white;
+    }
+
+    /* BOX CONTENT */
+
+    .backup-box-content {
+        border: $border-purple-light;
+    }
+
+    .backup-seed-word {
+        color: $white;
+    }
+
+    .backup-seed-order {
+        border: $border-purple-light;
+    }
+
+    /* ILLUSTRATION */
+
+    .backup-illustration {
+        background: url(../img/illus-dark.svg);
+        width: 280px;
+        height: 215px;
+        background-repeat: no-repeat;
+    }
+
+    /* FORMS */
+
+    .backup-checkbox {
+        label {
+            color: $white;
+        }
+    }
+
+    .backup-input,
+    .import-input {
+        color: $white !important;
+        border-bottom: $border-purple-light !important;
+        transition: border $hover-transition !important;
+
+        &:focus {
+            border-bottom: $border-yellow !important;
+        }
+    }
+
+    .backup-btn-gray {
+        border: $border-gray;
+        color: $gray;
+
+        &:hover {
+            color: $white;
+            background: $gray;
+        }
+
+        &:active {
+            background: darken($gray,15%);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: default;
+
+            &:hover,
+            &:active {
+                border: $border-gray;
+                color: $gray;
+            }
+        }
+
+        &:focus {
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.5) !important;
+        }
+    }
+
+    .backup-btn-green {
+        border: $border-green;
+        color: $green;
+        background:transparent;
+
+        &:hover {
+            color: $white;
+            background: $green;
+        }
+
+        &:active {
+            background: darken($green,15%);
+        }
+
+        &:disabled {
+            border: $border-gray;
+            color: $gray;
+            opacity: 0.5;
+            cursor: default;
+
+            &:hover,
+            &:active {
+                border: $border-gray;
+                color: $gray;
+                background: transparent;
+            }
+        }
+
+        &:focus {
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.5) !important;
+        }
+    }
+
+    .backup-spinner > div {
+        background: $white;
+    }
+}

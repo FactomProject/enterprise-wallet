@@ -18,6 +18,7 @@ package main
 //		- Factomd Instance
 import (
 	"fmt"
+	"time"
 
 	"github.com/FactomProject/enterprise-wallet/wallet"
 	"github.com/FactomProject/factomd/util"
@@ -39,9 +40,18 @@ func close() {
 	fmt.Println("Complete shut down.")
 }
 
+// panicWallet gives the nodejs application time to read the error and handle it
+func panicWallet(msg string, err error) {
+	if err != nil {
+		fmt.Println("Error in starting wallet: " + err.Error())
+		time.Sleep(1 * time.Second)
+		panic(fmt.Sprintf("%s: %s", msg, err.Error()))
+	}
+}
+
 // InitiateWalletAndWeb initiates and serves the guiwallet. If databases are given, they will be attempted to be loaded
 // and will be created if they are not found.
-func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, v1Import bool, v1Path string, factomdLocFlag string) {
+func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port int, v1Import bool, v1Path string, factomdLocFlag string, password string) {
 	fmt.Println("--------- Initiating GUIWallet ----------")
 
 	filename := util.ConfigFilename() //file name and path to factomd.conf file
@@ -80,6 +90,8 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		walletDB = wallet.BOLT
 	case "LDB":
 		walletDB = wallet.LDB
+	case "ENC":
+		walletDB = wallet.ENCRYPTED
 	}
 	switch txDBStr { // Holds transactions cache
 	case "Map":
@@ -95,9 +107,9 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 
 	// Can adjust starting variables
 	// This will also start wallet wsapi
-	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import)
+	wal, err := wallet.StartWallet(factomdLocation, walletDB, guiDB, txDB, v1Import, password)
 	if err != nil {
-		panic("Error in starting wallet: " + err.Error())
+		panicWallet("Error in starting wallet", err)
 	}
 
 	MasterWallet = wal
@@ -115,7 +127,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings.Theme = "darkTheme"
 		err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 		if err != nil {
-			panic("Error in loading settings: " + err.Error())
+			panicWallet("Error in loading settings", err)
 		}
 	} else {
 		MasterSettings = data.(*SettingsStruct)
@@ -134,11 +146,23 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings.FactomdLocation = "courtesy-node.factom.com"
 	}
 
+	if walletDB == wallet.ENCRYPTED {
+		MasterSettings.Encrypted = true
+	}
+
 	MasterSettings.SetFactomdLocation(factomdLocation)
 
 	MasterSettings.ControlPanelPort = controlPanelPort
 	// We always need to load transactions, even if in database. So let's start as not synced
 	MasterSettings.Synced = false
+
+	bh := new(BoolHolder)
+	old, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("backed-up"), bh)
+	if old == nil || err != nil {
+		MasterSettings.BackedUp = false
+	} else {
+		MasterSettings.BackedUp = bh.Value
+	}
 
 	// For Testing adds random addresses
 	if ADD_RANDOM_ADDRESSES {
@@ -169,6 +193,8 @@ func intToStringDBType(t int) string {
 		return "LDB"
 	case wallet.BOLT:
 		return "Bolt"
+	case wallet.ENCRYPTED:
+		return "Encrypted"
 	}
 	return "[No DB Type Found]"
 }

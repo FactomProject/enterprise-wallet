@@ -7,7 +7,7 @@ import (
 
 // StartWallet :
 // Must give the port for the factomd instance
-func StartWallet(factomdLocation string, walletDBType int, guiDBType int, txDBType int, v1Import bool) (*WalletDB, error) {
+func StartWallet(factomdLocation string, walletDBType int, guiDBType int, txDBType int, v1Import bool, password string) (*WalletDB, error) {
 	// Set ports
 	// factom.SetWalletServer("localhost:" + fmt.Sprintf("%d", walletPort))
 	factom.SetFactomdServer(factomdLocation) //"localhost:" + fmt.Sprintf("%d", factomdPort))
@@ -18,7 +18,7 @@ func StartWallet(factomdLocation string, walletDBType int, guiDBType int, txDBTy
 	TX_DB = txDBType
 
 	// Load the databases relavent to the wallet
-	wal, err := LoadWalletDB(v1Import)
+	wal, err := LoadWalletDB(v1Import, password)
 	if err != nil {
 		return nil, err
 	}

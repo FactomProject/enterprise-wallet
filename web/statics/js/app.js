@@ -1,3 +1,4 @@
+var HideSyncError = false
 
 $(document).ready(function () {
     fixUp()
@@ -89,6 +90,19 @@ $(function() {
                                 case "Settings":
                                     ChangeNav("settings", 3)
                                     break;
+                                case "Backup":
+                                    ChangeNav("backup-main", 4, "address-book", true)
+                                    LoadBackup0()
+                                    break;
+                                case "backup1":
+                                    ChangeNav("backup-main", 4, true)
+                                    break;
+                                case "backup2":
+                                    ChangeNav("backup-main", 4, true)
+                                    break;
+                                case "backup3":
+                                    ChangeNav("backup-main", 4, true)
+                                    break;
                                 case "send-factoids":
                                     ChangeNav("send-factoids", 1)
                                     LoadAddressesSendConvert()
@@ -110,6 +124,21 @@ $(function() {
                                 case "receive-factoids":
                                     ChangeNav("receive-factoids", 2)
                                     LoadRecAddresses()
+                                    break;
+                                case "import-seed":
+                                    ChangeNav("import-seed", 3, true)
+                                    break;
+                                case "success-screen-import":
+                                    ChangeNav("success-screen", 3, true)
+                                    $("#backup-message").hide()
+                                    $("#backup-nav-item").removeClass("never-backedup")
+                                    $("#backup-import-success-message").text("Your seed has been successfully restored!")
+                                    break;
+                                case "success-screen-backup":
+                                    ChangeNav("success-screen", 4, true)
+                                    $("#backup-message").hide()
+                                    $("#backup-nav-item").removeClass("never-backedup")
+                                    $("#backup-import-success-message").text("Your seed has been successfully backed up!")
                                     break;
                                 default:
                                     if(href.indexOf("receive-factoids?address") == 0){
@@ -135,16 +164,41 @@ $(function() {
     } // otherwise, history is not supported, so nothing fancy here.    
 });
 
-function ChangeNav(mainClass, activeWindow) {
+function ChangeNav(mainClass, activeWindow, extraClass, hideBalances) {
     $("main").removeClass()
 
+    if(extraClass === undefined) {
+        hideBalances = false
+    }
+
+    if(extraClass === true || extraClass === false) {
+        hideBalances = extraClass
+        extraClass = undefined
+    }
+
+    if(hideBalances) {
+        HideSyncError = true
+        $(".balances").hide()
+        $("#synced-indicator").hide()
+    } else {
+        $(".balances").show()
+        HideSyncError = false
+        //$("#synced-indicator").show()
+    }
+
     $("main").addClass(mainClass)
+    if(extraClass !== undefined) {
+       $("main").addClass(extraClass) 
+    }
     if(activeWindow == 1) {
         $("#transactions-nav").addClass("active")
     } else if(activeWindow == 2) {
         $("#address-book-nav").addClass("active")
-    } else {
+    } else if(activeWindow == 3){
         $("#settings-nav").addClass("active")
+    } else {
+        $("#backup-nav").addClass("active")
+
     }
     fixUp();
     $('#guts').foundation();

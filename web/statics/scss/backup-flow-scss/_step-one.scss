@@ -1,0 +1,29 @@
+@import '_variables';
+
+.backup-step-one {
+    .backup-box-content {
+        @media(max-width: 991px) {
+            display: block;
+        }
+
+        display: flex;
+
+        div:first-child {
+            flex-basis: 60%;
+            padding-right: 30px;
+            margin-right: 30px;
+            border-right: $border-purple-light;
+
+            @media(max-width: 991px) {
+                border-right: none;
+            }
+        }
+
+        div:last-child {
+            ul {
+                margin-left: 20px;
+            }
+        }
+    }
+}
+

@@ -31,6 +31,10 @@ var COMPILED_STATICS = true
 
 func SaveSettings() error {
 	err := MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("settings"), MasterSettings)
+	if err != nil {
+		return err
+	}
+	err = MasterWallet.GUIlDB.Put([]byte("gui-wallet"), []byte("backed-up"), &BoolHolder{MasterSettings.BackedUp})
 	return err
 }
 
@@ -156,6 +160,20 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleReceiveFactoids(w, r)
 	case "/send-factoids":
 		err = HandleSendFactoids(w, r)
+	case "/Backup":
+		err = HandleBackup0(w, r)
+	case "/backup1":
+		err = HandleBackup1(w, r)
+	case "/backup2":
+		err = HandleBackup2(w, r)
+	case "/backup3":
+		err = HandleBackup3(w, r)
+	case "/import-seed":
+		err = HandleImportSeed(w, r)
+	case "/success-screen-backup":
+		err = HandleSuccessScreen(w, r)
+	case "/success-screen-import":
+		err = HandleSuccessScreen(w, r)
 	default:
 		err = HandleNotFoundError(w, r)
 	}
