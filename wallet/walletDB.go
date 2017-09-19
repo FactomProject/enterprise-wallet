@@ -29,6 +29,7 @@ import (
 	"encoding/json"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/database/mapdb"
+	"github.com/FactomProject/go-bip39"
 )
 
 // List of int to db type
@@ -36,6 +37,7 @@ const (
 	MAP int = iota
 	LDB
 	BOLT
+	ENCRYPTED
 )
 
 // Default settings
@@ -67,15 +69,24 @@ type WalletDB struct {
 	cachedHeight             uint32                             // Last FBlock height used
 	transMap                 map[string]DisplayTransaction      // Prevent duplicate transactions
 	addrMap                  map[string]address.AddressNamePair // Find addresses quick, All addresses already searched for up to last FBlock
+
+	changeAddrMap     map[string]UpdateANP // Addresses that need to be moved to addrmap
+	changeAddrMapLock sync.Mutex
+
+	quit bool
 }
 
 // LoadWalletDB is the same as New
-func LoadWalletDB(v1Import bool) (*WalletDB, error) {
-	return NewWalletDB(v1Import)
+func LoadWalletDB(v1Import bool, password string) (*WalletDB, error) {
+	return NewWalletDB(v1Import, password)
 }
 
-func NewWalletDB(v1Import bool) (*WalletDB, error) {
+func NewWalletDB(v1Import bool, password string) (*WalletDB, error) {
 	w := new(WalletDB)
+
+	if WALLET_DB == ENCRYPTED {
+		GUI_DB = ENCRYPTED
+	}
 
 	var db interfaces.IDatabase
 	var err error
@@ -86,6 +97,8 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 		db, err = database.NewOrOpenLevelDBWallet(GetHomeDir() + guiLDBPath)
 	case BOLT:
 		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + guiBoltPath)
+	case ENCRYPTED:
+		db, err = database.NewOrOpenBoltDBWallet(GetHomeDir() + guiEncryptedBoltPath)
 	}
 	if err != nil {
 		return nil, err
@@ -107,6 +120,11 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 
 	var wal *wallet.Wallet
 
+	// Cannot import to encrypted
+	if WALLET_DB == ENCRYPTED {
+		v1Import = false
+	}
+
 	switch v1Import {
 	case true:
 		if WALLET_DB == MAP {
@@ -122,6 +140,8 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 			case BOLT:
 				m2Path = GetHomeDir() + walletBoltPath
 				_, err = os.Stat(GetHomeDir() + walletBoltPath)
+			case ENCRYPTED:
+				return nil, fmt.Errorf("Cannot import from v1 to encrypted wallet")
 			}
 			if err != nil { // No M2 file, lets grab from M1
 				m1Path := ""
@@ -151,6 +171,8 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 			wal, err = wallet.NewOrOpenLevelDBWallet(GetHomeDir() + walletLDBPath)
 		case BOLT:
 			wal, err = wallet.NewOrOpenBoltDBWallet(GetHomeDir() + walletBoltPath)
+		case ENCRYPTED:
+			wal, err = wallet.NewEncryptedBoltDBWallet(GetHomeDir()+walletEncryptedBoltPath, password)
 		}
 	}
 	if err != nil {
@@ -188,6 +210,7 @@ func NewWalletDB(v1Import bool) (*WalletDB, error) {
 
 	w.transMap = make(map[string]DisplayTransaction)
 	w.addrMap = make(map[string]address.AddressNamePair)
+	w.changeAddrMap = make(map[string]UpdateANP)
 	w.cachedHeight = 0
 	w.ActiveCachedTransactions = w.cachedTransactions
 
@@ -345,6 +368,9 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 
 	w.SetStage(0)
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+	}
 
 	// If we print 1 step, we should print all so user knows it is done
 	// Some steps may be very quick
@@ -384,7 +410,7 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	}
 
 	if block.GetDatabaseHeight() == 0 {
-		return nil, fmt.Errorf("Must wait 1 block and try again.")
+		// return nil, fmt.Errorf("Must wait 1 block and try again.")
 	}
 
 	var oldHeight uint32
@@ -394,6 +420,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	} else {
 		w.TransactionDB.GetAllTXs() // UpdateDB for next attempt if user tries again
 		return nil, fmt.Errorf("Error with loading transaction database. Try waiting a minute and reloading the page.")
+	}
+
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
 	}
 
 	//
@@ -464,6 +494,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 1/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+	}
+
 	//
 	// STAGE 2
 	w.SetStage(2)
@@ -482,6 +516,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	totalTransactions = 0
 	currentCheckpoint := 0
 	for _, a := range anps {
+		if w.quit {
+			return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+		}
+
 		_, ok := w.addrMap[a.Address]
 		if ok { // Found
 
@@ -512,6 +550,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 		fmt.Printf("Step 2/3 for Transactions %d / %d\n", totalTransactions, totalTransactions)
 	}
 
+	if w.quit {
+		return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+	}
+
 	//
 	// STAGE 3
 	w.SetStage(3)
@@ -522,6 +564,10 @@ func (w *WalletDB) GetRelatedTransactions() (dt []DisplayTransaction, err error)
 	/* This to end of function breaks the attempt to build for windows for some reason */
 	// Binary search and insert new transactions from new addresses
 	for i, t := range moreTransactions {
+		if w.quit {
+			return nil, fmt.Errorf("Wallet is closing, stoped fetching transactions")
+		}
+
 		if totalTransactions > STEPS_TO_PRINT && i%STEPS_TO_PRINT == 0 {
 			fmt.Printf("Step 3/3 for Transactions %d / %d\n", i, totalTransactions)
 		}
@@ -683,6 +729,8 @@ func (w *WalletDB) UpdateGUIDB() error {
 }
 
 func (w *WalletDB) Close() error {
+	w.quit = true
+
 	// Combine all close errors, as all need to get closed
 	errCount := 0
 	errString := ""
@@ -854,6 +902,12 @@ func (w *WalletDB) AddExternalAddress(name string, public string) (*address.Addr
 func (w *WalletDB) ImportSeed(seed string) error {
 	seedStruct := new(wallet.DBSeed)
 	seedStruct.MnemonicSeed = seed
+
+	v := bip39.IsMnemonicValid(seed)
+	if !v {
+		return fmt.Errorf("not a valid seed")
+	}
+
 	err := w.Wallet.InsertDBSeed(seedStruct)
 	if err != nil {
 		return err
@@ -999,6 +1053,8 @@ func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, 
 // the current names of the addresses, as user can change the name of their addresses.
 func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransaction) []DisplayTransaction {
 	w.relatedTransactionLock.Lock()
+	w.getNameChanges()
+
 	for i := range list {
 		ins := list[i].Inputs
 		for ii := range ins {
@@ -1006,6 +1062,7 @@ func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransact
 			anp, ok := w.addrMap[add]
 			if ok {
 				list[i].Inputs[ii].Name = anp.Name
+				list[i].Action[0] = true
 			}
 		}
 		outs := list[i].Outputs
@@ -1014,6 +1071,11 @@ func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransact
 			anp, ok := w.addrMap[add]
 			if ok {
 				list[i].Outputs[ii].Name = anp.Name
+				if add[:2] == "FA" {
+					list[i].Action[1] = true
+				} else {
+					list[i].Action[2] = true
+				}
 			}
 		}
 	}
@@ -1022,19 +1084,30 @@ func (w *WalletDB) ScrubDisplayTransactionsForNameChanges(list []DisplayTransact
 	return list
 }
 
+type UpdateANP struct {
+	Address string
+	Name    string
+}
+
+func (w *WalletDB) getNameChanges() {
+	w.changeAddrMapLock.Lock()
+	for k, v := range w.changeAddrMap {
+		anp := w.addrMap[k]
+		anp.Name = v.Name
+		w.addrMap[k] = anp
+	}
+	w.changeAddrMapLock.Unlock()
+}
+
 func (w *WalletDB) ChangeAddressName(address string, toName string) error {
 	err := w.guiWallet.ChangeAddressName(address, toName)
 	if err != nil {
 		return err
 	}
 
-	w.relatedTransactionLock.Lock() // Related Transactions uses this
-	anp, ok := w.addrMap[address]
-	if ok {
-		anp.Name = toName
-		w.addrMap[address] = anp
-	}
-	w.relatedTransactionLock.Unlock()
+	w.changeAddrMapLock.Lock() // Related Transactions uses this
+	w.changeAddrMap[address] = UpdateANP{Address: address, Name: toName}
+	w.changeAddrMapLock.Unlock()
 	return w.Save()
 }
 

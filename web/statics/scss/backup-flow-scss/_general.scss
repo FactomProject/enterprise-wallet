@@ -1,0 +1,228 @@
+body,
+html {
+    height: 100%;
+}
+
+main {
+    &.backup-main,
+    &.success-screen {
+        padding: 0 !important;
+    }
+}
+
+.backup-main,
+.success-screen {
+    height: 100%;
+    width: 100%;
+
+    #dynamic-content {
+        height: 100%;
+        width: 100%;
+
+        #guts {
+            height: 100%;
+            width: 100%;
+
+            .app {
+                height: 100%;
+                width: 100%;
+            }
+        }
+    }
+}
+
+.backup-alert-note {
+    position: relative;
+    padding: 8px;
+    margin: 0 -10px;
+    border-radius: 6px;
+    font-size: 14px;
+
+    &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -6px;
+        left: 42px;
+        width: 10px;
+        height: 10px;
+        transform: rotate(45deg);
+    }
+
+    @media(max-width:639px) {
+        display: none;
+    }
+}
+
+.app {
+    height: 100%;
+    display: flex;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    border: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &:focus {
+        outline: none;
+    }
+
+    img {
+        image-rendering: pixelated;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+.backup-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    padding: 16px;
+
+    @media(max-width: 1150px) {
+        justify-content: flex-start;
+        padding: 0;
+    }
+
+    #dynamic-content {
+        width: 100%;
+    }
+
+    .backup-pager {
+        margin: 30px 0;
+        flex-shrink: 0;
+
+        ul {
+            position: relative;
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            z-index: 200;
+
+            li {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 26px;
+                height: 26px;
+                margin: 0 8px;
+                border-radius: 50%;
+                font-size: 13px;
+                font-weight: 700;
+
+                &:first-child {
+                    margin-left: 0;
+                }
+
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+
+    .backup-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        flex-shrink: 0;
+        width: 95%;
+    }
+
+    .backup-footer {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        padding: 16px 0;
+    }
+
+    p, li {
+        line-height: 22px;
+    }
+
+    p:not(:last-child) {
+        margin-bottom: 16px;
+    }
+
+    strong {
+        font-weight: 700;
+    }
+}
+
+.backup-icon-alert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+h1.backup-title {
+    margin-bottom: 30px !important;
+    font-size: 32px !important;
+    line-height: 42px !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+    max-width: 95% !important;
+    text-transform: none !important;
+
+    a {
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+}
+
+.backup-illustration {
+    margin-bottom: 50px;
+    flex-shrink: 0;
+}
+
+.backup-box-content {
+    width: 100%;
+    padding: 20px;
+    border-radius: 6px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.backup-seed-order {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 13px;
+    margin-right: 16px;
+}
+
+.backup-seed-word {
+    font-size: 22px;
+    flex-grow: 1;
+}

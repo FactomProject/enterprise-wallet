@@ -7,6 +7,17 @@ $font-weight-bold: 700;
 
 $text-color: #656666;
 
+$white: #FFF;
+$purple: #302c42;
+
+$border-purple-light: 1px solid #4A4857;
+$border-gray-light: 1px solid #e8e8e8;
+
+$bg-dark: #0A0715;
+
+$sidebar-bg-dark: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
+$sidebar-bg-light: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
+
 
 // fonts
 
@@ -96,7 +107,7 @@ svg { height: auto; overflow: hidden; }
     font-weight: $font-weight-bold;
     text-transform: uppercase;
     &:not(.input-group-button) { padding: 0.825em 1em; }
-    &:hover, &:active { 
+    &:hover, &:active {
         background: lighten($primary-color, 10%);
         color: $white;
     }
@@ -145,7 +156,7 @@ svg { height: auto; overflow: hidden; }
     .fa { font-size: 20px; }
 }
 
-hr { 
+hr {
     max-width: none;
     border-bottom: solid 2px darken($light-gray, 10%);
 }
@@ -158,7 +169,7 @@ hr {
 
 // custom site styles
 
-html, body { 
+html, body {
     min-height: 100%;
     @include breakpoint(small only) {
         min-height: 0;
@@ -168,10 +179,11 @@ html, body {
 body { color: $text-color; }
 
 header {
-    min-height: 150px;
-    padding: 32px 0 22px;
+    padding: 16px 0;
     text-align: center;
-    @include breakpoint(small only) { 
+    border-bottom: $border-gray-light;
+
+    @include breakpoint(small only) {
         min-height: 0;
         padding: 24px 0 16px;
     }
@@ -181,11 +193,12 @@ header {
 		margin-bottom: 8px;
     }
     h1 {
-		margin-bottom: 1rem;
-        color: $tertiary-color;
-        font-size: 26px;
-		letter-spacing: 3px;
-		text-transform: uppercase;
+        font-size: 1.8rem;
+        padding: 0 0.8rem;
+        color: $purple;
+        letter-spacing: 0;
+        text-transform: none;
+
         @include breakpoint(medium down) { font-size: 20px; }
     }
 	@include breakpoint(small only) { background: $white; }
@@ -196,62 +209,58 @@ header {
     &.row { max-width: 100%; }
     > section { padding: 0; }
     section.leftCol {
+        display: flex;
+        flex-direction: column;
         max-width: 314px;
-		background: $light-gray;
+        background: $sidebar-bg-light;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
         @include breakpoint(small only) {
             flex: none;
             width: 100%;
             max-width: none;
         }
         nav {
+            flex-grow: 1;
+            padding-top: 0.8rem;
+
             ul {
                 margin: 0;
                 padding: 0;
                 list-style: none;
                 li {
-                    margin: 0;
+                    margin: 0 1.2rem;
                     padding: 0;
                     a {
-                        display: block;
-                        position: relative;
-                        padding: 2.25rem 0.5rem 2.25rem 8.5rem;
-                        overflow: hidden;
-                        transition: ease 0.15s all;
+                        display: flex;
+                        align-items: center;
+                        padding: 0.8rem 1.2rem;
+                        transition: ease 0.3s all;
                         color: $primary-color;
                         font-size: 18px;
                         line-height: 35px;
+                        font-weight: 700;
                         @include breakpoint(medium only) {
-                            padding-left: 8em;
                             font-size: 14px;
+                            padding: 0.8rem;
                         }
                         i {
-                            display: block;
-							position: absolute;
-							top: 1.5rem;
-							left: 2.75rem;
-                            width: 59px;
-                            height: 57px;
-                            text-align: center;
-                            svg, .svg { 
-                                max-width: 100%;
-                                path, rect, poly { 
+                            display: flex;
+                            align-items: center;
+                            margin-right: 1.2rem;
+                            width: 35px;
+                            height: 35px;
+
+                            svg, .svg {
+                                width: 100%;
+                                height: auto;
+
+                                path, rect, poly {
                                     fill: $primary-color !important;
                                     transition: ease 0.15s fill;
                                 }
                             }
                         }
-						&.address-book i { top: 1.8rem; left: 2.5rem; width: 64px; }
-						&.settings i { top: 1.5rem; left: 3rem; width: 54px; }
-						@include breakpoint(medium only) { 
-							padding-left: 6rem;
-							i {
-								left: 1.75rem;
-								width: 48px;
-								height: 48px;
-							}
-							&.address-book i { top: 1.95rem; left: 1.5rem; width: 52px; height: 48px; }
-							&.settings i { top: 1.75rem; left: 2rem; width: 44px; }
-						}
                         &:hover {
 							background: darken($light-gray, 3%);
                             color: lighten($primary-color,10%);
@@ -259,9 +268,19 @@ header {
                                 path, rect, poly { fill: lighten($primary-color,10%) !important; }
                             }
                         }
+
+                        &.never-backedup {
+                            color: #EC5840 !important;
+                            filter: none;
+                            opacity: 1;
+
+                            svg, .svg {
+                                path, rect, poly { fill: #EC5840 !important; }
+                            }
+                        }
                     }
                     &.active a {
-                        background: $body-background;
+                        background: none;
                         color: $tertiary-color;
                         svg, .svg {
                             path, rect, poly { fill: $tertiary-color !important; }
@@ -269,43 +288,87 @@ header {
                     }
                 }
                 @include breakpoint(small only) {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     margin: 0;
-                    padding: 16px 0 12px;
                     text-align: center;
                     li {
-                        display: inline-block;
                         &:not(:first-child) { margin-left: 8px; }
                         a {
-                            width: 64px;
-                            height: 64px;
                             padding: 0;
 							border-radius: 50%;
                             font-size: 0;
-                            i {
-								top: 0.6rem;
-								left: 0;
-								right: 0;
-                                float: none;
-                                width: 40px;
-                                height: 40px;
-                                margin: 0 auto;
-                            }
-							&.address-book i { top: 1rem; left: 0; width: 44px; height: 44px; }
-							&.settings i { top: 0.7rem; left: 0; width: 40px; }
                         }
-                        &.active a { background-color: $body-background; }
+                        &.active a { background-color: none; }
                     }
                 }
             }
+
+            @include breakpoint(small only) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.8rem;
+            }
         }
+
+        .wallet-type {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-top: $border-gray-light;
+            border-bottom: $border-gray-light;
+
+            .wallet-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                border: 1px solid #656666;
+                margin-right: 12px;
+
+                img {
+                    filter: brightness(-1);
+                    opacity: 0.6;
+                    width: 20px;
+                    height: auto;
+                }
+
+                &.icon-not-secure {
+                    img {
+                        margin-left: -2px;
+                    }
+                }
+            }
+
+            h1,
+            p {
+                text-align: left;
+                margin: 0;
+            }
+
+            h1 {
+                font-weight: 400;
+                font-size: 22px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+        }
+
 	#sync-status {
-		position: absolute;
-		bottom: 0;
-		left: 0;
 		width: 100%;
-		padding: 2em 1em;
+		padding: 0 1em 1em;
 		text-align: center;
 		.label {
+            margin: 12px 0 0;
 			padding-left: 1em;
 			padding-right: 1em;
 			border-radius: 16px;
@@ -329,7 +392,7 @@ header {
             background: lighten($light-gray,3%);
             text-align: center;
             @include breakpoint(medium only) { padding-top: 40px; }
-            > .row { 
+            > .row {
                 margin: 0 auto;
             }
             .balance {
@@ -367,7 +430,7 @@ header {
                 }
 				&.credits span { color: $secondary-color; }
             }
-            @include breakpoint(small only) { 
+            @include breakpoint(small only) {
                 min-height: 72px;
 				padding-top: 20px;
                 .balance {
@@ -400,13 +463,13 @@ header {
             }
             &::-webkit-scrollbar { width: 20px; }
             &::-webkit-scrollbar-track { background: transparent; }
-            &::-webkit-scrollbar-thumb { 
+            &::-webkit-scrollbar-thumb {
                 background: $tertiary-color;
                 border-radius: 12px;
                 &:hover { background: lighten($tertiary-color,10%); }
             }
             &::-webkit-scrollbar-button { display: none; }
-            &.transactions, &.address-book { 
+            &.transactions, &.address-book {
                 padding: 0;
                 border: solid 8px transparent;
                 border-top: none;
@@ -446,7 +509,7 @@ header {
                         font-size: 13px;
                         font-weight: $font-weight-regular;
                         text-transform: uppercase;
-                        a { 
+                        a {
                             color: lighten($primary-color, 20%);
                             &:hover { color: $primary-color; }
                         }
@@ -475,7 +538,7 @@ header {
                     background-repeat: no-repeat;
                     background-position: center right;
                 }
-                input[type='checkbox'] { 
+                input[type='checkbox'] {
                     //margin-right: 8px;
                     display: none;
                     & + label {
@@ -547,19 +610,19 @@ header {
                             padding: 1.25rem 1rem;
                             transition: ease 0.15s color;
                             font-size: 16px;
-                            @include breakpoint(small only) { 
+                            @include breakpoint(small only) {
                                 padding: 0.75rem 1rem;
                                 font-size: 12px;
                             }
                             .nick {
                                 //@include breakpoint(small only) { display: inline-block; }
                             }
-                            a { 
+                            a {
                                 transition: ease 0.15s color;
 								i svg, i .svg {
 									path, rect, poly { fill: $tertiary-color !important; }
 								}
-                                &:hover { 
+                                &:hover {
                                     text-decoration: underline;
                                     i svg, i .svg {
                                         path, rect, poly { fill: $primary-color !important; }
@@ -585,7 +648,7 @@ header {
                                         transition: ease 0.15s fill;
                                     }
                                 }
-                                @include breakpoint(small only) { 
+                                @include breakpoint(small only) {
                                     width: 36px;
                                     height: 25px;
 									&.received {
@@ -614,8 +677,8 @@ header {
 				}
 			}
             &.address-book {
-                table { 
-                    @include breakpoint(small only) { 
+                table {
+                    @include breakpoint(small only) {
                         td:nth-child(3) { display: none; }
                     }
                 }
@@ -645,21 +708,21 @@ header {
                             color: #777;
                             font-size: 16px;
                             text-transform: uppercase;
-                            &:hover { 
+                            &:hover {
                                 background: darken($light-gray,5%);
                             }
                         }
                         &:last-child { margin-right: 0; }
                         &.is-active {
                             background: $tertiary-color;
-                            a { 
+                            a {
                                 color: $white;
                                 &:hover { background: none; }
                             }
                         }
                     }
-                    @include breakpoint(small only) { 
-                        li { 
+                    @include breakpoint(small only) {
+                        li {
                             display: block;
                             width: 100%;
                             a {
@@ -700,7 +763,7 @@ header {
                     font-weight: $font-weight-bold;
                     line-height: 40px;
                     text-transform: uppercase;
-                    @include breakpoint(small only) { 
+                    @include breakpoint(small only) {
                         right: 16px;
                     }
                     &:before {
@@ -739,7 +802,7 @@ header {
                         line-height: 39px;
                     }
                     &.address:after { content: 'New Address'; }
-                    &.transaction:hover:after, &.address:hover:after { 
+                    &.transaction:hover:after, &.address:hover:after {
                         width: 160px;
                         padding: 0 12px;
                         color: $white;
@@ -759,7 +822,7 @@ header {
                     background: $light-gray;
 					border-radius: 30px;
 					box-shadow: 0 0 30px 2px rgba(0, 0, 0, 0.3);
-                    @include breakpoint(small only) { 
+                    @include breakpoint(small only) {
                         right: 24px;
                     }
                     li {
@@ -826,14 +889,14 @@ header {
 						tr.total {
 							border-top: solid 1px $medium-gray;
 						}
-						td { 
+						td {
 							padding-top: 3px;
 							padding-bottom: 3px;
 							font-family: monospace;
 							font-size: 14px;
 						}
 					}
-					tr:hover table { 
+					tr:hover table {
 						tr:nth-child(even) { background: none; }
 						tr:hover { background: $white; }
 					}
@@ -849,7 +912,7 @@ header {
 }
 
 body.darkTheme {
-	background: #000;
+	background: $bg-dark;
 	color: #939598;
 	a:not(.button) {
 		color: $primary-color;
@@ -865,47 +928,99 @@ body.darkTheme {
 	hr { border-bottom-color: $dark-gray; }
 	header {
 		h1 { color: $tertiary-color; }
-		@include breakpoint(small only) { background: #000; }
+		@include breakpoint(small only) { background: darken($bg-dark, 1%); }
 	}
 	#frame {
 		section.leftCol {
-			background: #1f1f1f;
-			nav ul li.active a { 
-				background: #000;
-				color: $tertiary-color;
-				svg, .svg {
-					path, rect, poly { 
-						fill: $tertiary-color !important;
-					}
-				}
-				&:hover { background: #000; }
-			}
+			background: $sidebar-bg-dark;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+
+            header {
+                border-bottom: $border-purple-light;
+                h1 {
+                    font-size: 1.8rem;
+                    padding: 0 0.8rem;
+                    color: $white;
+                    letter-spacing: 0;
+                    text-transform: none;
+                }
+            }
+            nav ul li {
+                margin: 0 1.2rem;
+            }
+            nav ul li a {
+                color: #fff;
+                opacity: 0.5;
+
+                svg, .svg {
+                    path, rect, poly { fill: #fff !important; }
+                }
+
+                &.never-backedup {
+                    color: #EC5840 !important;
+                    filter: none;
+                    opacity: 1;
+
+                    svg, .svg {
+                        path, rect, poly { fill: #EC5840 !important; }
+                    }
+                }
+            }
+            nav ul li.active a {
+                opacity: 1;
+                background: transparent;
+                color: $tertiary-color;
+                svg, .svg {
+                    path, rect, poly {
+                        fill: $tertiary-color !important;
+                    }
+                }
+            }
 			nav ul li a:hover {
-				background: #252525;
+                opacity: 1;
+				background: none;
 			}
+
+            .wallet-type {
+                border-top: $border-purple-light;
+                border-bottom: $border-purple-light;
+
+                .wallet-icon {
+                    border: 1px solid #FFF;
+                }
+
+                h1 {
+                    color: #FFF;
+                }
+
+                img {
+                    filter: none;
+                    opacity: 1;
+                }
+            }
 		}
-		section.rightCol { 
-			background: #000;
-			section.balances { background: #151515; }
+		section.rightCol {
+			background: $bg-dark;
+			section.balances { background: lighten($bg-dark, 3%); }
 			main table thead {
 				background: darken($primary-color, 35%);
 			}
 			main table tbody tr td {
 				svg, .svg {
-					path, rect, poly { 
+					path, rect, poly {
 						fill: #939598 !important;
 					}
 				}
 			}
 			main table tbody tr td a {
 				svg, .svg {
-					path, rect, poly { 
+					path, rect, poly {
 						fill: $primary-color !important;
 					}
 				}
 				&:hover {
 					svg, .svg {
-						path, rect, poly { 
+						path, rect, poly {
 							fill: lighten($primary-color,5%) !important;
 						}
 					}
@@ -913,13 +1028,13 @@ body.darkTheme {
 			}
 			main.transactions table tbody tr td a {
 				svg, .svg {
-					path, rect, poly { 
+					path, rect, poly {
 						fill: $text-color !important;
 					}
 				}
 				&:hover {
 					svg, .svg {
-						path, rect, poly { 
+						path, rect, poly {
 							fill: $primary-color !important;
 						}
 					}
@@ -945,11 +1060,11 @@ body.darkTheme {
 				}
 			}
 			main form {
-				input[type='text'], select { 
+				input[type='text'], select {
 					background-color: darken($dark-gray,20%);
 					&[disabled='true'] { background: darken($secondary-color, 35%); }
 				}
-                input[type='checkbox'] { 
+                input[type='checkbox'] {
                     & + label {
 						&:before { background-color: darken($dark-gray,20%); }
 					}
@@ -977,13 +1092,13 @@ body.darkTheme {
 			.reveal {
 				background: #111;
 				border-color: $primary-color;
-				thead, tfoot { 
+				thead, tfoot {
 					background: #222;
 					border-color: #333;
 				}
 				&#transDetails {
 					table {
-						thead { 
+						thead {
 							background: darken($primary-color, 30%);
 							border-color: darken($primary-color, 30%);
 						}

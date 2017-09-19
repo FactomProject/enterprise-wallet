@@ -7,7 +7,9 @@
 package main
 
 import (
+	"bufio"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,7 +24,7 @@ func main() {
 	// configure the server
 	var (
 		guiDB           = flag.String("guiDB", "Bolt", "GUI Database: Bolt, LDB, or Map")
-		walDB           = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, or Map")
+		walDB           = flag.String("walDB", "Bolt", "Wallet Database: Bolt, LDB, Map, or ENC")
 		txDB            = flag.String("txDB", "Bolt", "Transaction Database: Bolt, LDB, or Map")
 		port            = flag.Int("port", 8091, "The port for the GUIWallet")
 		compiled        = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
@@ -63,5 +65,13 @@ func main() {
 		FILES_PATH += "min-"
 	}
 
-	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *v1Import, *v1Path, *factomdLocation)
+	password := ""
+	if *walDB == "ENC" {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Println("Enter password: ")
+		text, _, _ := reader.ReadLine()
+		password = string(text)
+	}
+
+	InitiateWalletAndWeb(*guiDB, *walDB, *txDB, *port, *v1Import, *v1Path, *factomdLocation, password)
 }

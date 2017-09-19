@@ -1,0 +1,256 @@
+version: 2
+
+jobs:
+
+  build:
+    working_directory: /go/src/github.com/FactomProject/enterprise-wallet
+    docker:
+      - image: circleci/golang:1.9
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-enterprise-wallet-go-build-cache-{{ checksum "glide.lock" }}
+
+      - run:
+          name: Get glide
+          command: |
+            go get -v github.com/Masterminds/glide
+            cd $GOPATH/src/github.com/Masterminds/glide
+            git checkout tags/v0.12.3
+            go install
+
+      - run:
+          name: Get goveralls
+          command: |
+            go get github.com/mattn/goveralls
+            cd $GOPATH/src/github.com/Masterminds/glide
+            git checkout tags/v0.12.3
+            go install
+
+      - run:
+          name: Get the dependencies
+          command: |
+            glide install
+
+      - run:
+          name: Build and install the executable
+          command: go install -v
+
+      - save_cache:
+          key: v1-enterprise-wallet-go-build-cache-{{ checksum "glide.lock" }}
+          paths:
+            - vendor
+
+  test:
+    working_directory: /go/src/github.com/FactomProject/enterprise-wallet
+    docker:
+      - image: circleci/golang:1.9
+
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 17.06.0-ce
+
+      # The main (only) thing we care about is caching the /vendor dir.
+      #   Hence, checksumming glide.lock
+      - restore_cache:
+          keys:
+            - v1-enterprise-wallet-test-cache-{{ checksum "glide.lock" }}
+
+      # Load the image if the cache hit
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i ~/images/enterprise-wallet.tar | true
+
+
+      # start factomd and wait for it to start
+      - run: |
+          docker run --rm -d --name factomd factominc/factomd -blktime 1 -sim_stdin=false -customnet=ff_dev -network=CUSTOM  -startdelay=2
+          sleep 3
+
+      # build enterprise-wallet
+      - run: |
+          docker build -t enterprise-wallet .
+
+      # Run enterprise-wallet
+      - run: |
+          docker run --rm -d --network container:factomd --name enterprise-wallet enterprise-wallet -factomdlocation http://localhost:8088
+          sleep 2
+
+      # Run the test
+      - run: |
+          docker exec -it enterprise-wallet /bin/sh -c 'go test -v $(glide nv)'
+
+      - run:
+          name: Save the image cache
+          command: |
+            mkdir -p ~/images
+            docker save -o ~/images/enterprise-wallet.tar enterprise-wallet $(docker history -q enterprise-wallet |grep -v missing | grep -v none)
+
+      - save_cache:
+          key: v1-enterprise-wallet-test-cache-{{ checksum "glide.lock" }}
+          paths:
+            - ~/images
+
+  coveralls:
+    working_directory: /go/src/github.com/FactomProject/enterprise-wallet
+    docker:
+      - image: circleci/golang:1.9
+
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 17.06.0-ce
+
+      # The main (only) thing we care about is caching the /vendor dir.
+      #   Hence, checksumming glide.lock
+      - restore_cache:
+          keys:
+            - v1-enterprise-wallet-test-cache-{{ checksum "glide.lock" }}
+
+      # Load the image if the cache hit
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i ~/images/enterprise-wallet.tar | true
+
+
+      # start factomd and wait for it to start
+      - run: |
+          docker run --rm -d --name factomd factominc/factomd -blktime 1 -sim_stdin=false -customnet=ff_dev -network=CUSTOM  -startdelay=2
+          sleep 3
+
+      # Run enterprise-wallet (from the load)
+      - run: |
+          docker run --rm -d --network container:factomd --name enterprise-wallet enterprise-wallet -factomdlocation http://localhost:8088
+          sleep 2
+
+
+      # Get Goveralls
+      - run: |
+          docker exec -it enterprise-wallet /bin/sh -c 'go get github.com/mattn/goveralls'
+
+
+      # Run Goveralls
+      - run: |
+          docker exec -it enterprise-wallet goveralls -v -ignore=web/files/statics/*,web/files/templates/*,main.go,cliMain.go -service=circle-ci -repotoken=$COVERALLS_TOKEN
+
+  # Build containers
+  docker_build:
+    working_directory: /go/src/github.com/FactomProject/enterprise-wallet
+
+    docker:
+      - image: docker:17.06.0-ce-git
+
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 17.06.0-ce
+
+      # The main (only) thing we care about is caching the /vendor dir.
+      #   Hence, checksumming glide.lock
+      - restore_cache:
+          keys:
+            - v1-enterprise-wallet-docker-cache-{{ checksum "glide.lock" }}
+
+      # Load the image if the cache hit
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i /images/enterprise-wallet-alpine.tar | true
+            docker load -i /images/enterprise-wallet.tar | true
+
+      # Build the containers
+      - run:
+          name: Build the baseline images
+          command: |
+            docker build -t enterprise-wallet-alpine -f Dockerfile.alpine .
+            docker build -t enterprise-wallet -f Dockerfile .
+
+      - run:
+          name: Push  master / develop to DockerHub
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+
+              # If there is a tag, use it
+              if [ "$CIRCLE_TAG" != "" ]; then
+                docker tag enterprise-wallet-alpine factominc/enterprise-wallet:${TAG}-alpine
+                docker push factominc/enterprise-wallet:${TAG}-alpine
+                docker tag enterprise-wallet factominc/enterprise-wallet:${TAG}
+                docker push factominc/enterprise-wallet:${TAG}
+              fi
+
+              # But tag it as alpine/latest anyhow
+              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:alpine
+              docker push factominc/enterprise-wallet:alpine
+              docker tag enterprise-wallet factominc/enterprise-wallet:latest
+              docker push factominc/enterprise-wallet:latest
+
+            elif [ "${CIRCLE_BRANCH}" == "develop" ]; then
+
+              # If there is a tag, use it
+              if [ "$CIRCLE_TAG" != "" ]; then
+                docker tag enterprise-wallet-alpine factominc/enterprise-wallet:${TAG}-alpine-develop
+                docker push factominc/enterprise-wallet:${TAG}-alpine-develop
+                docker tag enterprise-wallet factominc/enterprise-wallet:${TAG}-develop
+                docker push factominc/enterprise-wallet:${TAG}-develop
+              fi
+
+              # But tag it as alpine-develop/develop anyhow
+              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:alpine-develop
+              docker push factominc/enterprise-wallet:alpine-develop
+              docker tag enterprise-wallet factominc/enterprise-wallet:develop
+              docker push factominc/enterprise-wallet:develop
+            fi
+
+            docker logout
+
+      - run:
+          name: Save the image cache
+          command: |
+            mkdir -p /images
+            docker save -o /images/enterprise-wallet-alpine.tar enterprise-wallet-alpine $(docker history -q enterprise-wallet-alpine |grep -v missing | grep -v none)
+            docker save -o /images/enterprise-wallet.tar enterprise-wallet $(docker history -q enterprise-wallet |grep -v missing | grep -v none)
+
+      - save_cache:
+          key: v1-enterprise-wallet-docker-cache-{{ checksum "glide.lock" }}
+          paths:
+            - /images
+
+# The flow is
+#    build
+#      |
+#      ---------- test
+#                   |
+#                   ---------- coveralls
+#                   |
+#                   ---------- docker_build
+#
+#
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - coveralls:
+          requires:
+            - test
+      - docker_build:
+          context: org-global
+          requires:
+            - test

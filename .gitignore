@@ -1,3 +1,4 @@
+.idea
 web/min-statics/*
 web/min-templates/*
 
@@ -13,3 +14,4 @@ scripts/*
 builds/*
 min-statics/*
 min-templats/*
+.sass-cache/*

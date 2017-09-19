@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/FactomProject/enterprise-wallet.svg?branch=master)](https://travis-ci.org/FactomProject/enterprise-wallet)
+[![CircleCI](https://circleci.com/gh/FactomProject/enterprise-wallet/tree/develop.svg?style=shield)](https://circleci.com/gh/FactomProject/enterprise-wallet/tree/develop)
 [![Coverage Status](https://coveralls.io/repos/github/FactomProject/enterprise-wallet/badge.svg?branch=master)](https://coveralls.io/github/FactomProject/enterprise-wallet?branch=master)
 
 # Enterprise Wallet - GUI Wallet for M2
@@ -29,8 +29,8 @@ When backing up, backing up #1 is most important. #2 is good to have if you plan
 
 ### Flags
 - ```-guiDB=TYPE``` - Gui Database Type, types can be 'Map', 'Bolt', or LDB
-  - Default: Bolt
-- ```-walDB=TYPE``` - Wallet Database Type, types can be 'Map', 'Bolt', or LDB
+  - Default: Bolt (forced to an alternate bolt file when -walDB=ENC)
+- ```-walDB=TYPE``` - Wallet Database Type, types can be 'Map', 'Bolt', LDB, or ENC
   - Default: Bolt
 - ```-txDB=TYPE``` - Transaction Database Type, Types can be 'Map', 'Bolt', or LDB
   - Default: Bolt
