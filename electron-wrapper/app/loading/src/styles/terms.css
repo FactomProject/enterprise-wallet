@@ -1,0 +1,175 @@
+.terms {
+    position: relative;
+    height: 344px;
+    margin: auto -14px;
+    overflow: scroll;
+    padding: 24px 80px 24px 40px;
+    color: var(--black);
+    background: color(var(--white) lightness(-3%));
+
+    p {
+        font-size: 13px;
+        line-height: 24px;
+    }
+}
+
+.terms-wrapper {
+    & .accept-terms {
+        height: 52px;
+        margin: auto -14px;
+        padding: 0 40px;
+        background: color(var(--white) lightness(-3%));
+        border-top: 1px solid var(--yellow-light);
+        overflow: hidden;
+
+        & > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            justify-content: space-between;
+            transform: translateY(-36px);
+            transition: all var(--hover-transition);
+            transition-delay: 0.5s;
+
+            &.scrolled {
+                transform: translateY(11px);
+            }
+        }
+
+
+        & .scroll-bounce {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--purple);
+            border: 1px solid var(--yellow);
+            animation: bounce 1s ease infinite;
+            cursor: pointer;
+            transition: all var(--hover-transition);
+
+            & img {
+                width: 20px;
+            }
+
+            &:hover {
+                background: var(--white);
+            }
+
+            &.scrolled {
+                transform: translateY(40px);
+                animation: none;
+            }
+        }
+    }
+
+    & .accept-form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    & .checkbox {
+        position: relative;
+        color: var(--black);
+
+        label {
+            display: flex;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+        }
+
+        input[type="checkbox"] + label {
+            opacity: 0.5;
+            transition: opacity var(--hover-transition);
+        }
+
+        input[type="checkbox"]:checked + label {
+            opacity: 1;
+        }
+
+        input[type="checkbox"] + label span {
+            flex-shrink: 0;
+            position: relative;
+            display:inline-block;
+            width:19px;
+            height:19px;
+            margin: 0 8px 0 0;
+            vertical-align:middle;
+            border: 2px solid var(--black);
+            border-radius: 4px;
+            cursor:pointer;
+            transition: all var(--hover-transition);
+        }
+
+        input[type="checkbox"]:focus + label span {
+            border: 2px solid #EDB820;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+
+        input[type="checkbox"]:checked + label span {
+            border: 2px solid var(--yellow);
+
+            &::before {
+                content: '';
+                width: 9px;
+                height: 5px;
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                border: 2px solid var(--yellow);
+                border-top: none;
+                border-right: none;
+                opacity: 1;
+                transform: rotate(-45deg);
+            }
+        }
+    }
+
+    & button {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 16px;
+        margin-left: 20px;
+        background: none;
+        font-family: var(--open-sans);
+        color: var(--purple);
+        font-weight: 700;
+        border: 1px solid var(--purple);
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all var(--hover-transition);
+
+        &:focus {
+            box-shadow: 0 0 10px rgba(237, 184, 32, 0.4);
+        }
+
+        &:hover {
+            color: var(--white);
+            background: var(--purple);
+        }
+
+        &:disabled {
+            background: color(var(--black) alpha(0.1));
+            color: color(var(--black) alpha(0.3));
+            border: 1px solid color(var(--black) alpha(0.1));
+        }
+    }
+}
+
+@keyframes bounce {
+    0% { transform: translateY(-8px); }
+    50% { transform: translateY(-4px); }
+    100% { transform: translateY(-8px); }
+}

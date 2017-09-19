@@ -1,0 +1,136 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 1000px;
+    height: 500px;
+    background: var(--bg-gradient);
+}
+
+.terms-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 1000px;
+    height: 500px;
+    overflow: hidden;
+    background: var(--bg-gradient);
+}
+
+.wallet {
+    display: flex;
+    width: 1400px;
+    height: 780px;
+    box-shadow: 0 0 26px color(black alpha(0.4));
+
+    &.bg-dark {
+        background: url(../images/app-bg.jpg);
+        background-size: cover;
+    }
+    &.bg-light {
+        background: url(../images/app-bg-light.jpg);
+        background-size: cover;
+    }
+}
+
+aside {
+    height: 100%;
+    width: 315px;
+    box-shadow: 2px 0 16px color(black alpha(0.4));
+}
+
+header {
+    &.home {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+
+        & .logo {
+            margin-bottom: 10px;
+        }
+    }
+
+    &.terms-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 32px;
+        margin: 20px 0 5px;
+        color: var(--white);
+
+        & h1 {
+            margin-bottom: 10px;
+        }
+
+        & .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 16px;
+
+            & img {
+                margin-left: 16px;
+                width: 30px;
+                height: auto;
+            }
+        }
+    }
+
+    &.section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 28px;
+    }
+}
+
+main {
+    flex-grow: 1;
+    width: 100%;
+    padding: 0 14px;
+
+    &.loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        & .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            & img {
+                margin-bottom: 16px;
+            }
+        }
+    }
+}
+
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    font-size: 10px;
+    opacity: 0.8;
+
+    & .logo-footer {
+        width: 80px;
+    }
+
+    & span {
+        margin-right: 10px;
+    }
+
+    &.footer-terms {
+        width: 100%;
+    }
+}

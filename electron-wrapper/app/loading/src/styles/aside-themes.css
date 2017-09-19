@@ -1,0 +1,105 @@
+aside {
+    &.dark-theme {
+        background: var(--bg-gradient);
+        color: var(--white);
+
+        & header {
+            border-bottom: var(--border-purple-light);
+        }
+
+        & nav {
+            & ul {
+                & li {
+                    border-bottom: var(--border-purple-light);
+
+                    & a {
+                        & img {
+                            filter: brightness(10);
+                        }
+
+                        &.active {
+                            color: var(--yellow);
+                            opacity: 1;
+
+                            & img {
+                                filter: none;
+                            }
+                        }
+
+                        &:hover {
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        & footer {
+            & .wallet-type {
+                border-top: var(--border-purple-light);
+                border-bottom: var(--border-purple-light);
+            }
+        }
+    }
+
+    &.light-theme {
+        color: var(--black);
+        background: var(--bg-gradient-light);
+
+        & header {
+            border-bottom: var(--border-gray);
+
+            & h1 {
+                color: var(--purple);
+            }
+        }
+
+        & nav {
+            & ul {
+                & li {
+                    border-bottom: var(--border-gray);
+
+                    & a {
+                        opacity: 0.4;
+
+                        & img {
+                            filter: brightness(5%);
+                        }
+
+                        &.active {
+                            opacity: 1;
+                            color: var(--purple);
+
+                            & img {
+                                filter: none;
+                            }
+
+                            &:hover {
+                                opacity: 1;
+                            }
+                        }
+
+                        &:hover {
+                            opacity: 0.6;
+                        }
+                    }
+                }
+            }
+        }
+
+        & footer {
+            & .wallet-type {
+                border-top: var(--border-gray);
+                border-bottom: var(--border-gray);
+
+                & .wallet-icon {
+                    border: var(--border-black);
+
+                    & img {
+                        filter: brightness(10%);
+                    }
+                }
+            }
+        }
+    }
+}
