@@ -48,6 +48,7 @@ type SettingsStruct struct {
 	Synced           bool
 	Encrypted        bool
 	BackedUp         bool
+	Version          string
 }
 
 // Refresh refreshes the "synced" flag, and anything else that needs to be done

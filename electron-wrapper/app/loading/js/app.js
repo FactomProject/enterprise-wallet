@@ -1,5 +1,6 @@
 const ipc = require('electron').ipcRenderer
 
+
 const {shell} = require('electron')
 function openBlog(link) {
 	shell.openExternal(link)
@@ -41,3 +42,9 @@ function checkValidPassword(pass) {
 	}
 	return true
 }
+
+$("#termsbox").bind('scroll', function() {
+	if($("#termsbox").scrollTop() + $("#termsbox").innerHeight() >= .95 * $("#termsbox").prop('scrollHeight')) {
+		// Toggle class to show proceed
+	}
+});

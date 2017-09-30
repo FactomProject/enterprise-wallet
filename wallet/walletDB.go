@@ -19,6 +19,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/FactomProject/enterprise-wallet/address"
 	"github.com/FactomProject/enterprise-wallet/wallet/database"
@@ -1146,6 +1147,30 @@ func (w *WalletDB) FactomdOnline() (bool, string) {
 	} else {
 		return true, factom.FactomdServer()
 	}
+}
+
+type TermsAccept struct {
+	Accepted bool   `json:"accepted"`
+	Date     string `json:"date"`
+	Version  string `json:"version"`
+}
+
+func AddAcceptTermsFile() {
+	path := GetHomeDir() + "/.factom/wallet/.agree"
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		return
+	}
+
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0777)
+	if err != nil {
+		return
+	}
+
+	t := TermsAccept{true, time.Now().Format("2006/01/02"), VERSION}
+
+	d, _ := json.Marshal(t)
+	f.WriteString(string(d))
+	f.Close()
 }
 
 func GetHomeDir() string {

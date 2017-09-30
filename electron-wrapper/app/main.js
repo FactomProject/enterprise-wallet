@@ -3,6 +3,8 @@ const {ipcMain} = require('electron')
 const dialog = require('electron').dialog
 var ps = require('ps-node');
 var request=require('request');
+var fs = require('fs');
+
 // Module to control application life.
 const app = electron.app
 // Module to create menu for copy/paste
@@ -238,7 +240,14 @@ function ChooseWalletType(witherror) {
     // transparent: true
   })
 
-  var pathurl = 'loading/index.html'
+  var agreePath = process.env.HOME + "/.factom/wallet/.agree"
+  var pathurl = 'loading/terms.html'
+  if (fs.existsSync(agreePath)) {
+      console.log("Terms already accepted")
+      pathurl = 'loading/index.html'
+  }
+
+
   var ext = ''
   if(witherror) {
     ext = `?error=Wrong Password`
