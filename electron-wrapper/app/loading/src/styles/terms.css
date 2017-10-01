@@ -3,13 +3,17 @@
     height: 344px;
     margin: auto -14px;
     overflow: scroll;
-    padding: 24px 80px 24px 40px;
+    padding: 24px 40px;
     color: var(--black);
     background: color(var(--white) lightness(-3%));
 
     p {
         font-size: 13px;
         line-height: 24px;
+    }
+
+    ul {
+        margin-left: 20px;
     }
 }
 

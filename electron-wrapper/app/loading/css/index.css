@@ -883,13 +883,16 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     height: 344px;
     margin: auto -14px;
     overflow: scroll;
-    padding: 24px 80px 24px 40px;
+    padding: 24px 40px;
     color: #000;
     background: rgb(247, 247, 247);
 }
 .terms p {
         font-size: 13px;
         line-height: 24px;
+    }
+.terms ul {
+        margin-left: 20px;
     }
 .terms-wrapper .accept-terms {
     height: 52px;
