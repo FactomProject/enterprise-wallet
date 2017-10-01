@@ -1034,7 +1034,7 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     -webkit-transform: rotate(-45deg);
             transform: rotate(-45deg);
 }
-.terms-wrapper button {
+.terms-wrapper #proceed-button {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -1054,15 +1054,15 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     -webkit-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out
 }
-.terms-wrapper button:focus {
+.terms-wrapper #proceed-button:focus {
     -webkit-box-shadow: 0 0 10px rgba(237, 184, 32, 0.4);
             box-shadow: 0 0 10px rgba(237, 184, 32, 0.4);
 }
-.terms-wrapper button:hover {
+.terms-wrapper #proceed-button:hover {
     color: #FFF;
     background: #302c42;
 }
-.terms-wrapper button:disabled {
+.terms-wrapper #proceed-button:disabled {
     background: rgba(0, 0, 0, 0.1);
     color: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(0, 0, 0, 0.1);
