@@ -882,7 +882,7 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     position: relative;
     height: 344px;
     margin: auto -14px;
-    overflow: scroll;
+    overflow-y: scroll;
     padding: 24px 40px;
     color: #000;
     background: rgb(247, 247, 247);

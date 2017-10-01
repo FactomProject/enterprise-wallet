@@ -2,7 +2,7 @@
     position: relative;
     height: 344px;
     margin: auto -14px;
-    overflow: scroll;
+    overflow-y: scroll;
     padding: 24px 40px;
     color: var(--black);
     background: color(var(--white) lightness(-3%));
