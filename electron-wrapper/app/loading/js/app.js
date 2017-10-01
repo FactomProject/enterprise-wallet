@@ -30,7 +30,9 @@ function updateCheckbox() {
 	var c = document.getElementById('checkbox');
 	if(c.checked) {
 		document.getElementById("proceed-button").disabled = false;
+		$("#proceed-button").removeClass("disabled")
 	} else {
+		$("#proceed-button").addClass("disabled")
 		document.getElementById("proceed-button").disabled = true;
 	}
 }
