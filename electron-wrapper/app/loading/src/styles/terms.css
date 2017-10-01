@@ -160,7 +160,8 @@
             background: var(--purple);
         }
 
-        &:disabled {
+        &.disabled {
+            cursor: default;
             background: color(var(--black) alpha(0.1));
             color: color(var(--black) alpha(0.3));
             border: 1px solid color(var(--black) alpha(0.1));

@@ -1062,7 +1062,8 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     color: #FFF;
     background: #302c42;
 }
-.terms-wrapper #proceed-button:disabled {
+.terms-wrapper #proceed-button.disabled {
+    cursor: default;
     background: rgba(0, 0, 0, 0.1);
     color: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(0, 0, 0, 0.1);
