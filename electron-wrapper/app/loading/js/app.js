@@ -46,5 +46,6 @@ function checkValidPassword(pass) {
 $("#termsbox").bind('scroll', function() {
 	if($("#termsbox").scrollTop() + $("#termsbox").innerHeight() >= .95 * $("#termsbox").prop('scrollHeight')) {
 		// Toggle class to show proceed
+		$(".toggle-scrolled").addClass("scrolled")
 	}
 });
