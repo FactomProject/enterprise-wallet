@@ -946,7 +946,6 @@ aside.light-theme footer .wallet-type .wallet-icon img {
     border: 1px solid #EDB820;
     -webkit-animation: bounce 1s ease infinite;
             animation: bounce 1s ease infinite;
-    cursor: pointer;
     -webkit-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out
 }

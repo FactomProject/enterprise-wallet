@@ -49,7 +49,6 @@
             color: var(--purple);
             border: 1px solid var(--yellow);
             animation: bounce 1s ease infinite;
-            cursor: pointer;
             transition: all var(--hover-transition);
 
             & img {
