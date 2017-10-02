@@ -164,6 +164,7 @@
         }
 
         &.disabled {
+            pointer-events: none;
             cursor: default;
             background: color(var(--black) alpha(0.1));
             color: color(var(--black) alpha(0.3));
