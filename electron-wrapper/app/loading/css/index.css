@@ -895,11 +895,15 @@ aside.light-theme footer .wallet-type .wallet-icon img {
         margin-left: 20px;
     }
 .terms-wrapper .accept-terms {
+    position: relative;
     height: 52px;
     margin: auto -14px;
     padding: 0 40px;
     background: rgb(247, 247, 247);
     border-top: 1px solid #F5E3AF;
+    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+    z-index: 200;
     overflow: hidden
 }
 .terms-wrapper .accept-terms > div {

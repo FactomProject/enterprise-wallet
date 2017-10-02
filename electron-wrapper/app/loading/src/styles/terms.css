@@ -19,11 +19,14 @@
 
 .terms-wrapper {
     & .accept-terms {
+        position: relative;
         height: 52px;
         margin: auto -14px;
         padding: 0 40px;
         background: color(var(--white) lightness(-3%));
         border-top: 1px solid var(--yellow-light);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+        z-index: 200;
         overflow: hidden;
 
         & > div {
