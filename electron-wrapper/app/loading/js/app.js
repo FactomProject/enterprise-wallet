@@ -2,7 +2,7 @@ const ipc = require('electron').ipcRenderer
 
 
 const {shell} = require('electron')
-function openBlog(link) {
+function openExternal(link) {
 	shell.openExternal(link)
 }
 
@@ -29,13 +29,14 @@ function clearError() {
 function updateCheckbox() {
 	var c = document.getElementById('checkbox');
 	if(c.checked) {
-		document.getElementById("proceed-button").disabled = false;
+		$("#proceed-button").removeAttr('disabled');
 		$("#proceed-button").removeClass("disabled")
 	} else {
 		$("#proceed-button").addClass("disabled")
-		document.getElementById("proceed-button").disabled = true;
+		$("#proceed-button").attr('disabled','disabled');
 	}
 }
+
 
 function checkValidPassword(pass) {
 	if(pass.length < 8) {
