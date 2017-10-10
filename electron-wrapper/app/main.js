@@ -5,6 +5,8 @@ var ps = require('ps-node');
 var request=require('request');
 var fs = require('fs');
 
+const VERSION = "0.2.1"
+
 // Module to control application life.
 const app = electron.app
 // Module to create menu for copy/paste
@@ -222,6 +224,24 @@ function cleanUp(functionAfterCleanup) {
   });
 }
 
+// Returns the path to the correct URL to load depending on if they accepted the terms
+function GetAcceptedTermsPathURL(func) {
+  var agreePath = process.env.HOME + "/.factom/wallet/.agree"
+  var pathurl = 'loading/terms.html'
+  if (fs.existsSync(agreePath)) {
+    var lines = require('fs').readFileSync(agreePath, 'utf-8').split('\n').filter(Boolean);
+    for(var i = 0; i < lines.length; i++) {
+        var obj = JSON.parse(lines[i])
+        if(obj != undefined && obj.version === VERSION) {
+          console.log("Terms already accepted")
+          pathurl = 'loading/index.html'
+          return pathurl
+        }
+    }
+  }
+  return pathurl
+}
+
 function ChooseWalletType(witherror) {
   var height = 500
   if(isWin) {
@@ -240,13 +260,7 @@ function ChooseWalletType(witherror) {
     // transparent: true
   })
 
-  var agreePath = process.env.HOME + "/.factom/wallet/.agree"
-  var pathurl = 'loading/terms.html'
-  if (fs.existsSync(agreePath)) {
-      console.log("Terms already accepted")
-      pathurl = 'loading/index.html'
-  }
-
+  var pathurl = GetAcceptedTermsPathURL()
 
   var ext = ''
   if(witherror) {

@@ -13,6 +13,7 @@ package wallet
  */
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/user"
@@ -1158,18 +1159,37 @@ type TermsAccept struct {
 func AddAcceptTermsFile() {
 	path := GetHomeDir() + "/.factom/wallet/.agree"
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return
+		// File exists, check if it has version
+		file, err := os.Open(path)
+		if err != nil {
+			return // This shouldn't happen, as the file exists
+		}
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			// Look for this version already added
+			line := scanner.Text()
+			var lineTA TermsAccept
+			err := json.Unmarshal([]byte(line), &lineTA)
+			if err == nil && lineTA.Version == VERSION {
+				file.Close()
+				return // Version already added
+			}
+		}
+		file.Close()
 	}
 
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0777)
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	t := TermsAccept{true, time.Now().Format("2006/01/02"), VERSION}
 
+	fmt.Println("ADDING LINE")
 	d, _ := json.Marshal(t)
-	f.WriteString(string(d))
+	f.WriteString(fmt.Sprintf(",\n%s", string(d)))
 	f.Close()
 }
 
