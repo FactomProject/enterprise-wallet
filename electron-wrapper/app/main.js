@@ -243,11 +243,15 @@ function GetAcceptedTermsPathURL(func) {
       if(str.substring(str.length-1, str.length) === `,`) {
         str = str.substring(0, str.length - 1);
       }
-      var obj = JSON.parse(str)
-      if(obj != undefined && obj.version === VERSION) {
-        console.log("Terms already accepted")
-        pathurl = 'loading/index.html'
-        return pathurl
+      try{
+        var obj = JSON.parse(str)
+        if(obj != undefined && obj.version === VERSION) {
+          console.log("Terms already accepted")
+          pathurl = 'loading/index.html'
+          return pathurl
+        }
+      } catch(e) {
+        continue
       }
     }
   }

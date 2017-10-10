@@ -1157,6 +1157,7 @@ type TermsAccept struct {
 }
 
 func AddAcceptTermsFile() {
+	created := false
 	path := GetHomeDir() + "/.factom/wallet/.agree"
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		// File exists, check if it has version
@@ -1177,6 +1178,9 @@ func AddAcceptTermsFile() {
 			}
 		}
 		file.Close()
+	} else {
+		created = true
+
 	}
 
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
@@ -1187,9 +1191,13 @@ func AddAcceptTermsFile() {
 
 	t := TermsAccept{true, time.Now().Format("2006/01/02"), VERSION}
 
-	fmt.Println("ADDING LINE")
+	prefix := ""
+	if !created {
+		prefix = ",\n"
+	}
+
 	d, _ := json.Marshal(t)
-	f.WriteString(fmt.Sprintf(",\n%s", string(d)))
+	f.WriteString(fmt.Sprintf("%s%s", prefix, string(d)))
 	f.Close()
 }
 
