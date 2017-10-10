@@ -4,6 +4,7 @@ const dialog = require('electron').dialog
 var ps = require('ps-node');
 var request=require('request');
 var fs = require('fs');
+var homedir = require("homedir")
 
 const VERSION = "0.2.1"
 
@@ -226,17 +227,28 @@ function cleanUp(functionAfterCleanup) {
 
 // Returns the path to the correct URL to load depending on if they accepted the terms
 function GetAcceptedTermsPathURL(func) {
-  var agreePath = process.env.HOME + "/.factom/wallet/.agree"
+  var home = homedir()
+  if(home.length === 0 || home === "undefined" || home === undefined) {
+    home = process.env.HOME
+  }
+  var agreePath = home+ "/.factom/wallet/.agree"
   var pathurl = 'loading/terms.html'
   if (fs.existsSync(agreePath)) {
     var lines = require('fs').readFileSync(agreePath, 'utf-8').split('\n').filter(Boolean);
     for(var i = 0; i < lines.length; i++) {
-        var obj = JSON.parse(lines[i])
-        if(obj != undefined && obj.version === VERSION) {
-          console.log("Terms already accepted")
-          pathurl = 'loading/index.html'
-          return pathurl
-        }
+      var str = lines[i]
+      if(str.length <= 2) {
+        continue
+      }
+      if(str.substring(str.length-1, str.length) === `,`) {
+        str = str.substring(0, str.length - 1);
+      }
+      var obj = JSON.parse(str)
+      if(obj != undefined && obj.version === VERSION) {
+        console.log("Terms already accepted")
+        pathurl = 'loading/index.html'
+        return pathurl
+      }
     }
   }
   return pathurl
