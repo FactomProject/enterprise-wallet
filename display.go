@@ -78,7 +78,7 @@ func ServeWallet(port int) {
 	http.HandleFunc("/GET", HandleGETRequests)
 	http.HandleFunc("/POST", HandlePOSTRequests)
 
-	portStr := "localhost:" + strconv.Itoa(port)
+	portStr := ":" + strconv.Itoa(port)
 
 	fmt.Println("Starting GUI on http://" + portStr + "/")
 	http.ListenAndServe(portStr, nil)
