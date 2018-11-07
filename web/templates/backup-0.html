@@ -3,7 +3,7 @@
 {{$pageTitle := "Backup Step 1"}}
 {{$mainClass := "address-book"}}
 {{$theme := .Settings.Theme}}
-{{$activeNav := 4}}
+{{$activeNav := 5}}
 {{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
 
 {{template "templateTop" $info}}
@@ -15,12 +15,12 @@
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
             </div>
             <h1 class="backup-title backup-title-alert not-all-backed-up">
-                Addresses that are not generated from your wallet's seed will not be backed up. This includes the following addresses.
+                Addresses and identity keys that are not generated from your wallet's seed will not be backed up. This includes the following.
                 <br />
                 <a href="https://docs.factom.com/#backup-your-wallets" target="_blank" class="external-link">Click here to learn more.</a>
             </h1>
             <h1 class="backup-title backup-title-alert all-backed-up" style="display: none;">
-                All of your current addresses will be backed up, but any addresses you import later will not be part of your backup. This is because imported addresses are not created from this wallet's seed.
+                All of your current addresses and identity keys will be backed up, but any that you import later will not be part of your backup. This is because imported addresses and identity keys are not created from this wallet's seed.
                 <br />
                 <a href="https://docs.factom.com/#backup-your-wallets" target="_blank" class="external-link">Click here to learn more.</a>
             </h1>

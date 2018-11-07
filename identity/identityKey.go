@@ -152,6 +152,9 @@ func (idKey *IdentityKeyNamePair) MarshalBinary() (data []byte, err error) {
 
 func (idKey *IdentityKeyNamePair) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
+	if len(data) < 66 {
+		return
+	}
 
 	nameData := bytes.Trim(newData[:MaxNameLength], "\x00")
 	idKey.Name = fmt.Sprintf("%s", nameData)
@@ -265,7 +268,6 @@ func (idKeyList *IdentityKeyList) add(idKey *IdentityKeyNamePair) (*IdentityKeyN
 
 	// Duplicate Found
 	return nil, errors.New("identity key already exists")
-
 }
 
 func (idKeyList *IdentityKeyList) Remove(removeAdd string) error {
@@ -305,6 +307,9 @@ func (idKeyList *IdentityKeyList) MarshalBinary() (data []byte, err error) {
 
 func (idKeyList *IdentityKeyList) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	newData = data
+	if len(data) < 8 {
+		return
+	}
 
 	idKeyList.Length = binary.BigEndian.Uint64(data[:8])
 	newData = newData[8:]
@@ -313,6 +318,9 @@ func (idKeyList *IdentityKeyList) UnmarshalBinaryData(data []byte) (newData []by
 	for i < idKeyList.Length {
 		idKey := new(IdentityKeyNamePair)
 		newData, err = idKey.UnmarshalBinaryData(newData)
+		if err != nil {
+			return
+		}
 		idKeyList.List = append(idKeyList.List, *idKey)
 		i++
 	}

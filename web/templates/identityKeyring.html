@@ -1,0 +1,13 @@
+{{define "identity-keyring"}}
+
+{{$pageTitle := "Identity Keyring"}}
+{{$mainClass := "identity-keyring"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 3}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+
+{{template "templateTop" $info}}
+<div id="guts">
+{{template "identityKeyringInner" "all"}}
+{{template "templateBottom" "LoadIdentityKeys()"}}
+{{end}}

@@ -1,0 +1,56 @@
+{{define "new-identity-key"}}
+
+{{$pageTitle := "New Identity Key"}}
+{{$mainClass := "send-factoids"}}
+{{$theme := .Settings.Theme}}
+{{$activeNav := 3}}
+{{$info := mkArray $pageTitle $theme $activeNav $mainClass .Settings}}
+{{template "templateTop" $info}}
+<div id="guts">
+    <div class="row">
+        <div class="columns">
+            <a nav-click="true" href="IdentityKeyring" class="button close-button" data-close aria-label="Close reveal"><span aria-hidden="true">&times;</span></a>
+            <h1>New Address</h1>
+            <form>
+                <div class="row">
+                    <div class="small-12 medium-8 large-6 columns">
+                        <label>Generate identity key from:</label>
+                        <select id="generate-source" name="generate-source">
+                            <option value="random-identity-key">Random new identity key</option>
+                            <option value="import-identity-key">Import from private key</option>
+                            <option value="new-external-address">New external identity key</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 medium-7 large-8 columns">
+                        <label><span id="sec-pub">Private</span> key:</label>
+                        <div class="input-group" id="private-key-input-container">
+                          <pre><input id="private-key-input" type="text" name="private-key" class="input-group-field percent95 disabled-input" placeholder="A new identity key will be created" disabled></pre>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-5 large-4 columns">
+                        <label>Nickname:</label>
+                        <input id="nickname-input" type="text" name="alias" placeholder="Alias of identity key" class="input-group-error" maxlength=20>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="medium-8 hide-for-small-only columns">
+
+                    </div>
+                    <div class="medium-4 small-12 columns">
+                        <a id="add-to-identitykeyring" class="button expanded">Add to Identity Keyring</a>
+                    </div>
+                </div>
+                <div id="error-zone" class="callout alert text-center" style="display:none">An error has occured</div>
+                <div id="success-zone" class="callout success text-center" style="display:none">
+                    <div> A new identity key was created with the following details: <a id="success-link"><small>Open identity key in new tab</small></a></div>
+                    Name: <span id="name"> Name</span>
+                    <pre> Identity Key</pre>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{template "templateBottom" ""}}
+{{end}}

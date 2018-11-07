@@ -244,6 +244,14 @@ func HandleAddressBook(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func HandleIdentityKeyring(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	templates.ExecuteTemplate(w, "identityKeyring", NewPlaceHolderStruct())
+	return nil
+}
+
 type HandleSettingsStruct struct {
 	Settings *SettingsStruct
 
@@ -288,12 +296,18 @@ func HandleBackup0(w http.ResponseWriter, r *http.Request) error {
 	st.Settings = MasterSettings
 
 	adds := MasterWallet.GetAllMyGUIAddresses()
+	//idKeys := MasterWallet.GetAllMyGUIIdentityKeys()
 	notBacked := []string{}
 	for _, a := range adds {
 		if !a.Seeded {
 			notBacked = append(notBacked, a.Address)
 		}
 	}
+	/*for _, k := range idKeys {
+		if !k.Seeded {
+			notBacked = append(notBacked, k.Key)
+		}
+	}*/
 	st.AddressesNotBackedUp = notBacked
 
 	templates.ExecuteTemplate(w, "backup0", st)
@@ -453,6 +467,64 @@ func HandleEditAddressExternal(w http.ResponseWriter, r *http.Request) error {
 }
 
 /*******************
+ *  Edit Identity Keys *
+ *******************/
+
+type EditIdentityKeyStruct struct {
+	Settings *SettingsStruct
+
+	Key  string
+	Name string
+}
+
+func NewEditIdentityKeyStruct(key string, name string) *EditIdentityKeyStruct {
+	e := new(EditIdentityKeyStruct)
+	e.Settings = MasterSettings
+	e.Key = key
+	e.Name = name
+
+	return e
+}
+
+func handleEditIdentityKey(w http.ResponseWriter, r *http.Request) (*EditIdentityKeyStruct, error) {
+	k := r.FormValue("address")
+	if !factom.IsValidIdentityKey(k) {
+		reqStruct := fmt.Sprintf("%-10s: %s\n%10s: %s", "RequestUrl", r.URL, "RequestForm", r.Form)
+		return nil, fmt.Errorf(" %s is an invalid identity key.\n%s", k, reqStruct)
+	}
+
+	name := r.FormValue("name")
+	e := NewEditIdentityKeyStruct(k, name)
+	return e, nil
+}
+
+func HandleEditIdentityKey(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	e, err := handleEditAddress(w, r)
+	if err != nil {
+		return fmt.Errorf("Error in HandleEditAddressFactoids(): %s", err.Error())
+	}
+
+	templates.ExecuteTemplate(w, "edit-address-factoid", e)
+	return nil
+}
+
+func HandleEditIdentityKeyExternal(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	e, err := handleEditIdentityKey(w, r)
+	if err != nil {
+		return fmt.Errorf("Error in HandleEditIdentityKeyExternal(): %s", err.Error())
+	}
+
+	templates.ExecuteTemplate(w, "edit-identity-key-external", e)
+	return nil
+}
+
+/*******************
  *  Import/Export  *
  *******************/
 
@@ -501,6 +573,26 @@ func HandleNewAddressExternal(w http.ResponseWriter, r *http.Request) error {
 	defer TemplateMutex.Unlock()
 
 	templates.ExecuteTemplate(w, "new-address-external", NewPlaceHolderStruct())
+	return nil
+}
+
+/***********************
+ *  New Identity Keys  *
+ ***********************/
+
+func HandleNewIdentityKey(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	templates.ExecuteTemplate(w, "new-identity-key", NewPlaceHolderStruct())
+	return nil
+}
+
+func HandleNewIdentityKeyExternal(w http.ResponseWriter, r *http.Request) error {
+	TemplateMutex.Lock()
+	defer TemplateMutex.Unlock()
+
+	templates.ExecuteTemplate(w, "new-identity-key-external", NewPlaceHolderStruct())
 	return nil
 }
 

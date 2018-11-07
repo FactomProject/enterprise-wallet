@@ -39,15 +39,21 @@
                                 Address Book
                             </a>
                         </li>
-                        <li id="settings-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}>
+                        <li id="identity-keyring-nav" {{if compareInts $activeNav 3 }} class="active" {{end}}>
+                            <a href="IdentityKeyring" class="identity-keyring nav-element" nav-click="true">
+                                <i><img src="img/nav_address-book.svg" class="svg" alt="Identity Keyring"></i>
+                                Identity Keyring
+                            </a>
+                        </li>
+                        <li id="settings-nav" {{if compareInts $activeNav 4 }} class="active" {{end}}>
                             <a href="Settings" class="settings nav-element" nav-click="true">
                                 <i><img src="img/nav_settings.svg" class="svg" alt="Settings"></i>
                                 Settings
                             </a>
                         </li>
-                        <li id="backup-nav" {{if compareInts $activeNav 4 }} class="active" {{end}}>
+                        <li id="backup-nav" {{if compareInts $activeNav 5 }} class="active" {{end}}>
                             <a href="Backup" id="backup-nav-item" class="settings nav-element {{ if $settings.BackedUp }} {{ else }} never-backedup {{end}}" nav-click="true">
-                                <i><img src="img/nav_backup.svg" class="svg" alt="Settings"></i>
+                                <i><img src="img/nav_backup.svg" class="svg" alt="Backup"></i>
                                 Backup
                             </a>
                             {{ if $settings.BackedUp }}

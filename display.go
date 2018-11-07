@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/FactomProject/factom"
 	"net/http"
 	"strconv"
 	"strings"
@@ -136,6 +137,8 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleIndexPage(w, r)
 	case "/AddressBook":
 		err = HandleAddressBook(w, r)
+	case "/IdentityKeyring":
+		err = HandleIdentityKeyring(w, r)
 	case "/Settings":
 		err = HandleSettings(w, r)
 	case "/create-entry-credits":
@@ -146,6 +149,10 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleEditAddressExternal(w, r)
 	case "/edit-address-factoid":
 		err = HandleEditAddressFactoids(w, r)
+	case "/edit-identity-key":
+		err = HandleEditIdentityKey(w, r)
+	case "/edit-identity-key-external":
+		err = HandleEditIdentityKeyExternal(w, r)
 	case "/import-export-transaction":
 		err = HandleImportExportTransaction(w, r)
 	case "/new-address-entry-credits":
@@ -156,6 +163,10 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		err = HandleNewAddressFactoid(w, r)
 	case "/new-address":
 		err = HandleNewAddress(w, r)
+	case "/new-identity-key":
+		err = HandleNewIdentityKey(w, r)
+	case "/new-identity-key-external":
+		err = HandleNewIdentityKeyExternal(w, r)
 	case "/receive-factoids":
 		err = HandleReceiveFactoids(w, r)
 	case "/send-factoids":
@@ -353,6 +364,25 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write(jsonResp("Success"))
 		}
+	case "identity-key-name-change":
+		type KNC struct {
+			Key    string `json:"Key"`
+			ToName string `json:"Name"`
+		}
+		j := r.FormValue("json")
+		knc := new(KNC)
+		err := json.Unmarshal([]byte(j), knc)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		err = MasterWallet.ChangeIdentityKeyName(knc.Key, knc.ToName)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		} else {
+			w.Write(jsonResp("Success"))
+		}
 	case "delete-address":
 		type ANC struct {
 			Address string `json:"Address"`
@@ -373,6 +403,32 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		_, err = MasterWallet.RemoveAddress(anc.Address, list)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		} else {
+			w.Write(jsonResp("Success"))
+		}
+	case "delete-identity-key":
+		type KNC struct {
+			Key  string `json:"Key"`
+			Name string `json:"Name"`
+		}
+		j := r.FormValue("json")
+		knc := new(KNC)
+		err := json.Unmarshal([]byte(j), knc)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		_, list := MasterWallet.GetGUIIdentityKey(knc.Key)
+		if list != 2 {
+			w.Write(jsonError("You can only delete External Identity Keys."))
+			return
+		}
+
+		_, err = MasterWallet.RemoveIdentityKey(knc.Key, list)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 			return
@@ -410,6 +466,37 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(secret))
+	case "display-identity-private-key":
+		type IDKey struct {
+			Key string `json:"Key"`
+		}
+
+		if !MasterSettings.KeyExport {
+			w.Write(jsonResp("Displaying private key disabled in settings"))
+			return
+		}
+
+		j := r.FormValue("json")
+		k := new(IDKey)
+		err := json.Unmarshal([]byte(j), k)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		_, list := MasterWallet.GetGUIIdentityKey(k.Key)
+		if list == -1 {
+			w.Write(jsonError("Not found"))
+			return
+		}
+
+		secret, err := MasterWallet.GetIdentityPrivateKey(k.Key)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		w.Write(jsonResp(secret))
 	case "get-address":
 		type Add struct {
 			Address string `json:"Address"`
@@ -430,9 +517,37 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(jsonResp(anp))
+	case "get-identity-key":
+		type IDKey struct {
+			Key string `json:"Key"`
+		}
+
+		j := r.FormValue("json")
+		k := new(IDKey)
+		err := json.Unmarshal([]byte(j), k)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, list := MasterWallet.GetGUIIdentityKey(k.Key)
+		if list == -1 {
+			w.Write(jsonError("Not found"))
+			return
+		}
+
+		w.Write(jsonResp(anp))
 	case "is-valid-address":
 		add := r.FormValue("json")
 		v := MasterWallet.IsValidAddress(add)
+		if v {
+			w.Write(jsonResp("true"))
+		} else {
+			w.Write(jsonResp("false"))
+		}
+	case "is-valid-identity-key":
+		idKey := r.FormValue("json")
+		v := factom.IsValidIdentityKey(idKey)
 		if v {
 			w.Write(jsonResp("true"))
 		} else {
@@ -512,6 +627,56 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 
 		anp, err := MasterWallet.AddExternalAddress(nas.Name, nas.Public)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
+	case "generate-new-identity-key":
+		name := r.FormValue("json")
+		k, err := MasterWallet.GenerateIdentityKey(name)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(k))
+		}
+	case "new-identity-key":
+		type NewIdentityKeyStruct struct {
+			Name   string `json:"Name"`
+			Secret string `json:"Secret"`
+		}
+
+		k := new(NewIdentityKeyStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), k)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, err := MasterWallet.AddIdentityKey(k.Name, k.Secret)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		} else {
+			w.Write(jsonResp(anp))
+		}
+	case "new-external-identity-key":
+		type NewIdentityKeyStruct struct {
+			Name   string `json:"Name"`
+			Public string `json:"Public"`
+		}
+
+		k := new(NewIdentityKeyStruct)
+
+		jsonElement := r.FormValue("json")
+		err := json.Unmarshal([]byte(jsonElement), k)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		}
+
+		anp, err := MasterWallet.AddExternalIdentityKey(k.Name, k.Public)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		} else {

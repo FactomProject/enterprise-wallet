@@ -1,0 +1,42 @@
+{{define "identityKeyringInner"}}
+<ul class="tabs" data-tabs id="transaction-tabs" data-options="deep_linking:true">
+    <li class="tabs-title is-active"><a href="#identity-keys" aria-selected="true">Identity Keys</a></li>
+    <li class='tabs-title {{if compareStrings . "all"}} {{else}} hide {{end}}'><a href="#external-identity-keys">External Identity Keys</a></li>
+</ul>
+<div class="tabs-content" data-tabs-content="transaction-tabs">
+    <div class="tabs-panel is-active" id="identity-keys">
+        <table id="identity-keys-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th><a id="sort-names"><i id="sort-names-icon" class="fa fa-sort" aria-hidden="true"></i> &nbsp;Nickname</a></th>
+                    <th><a id="sort-seeded"><i id="sort-seeded-icon" class="fa fa-sort" aria-hidden="true"></i> &nbsp;Seed Generated (<span class="fa fa-star" style="color: grey;" aria-hidden="true"></span>) / Not Seed Generated (<span class="fa fa-star-o" aria-hidden="true" style="color: grey;"></span>)</a></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div class="newCTA">
+            <a href="new-identity-key" class="identity-key" nav-click="true"></a>
+        </div>
+    </div>
+    <div class='tabs-panel {{if compareStrings . "all"}} {{else}} hide {{end}}' id="external-identity-keys">
+        <table id="external-identity-keys-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th><a id="sort-names"><i id="sort-names-icon" class="fa fa-sort" aria-hidden="true"></i> &nbsp;Nickname</a></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div class="newCTA">
+            <a href="new-identity-key" class="identity-key" nav-click="true"></a>
+        </div>
+    </div>
+</div>
+{{end}}
