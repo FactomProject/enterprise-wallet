@@ -4,16 +4,17 @@
 //
 // The wallet consists of three 3 main structures that are interacted with:
 // Wallet : From 'factom' library, this contains all the funcationality related with transactions.
-// GuiWallet : Contains all the addresses associated with the addresses in the Wallet.
+// GuiWallet : Contains all the addresses associated with the addresses and identity keys in the Wallet.
 // TransactionDB : Contains all transactions from factom. Has helpful functions to find transactions.
 package wallet
 
 /*
- * Manages all the addresses and 2 databases (Wallet DB and GUI DB)
+ * Manages all the addresses, identity keys, and 2 databases (Wallet DB and GUI DB)
  */
 
 import (
 	"fmt"
+	"github.com/FactomProject/enterprise-wallet/identity"
 	"os"
 	"os/user"
 	"sort"
@@ -682,16 +683,24 @@ func (w *WalletDB) UpdateGUIDB() error {
 	if err != nil {
 		return err
 	}
+	idKeys, err := w.Wallet.GetAllIdentityKeys()
+	if err != nil {
+		return err
+	}
 
 	var addMap map[string]string
 	addMap = make(map[string]string)
+	idKeyMap := make(map[string]string)
 
 	var names []string
 	var addresses []string
+	var idKeyNames []string
+	var idKeyStrings []string
 
 	guiAdds := w.GetAllMyGUIAddresses()
+	guiIDKeys := w.GetAllMyGUIIdentityKeys()
 
-	// Add addresses to GUI from cli
+	// Add addresses and identity keys to GUI from cli
 	for _, fa := range faAdds {
 		_, list := w.GetGUIAddress(fa.String())
 		if list == -1 {
@@ -710,9 +719,24 @@ func (w *WalletDB) UpdateGUIDB() error {
 		addMap[ec.String()] = ec.String()
 	}
 
+	for _, k := range idKeys {
+		_, list := w.GetGUIAddress(k.String())
+		if list == -1 {
+			idKeyNames = append(idKeyNames, "ID-Imported-From-CLI")
+			idKeyStrings = append(idKeyStrings, k.String())
+		}
+		idKeyMap[k.String()] = k.String()
+	}
+
 	// Add in new guys
 	if len(names) > 0 {
 		err = w.addBatchGUIAddresses(names, addresses)
+		if err != nil {
+			return err
+		}
+	}
+	if len(idKeyNames) > 0 {
+		err = w.addBatchGUIIdentityKeys(idKeyNames, idKeyStrings)
 		if err != nil {
 			return err
 		}
@@ -722,6 +746,11 @@ func (w *WalletDB) UpdateGUIDB() error {
 	for _, guiAdd := range guiAdds {
 		if _, ok := addMap[guiAdd.Address]; !ok {
 			w.RemoveAddressFromAnyList(guiAdd.Address)
+		}
+	}
+	for _, guiIDKey := range guiIDKeys {
+		if _, ok := idKeyMap[guiIDKey.Key]; !ok {
+			w.RemoveAddressFromAnyList(guiIDKey.Key)
 		}
 	}
 
@@ -856,6 +885,51 @@ func (w *WalletDB) GenerateEntryCreditAddress(name string) (*address.AddressName
 	return anp, nil
 }
 
+func (w *WalletDB) GenerateIdentityKey(name string) (*identity.IdentityKeyNamePair, error) {
+	idKey, err := w.Wallet.GenerateIdentityKey()
+	if err != nil {
+		return nil, fmt.Errorf("There has been an error generating a new identity key, please try again.")
+	}
+
+	anp, err := w.guiWallet.AddSeededIdentityKey(name, idKey.String(), 1)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Save()
+	if err != nil {
+		return nil, err
+	}
+	return anp, nil
+}
+
+func (w *WalletDB) GetIdentityPrivateKey(key string) (secret string, err error) {
+	if !factom.IsValidAddress(key) {
+		return "", fmt.Errorf("Not a valid identity key")
+	}
+
+	if key[:factom.IDKeyPrefixLength] == "idpub" {
+		return w.getIdentityPrivateKey(key)
+	}
+
+	return "", fmt.Errorf("Not a public identity key")
+}
+
+func (w *WalletDB) getIdentityPrivateKey(key string) (secret string, err error) {
+	idKeys, err := w.Wallet.GetAllIdentityKeys()
+	if err != nil {
+		return "", err
+	}
+
+	for _, k := range idKeys {
+		if strings.Compare(k.String(), key) == 0 {
+			return k.SecString(), nil
+		}
+	}
+
+	return "", fmt.Errorf("Identity key not found")
+}
+
 func (w *WalletDB) RemoveAddress(address string, list int) (*address.AddressNamePair, error) {
 	anp, _, _ := w.guiWallet.GetAddress(address)
 
@@ -886,6 +960,36 @@ func (w *WalletDB) RemoveAddressFromAnyList(address string) (*address.AddressNam
 	return anp, nil
 }
 
+func (w *WalletDB) RemoveIdentityKey(key string, list int) (*identity.IdentityKeyNamePair, error) {
+	idKey, _, _ := w.guiWallet.GetIdentityKey(key)
+
+	_, err := w.guiWallet.RemoveIdentityKey(idKey.Key, list)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	return idKey, nil
+}
+
+func (w *WalletDB) RemoveIdentityKeyFromAnyList(key string) (*identity.IdentityKeyNamePair, error) {
+	idKey, err := w.guiWallet.RemoveIdentityKeyFromAnyList(key)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	return idKey, nil
+}
+
 func (w *WalletDB) AddExternalAddress(name string, public string) (*address.AddressNamePair, error) {
 	if !factom.IsValidAddress(public) {
 		return nil, fmt.Errorf("Not a valid public key")
@@ -897,6 +1001,19 @@ func (w *WalletDB) AddExternalAddress(name string, public string) (*address.Addr
 	}
 
 	return anp, nil
+}
+
+func (w *WalletDB) AddExternalIdentityKey(name string, public string) (*identity.IdentityKeyNamePair, error) {
+	if !factom.IsValidIdentityKey(public) {
+		return nil, fmt.Errorf("Not a valid identity public key")
+	}
+
+	idKey, err := w.addGUIIdentityKey(name, public, 2)
+	if err != nil {
+		return nil, err
+	}
+
+	return idKey, nil
 }
 
 func (w *WalletDB) ImportSeed(seed string) error {
@@ -1042,10 +1159,81 @@ func (w *WalletDB) addGUIAddress(name string, addressStr string, list int) (*add
 	return anp, nil
 }
 
+func (w *WalletDB) AddIdentityKey(name string, secret string) (*identity.IdentityKeyNamePair, error) {
+	if factom.IdentityKeyStringType(secret) != factom.IDSec {
+		return nil, fmt.Errorf("Not a valid private key")
+	}
+
+	idKey, err := factom.GetIdentityKey(secret)
+	if err != nil {
+		return nil, fmt.Errorf("There has been an error when trying to convert the secret key to an identity key pair, the secret key might not be valid.")
+	}
+
+	err = w.Wallet.InsertIdentityKey(idKey)
+	if err != nil {
+		return nil, fmt.Errorf("There has been an error trying to insert the new identity key into the wallet. Please try again.")
+	}
+
+	idKeyNP, err := w.addGUIIdentityKey(name, idKey.String(), 1)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	return idKeyNP, nil
+}
+
+// addBatchGUIIdentityKeys only adds to GUI Database
+func (w *WalletDB) addBatchGUIIdentityKeys(names []string, keys []string) error {
+	if len(names) != len(keys) {
+		return fmt.Errorf("list length does not match")
+	}
+
+	for i := 0; i < len(names); i++ {
+		if _, err := w.addGUIIdentityKey(names[i], keys[i], 1); err != nil {
+			return err
+		}
+	}
+
+	return w.Save()
+}
+
+// addGUIIdentityKey only adds to GUI database
+func (w *WalletDB) addGUIIdentityKey(name string, key string, list int) (*identity.IdentityKeyNamePair, error) {
+	if factom.IdentityKeyStringType(key) != factom.IDPub {
+		return nil, fmt.Errorf("Not a valid identity public key")
+	}
+	if list <= 0 || list > 2 {
+		return nil, fmt.Errorf("Invalid list")
+	}
+	idKey, err := w.guiWallet.AddIdentityKey(name, key, list)
+
+	if err != nil {
+		return nil, err
+	}
+	err = w.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	return idKey, nil
+}
+
 // GetGUIAddress returns address with associated name
 // List is 0 for not found, 1 for Factoid address, 2 for EC Address, 3 for External
 func (w *WalletDB) GetGUIAddress(address string) (anp *address.AddressNamePair, list int) {
 	anp, list, _ = w.guiWallet.GetAddress(address)
+	return
+}
+
+// GetGUIIdentityKey tries to find and return an IdentityKeyNamePair
+// List is 0 for not found, 1 for Identity Key, 2 for External Identity key
+func (w *WalletDB) GetGUIIdentityKey(key string) (idKey *identity.IdentityKeyNamePair, list int) {
+	idKey, list, _ = w.guiWallet.GetIdentityKey(key)
 	return
 }
 
@@ -1111,6 +1299,14 @@ func (w *WalletDB) ChangeAddressName(address string, toName string) error {
 	return w.Save()
 }
 
+func (w *WalletDB) ChangeIdentityKeyName(key string, toName string) error {
+	err := w.guiWallet.ChangeIdentityKeyName(key, toName)
+	if err != nil {
+		return err
+	}
+	return w.Save()
+}
+
 func (w *WalletDB) GetTotalGUIAddresses() uint64 {
 	return w.guiWallet.GetTotalAddressCount()
 }
@@ -1125,6 +1321,18 @@ func (w *WalletDB) GetAllMyGUIAddresses() []address.AddressNamePair {
 
 func (w *WalletDB) IsValidAddress(address string) bool {
 	return factom.IsValidAddress(address)
+}
+
+func (w *WalletDB) GetTotalGUIIdentityKeys() uint64 {
+	return w.guiWallet.GetTotalIdentityKeyCount()
+}
+
+func (w *WalletDB) GetAllGUIIdentityKeys() []identity.IdentityKeyNamePair {
+	return w.guiWallet.GetAllIdentityKeys()
+}
+
+func (w *WalletDB) GetAllMyGUIIdentityKeys() []identity.IdentityKeyNamePair {
+	return w.guiWallet.GetAllMyGUIIdentityKeys()
 }
 
 func (w *WalletDB) GetECBalance() int64 {

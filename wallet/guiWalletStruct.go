@@ -3,6 +3,7 @@ package wallet
 import (
 	"bytes"
 	"fmt"
+	"github.com/FactomProject/enterprise-wallet/identity"
 	"strings"
 	"sync"
 
@@ -15,6 +16,8 @@ type WalletStruct struct {
 	FactoidAddresses     *address.AddressList
 	EntryCreditAddresses *address.AddressList
 	ExternalAddresses    *address.AddressList
+	IdentityKeys         *identity.IdentityKeyList
+	ExternalIdentityKeys *identity.IdentityKeyList
 
 	// Not marshaled into database
 	FactoidTotal int64
@@ -28,6 +31,8 @@ func NewWallet() *WalletStruct {
 	w.FactoidAddresses = address.NewAddressList()
 	w.EntryCreditAddresses = address.NewAddressList()
 	w.ExternalAddresses = address.NewAddressList()
+	w.IdentityKeys = identity.NewIdentityKeyList()
+	w.ExternalIdentityKeys = identity.NewIdentityKeyList()
 
 	return w
 }
@@ -52,6 +57,25 @@ func (w *WalletStruct) AddAddress(name string, address string, list int) (*addre
 	return nil, fmt.Errorf("Encountered an error, this should not be able to happen")
 }
 
+
+func (w *WalletStruct) AddIdentityKey(name string, key string, list int) (*identity.IdentityKeyNamePair, error) {
+	if err := w.addIdentityKey(name, key, list); err != nil {
+		return nil, err
+	}
+
+	w.Lock()
+	defer w.Unlock()
+
+	switch list {
+	case 1:
+		return w.IdentityKeys.Add(name, key)
+	case 2:
+		return w.ExternalIdentityKeys.Add(name, key)
+	}
+
+	return nil, fmt.Errorf("encountered an error, this should not be able to happen")
+}
+
 func (w *WalletStruct) AddSeededAddress(name string, address string, list int) (*address.AddressNamePair, error) {
 	if err := w.addAddress(name, address, list); err != nil {
 		return nil, err
@@ -70,6 +94,24 @@ func (w *WalletStruct) AddSeededAddress(name string, address string, list int) (
 	}
 
 	return nil, fmt.Errorf("Encountered an error, this should not be able to happen")
+}
+
+func (w *WalletStruct) AddSeededIdentityKey(name string, key string, list int) (*identity.IdentityKeyNamePair, error) {
+	if err := w.addAddress(name, key, list); err != nil {
+		return nil, err
+	}
+
+	w.Lock()
+	defer w.Unlock()
+
+	switch list {
+	case 1:
+		return w.IdentityKeys.AddSeeded(name, key)
+	case 2:
+		return w.ExternalIdentityKeys.Add(name, key) // You can't do this, but will not hurt
+	}
+
+	return nil, fmt.Errorf("encountered an error, this should not be able to happen")
 }
 
 func (w *WalletStruct) addAddress(name string, address string, list int) error {
@@ -108,10 +150,37 @@ func (w *WalletStruct) addAddress(name string, address string, list int) error {
 	return nil
 }
 
+func (w *WalletStruct) addIdentityKey(name string, key string, list int) error {
+	if list > 2 || list <= 0 {
+		return fmt.Errorf("invalid list")
+	}
+
+	if list == 2 {
+		idKey, getList, _ := w.GetIdentityKey(key)
+		if getList != -1 {
+			return fmt.Errorf("You cannot add this identity key as it is located in your Addressbook. " +
+				"It's nickname is: " + idKey.Name)
+		}
+	}
+
+	valid := factom.IsValidIdentityKey(key)
+	if !valid {
+		return fmt.Errorf("invalid identity key")
+	}
+
+	return nil
+}
+
 func (w *WalletStruct) GetTotalAddressCount() uint64 {
 	w.RLock()
 	defer w.RUnlock()
 	return w.FactoidAddresses.Length + w.EntryCreditAddresses.Length + w.ExternalAddresses.Length
+}
+
+func (w *WalletStruct) GetTotalIdentityKeyCount() uint64 {
+	w.RLock()
+	defer w.RUnlock()
+	return w.IdentityKeys.Length + w.ExternalIdentityKeys.Length
 }
 
 // GetAddress :
@@ -141,6 +210,32 @@ func (w *WalletStruct) GetAddress(address string) (anp *address.AddressNamePair,
 	anp, index = w.ExternalAddresses.Get(address)
 	if index != -1 && anp != nil {
 		list = 3
+		return
+	}
+
+	return
+}
+
+// GetIdentityKey :
+// 		Returns:
+//			list:	-1 for not found,
+//				 	1 for IdentityKeys,
+//					2 for ExternalIdentityKeys
+func (w *WalletStruct) GetIdentityKey(key string) (idKey *identity.IdentityKeyNamePair, list int, index int) {
+	w.RLock()
+	defer w.RUnlock()
+
+	list = -1
+
+	idKey, index = w.IdentityKeys.Get(key)
+	if index != -1 && idKey != nil {
+		list = 1
+		return
+	}
+
+	idKey, index = w.ExternalIdentityKeys.Get(key)
+	if index != -1 && idKey != nil {
+		list = 2
 		return
 	}
 
@@ -182,6 +277,34 @@ func (w *WalletStruct) ChangeAddressName(address string, toName string) error {
 	return fmt.Errorf("Could not change name")
 }
 
+func (w *WalletStruct) ChangeIdentityKeyName(key string, toName string) error {
+	idKey, list, i := w.GetIdentityKey(key)
+	if list == -1 || idKey == nil || i == -1 {
+		return fmt.Errorf("Identity key not found")
+	}
+
+	w.Lock()
+	defer w.Unlock()
+	if strings.Compare(idKey.Key, key) == 0 { // To be sure
+		switch list {
+		case 1:
+			err := w.IdentityKeys.List[i].ChangeName(toName)
+			if err != nil {
+				return err
+			}
+			return nil
+		case 2:
+			err := w.ExternalIdentityKeys.List[i].ChangeName(toName)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+
+	return fmt.Errorf("Could not change name")
+}
+
 func (w *WalletStruct) GetAllAddresses() []address.AddressNamePair {
 	w.RLock()
 	defer w.RUnlock()
@@ -191,6 +314,16 @@ func (w *WalletStruct) GetAllAddresses() []address.AddressNamePair {
 	anpList = append(anpList, w.ExternalAddresses.List...)
 
 	return anpList
+}
+
+func (w *WalletStruct) GetAllIdentityKeys() []identity.IdentityKeyNamePair {
+	w.RLock()
+	defer w.RUnlock()
+	var idKeyList []identity.IdentityKeyNamePair
+	idKeyList = append(idKeyList, w.IdentityKeys.List...)
+	idKeyList = append(idKeyList, w.ExternalIdentityKeys.List...)
+
+	return idKeyList
 }
 
 func (w *WalletStruct) GetAllMyGUIAddresses() []address.AddressNamePair {
@@ -203,11 +336,19 @@ func (w *WalletStruct) GetAllMyGUIAddresses() []address.AddressNamePair {
 	return anpList
 }
 
+func (w *WalletStruct) GetAllMyGUIIdentityKeys() []identity.IdentityKeyNamePair {
+	w.RLock()
+	defer w.RUnlock()
+
+	return w.IdentityKeys.List
+}
+
 // Simply remove all seeded flags
 func (w *WalletStruct) ResetSeeded() {
 	w.Lock()
 	w.FactoidAddresses.ResetSeeded()
 	w.EntryCreditAddresses.ResetSeeded()
+	w.IdentityKeys.ResetSeeded()
 	w.Unlock()
 }
 
@@ -227,6 +368,20 @@ func (w *WalletStruct) GetAllAddressesFromList(list int) []address.AddressNamePa
 	return anpList
 }
 
+func (w *WalletStruct) GetAllIdentityKeysFromList(list int) []identity.IdentityKeyNamePair {
+	w.RLock()
+	defer w.RUnlock()
+	var idKeyList []identity.IdentityKeyNamePair
+	switch list {
+	case 1:
+		idKeyList = append(idKeyList, w.IdentityKeys.List...)
+	case 2:
+		idKeyList = append(idKeyList, w.ExternalIdentityKeys.List...)
+	}
+
+	return idKeyList
+}
+
 func (w *WalletStruct) IsSameAs(b *WalletStruct) bool {
 	w.RLock()
 	defer w.RUnlock()
@@ -238,6 +393,10 @@ func (w *WalletStruct) IsSameAs(b *WalletStruct) bool {
 	} else if !w.EntryCreditAddresses.IsSameAs(b.EntryCreditAddresses) {
 		return false
 	} else if !w.ExternalAddresses.IsSameAs(b.ExternalAddresses) {
+		return false
+	} else if !w.IdentityKeys.IsSameAs(b.IdentityKeys) {
+		return false
+	} else if !w.ExternalIdentityKeys.IsSameAs(b.ExternalIdentityKeys) {
 		return false
 	}
 	return true
@@ -266,6 +425,18 @@ func (w *WalletStruct) MarshalBinary() ([]byte, error) {
 	}
 	buf.Write(data)
 
+	data, err = w.IdentityKeys.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = w.ExternalIdentityKeys.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
 	return buf.Next(buf.Len()), nil
 }
 
@@ -282,6 +453,12 @@ func (w *WalletStruct) UnmarshalBinaryData(data []byte) (newData []byte, err err
 	if w.ExternalAddresses == nil {
 		w.ExternalAddresses = address.NewAddressList()
 	}
+	if w.IdentityKeys == nil {
+		w.IdentityKeys = identity.NewIdentityKeyList()
+	}
+	if w.ExternalIdentityKeys == nil {
+		w.ExternalIdentityKeys = identity.NewIdentityKeyList()
+	}
 
 	newData = data
 	newData, err = w.FactoidAddresses.UnmarshalBinaryData(newData)
@@ -295,6 +472,16 @@ func (w *WalletStruct) UnmarshalBinaryData(data []byte) (newData []byte, err err
 	}
 
 	newData, err = w.ExternalAddresses.UnmarshalBinaryData(newData)
+	if err != nil {
+		return
+	}
+
+	newData, err = w.IdentityKeys.UnmarshalBinaryData(newData)
+	if err != nil {
+		return
+	}
+
+	newData, err = w.ExternalIdentityKeys.UnmarshalBinaryData(newData)
 	if err != nil {
 		return
 	}
@@ -353,6 +540,46 @@ func (w *WalletStruct) RemoveAddress(address string, list int) (string, error) {
 	}
 
 	return "", fmt.Errorf("Impossible to reach.")
+}
+
+func (w *WalletStruct) RemoveIdentityKeyFromAnyList(key string) (*identity.IdentityKeyNamePair, error) {
+	idKey, list, _ := w.GetIdentityKey(key)
+	if list > 2 {
+		return nil, fmt.Errorf("invalid list, this should never happen")
+	}
+	_, err := w.RemoveIdentityKey(key, list)
+	if err != nil {
+		return nil, err
+	}
+	return idKey, nil
+}
+
+func (w *WalletStruct) RemoveIdentityKey(key string, list int) (string, error) {
+	w.Lock()
+	defer w.Unlock()
+
+	switch list {
+	case 0:
+		return "", fmt.Errorf("no identity key found")
+	case 1:
+		err := w.IdentityKeys.Remove(key)
+		if err != nil {
+			return "", err
+		}
+
+		// factom-wallet remove?
+		return key, nil
+	case 2:
+		err := w.ExternalIdentityKeys.Remove(key)
+		if err != nil {
+			return "", err
+		}
+
+		// factom-wallet remove?
+		return key, nil
+	}
+
+	return "", fmt.Errorf("impossible to reach")
 }
 
 // AddBalancesToAddresses adds balances to addresses so the GUI can display
