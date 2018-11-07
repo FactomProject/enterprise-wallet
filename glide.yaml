@@ -5,7 +5,7 @@ import:
   subpackages:
   - base58
 - package: github.com/FactomProject/factom
-  version: develop
+  version: FD-670_IdentityWalletdAPI
   subpackages:
   - wallet
   - wallet/wsapi
