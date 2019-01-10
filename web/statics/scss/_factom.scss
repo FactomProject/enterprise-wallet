@@ -790,25 +790,21 @@ header {
                         position: absolute;
                         right: 20px;
                         top: 12px;
-                        width: 0;
-                        padding: 0;
+                        width: 160px;
+                        padding: 0 12px;
+                        color: $white;
+                        font-size: 12px;
                         background: $tertiary-color;
                         border-top-left-radius: 18px;
                         border-bottom-left-radius: 18px;
                         overflow: hidden;
                         transition: ease 0.4s all;
-                        color: $tertiary-color;
-                        font-size: 0;
                         line-height: 39px;
                     }
-                    &.address:after { content: 'New Address'; }
-                    &.transaction:hover:after, &.address:hover:after {
-                        width: 160px;
-                        padding: 0 12px;
-                        color: $white;
-                        font-size: 12px;
+                    &.address:after { 
+                        content: 'New Address';
+                        width: 130px;
                     }
-                    &.address:hover:after { width: 130px; }
                 }
                 ul {
                     display: none;
