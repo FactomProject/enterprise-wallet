@@ -150,6 +150,9 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings.Encrypted = true
 	}
 
+	factomdLocation, _ = SanitizeFactomdLocation(factomdLocation)
+	MasterSettings.FactomdLocation, _ = SanitizeFactomdLocation(MasterSettings.FactomdLocation)
+
 	MasterSettings.SetFactomdLocation(factomdLocation)
 
 	MasterSettings.ControlPanelPort = controlPanelPort

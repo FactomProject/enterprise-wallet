@@ -715,6 +715,13 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		MasterSettings.CoinControl = st.Bools[2]
 		MasterSettings.ImportExport = st.Bools[3]
 
+		if loc, err := SanitizeFactomdLocation(st.FactomdLocation); err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		} else {
+			st.FactomdLocation = loc
+		}
+
 		fdChange := false
 		if len(st.FactomdLocation) > 0 && st.FactomdLocation != MasterSettings.FactomdLocation {
 			MasterSettings.FactomdLocation = st.FactomdLocation
