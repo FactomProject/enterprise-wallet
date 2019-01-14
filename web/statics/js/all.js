@@ -768,7 +768,7 @@ function MakeTransaction(sig, checkonly = false) {
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
       if (checkonly) {
-        ClearGeneralMessage()
+        HideMessages()
       } else {
         if(importexport) {
             setExportDownload(obj.Content.Json)
@@ -798,6 +798,7 @@ function setExportDownload(json) {
 }
 
 $("#send-entire-transaction").on('click', function(){
+    disableInput()
   SendTransaction()
 })
 
@@ -1113,6 +1114,8 @@ function disableInput() {
   $("#addressbook-button").prop("disabled", true)
   $("#make-entire-transaction").addClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", true)
+  $("#send-entire-transaction").addClass("disabled-input")
+  $("#send-entire-transaction").prop("disabled", true)
   $("#first-stage-buttons").slideUp(100)
   $("#import-file").addClass("disabled-input")
   $("#import-file").prop("disabled", true)
@@ -1140,6 +1143,8 @@ function enableInput() {
   $("#addressbook-button").prop("disabled", false)
   $("#make-entire-transaction").removeClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", false)
+  $("#send-entire-transaction").removeClass("disabled-input")
+  $("#send-entire-transaction").prop("disabled", false)
   $("#first-stage-buttons").slideDown(100)
 
   $("#import-file").removeClass("disabled-input")

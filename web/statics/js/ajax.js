@@ -185,11 +185,6 @@ function SetGeneralSuccess(mes) {
   $("#success-zone").slideDown(100)
 }
 
-function ClearGeneralMessage() {
-    $("#error-zone").slideUp(100)
-    $("#success-zone").slideUp(100)
-}
-
 function saveTextAsFile(text, filename) {
     var textToWrite = text
     var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' })
