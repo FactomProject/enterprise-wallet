@@ -792,13 +792,12 @@ header {
                         top: 12px;
                         width: 160px;
                         padding: 0 12px;
-                        color: $white;
+                        color: #000;
                         font-size: 12px;
                         background: $tertiary-color;
                         border-top-left-radius: 18px;
                         border-bottom-left-radius: 18px;
                         overflow: hidden;
-                        transition: ease 0.4s all;
                         line-height: 39px;
                     }
                     &.address:after { 

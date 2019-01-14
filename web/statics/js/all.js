@@ -574,9 +574,9 @@ function addNewOutputAddress(defaultAdd, defaultAmt, error, first) {
   }
 
 
-  defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '">'
+  defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount">'
   if(defaultAmt != 0) {
-     defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '" value="' + defaultAmt + '">'
+     defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount" value="' + defaultAmt + '">'
   }
 
   button = '<a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>'
@@ -621,9 +621,9 @@ function addNewInputAddress(defaultAdd, defaultAmt, error, first) {
     eClass = "input-group-error"
   }
 
-  defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">'
+  defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount">'
   if(defaultAmt != 0) {
-    defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids" value="' + defaultAmt + '">'
+    defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount" value="' + defaultAmt + '">'
   }
 
 
@@ -681,9 +681,23 @@ $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
 });
 
 
+function mockTransaction() {
+    if($("#make-entire-transaction").attr("value") == "1") {
+        if($("#sign-transaction").prop('checked')) {
+            MakeTransaction(true, true)
+        } else {
+            MakeTransaction(false, true)
+        }
+    } else {
+        MakeTransaction(true, true)
+    }
+}
+
+
 // Update Fee
-$("#all-outputs").on('change', '#output-factoid-amount', function(){
-	// Need to determine new fee
+$("#all-outputs").on('keyup', 'input[type=text]', function(){
+    // Need to determine new fee
+    mockTransaction()
 })
 
 $("#all-outputs").on('click', '#output-factoid-address-container', function(){
@@ -713,7 +727,7 @@ $("#make-entire-transaction").on('click', function(){
   }
 })
 
-function MakeTransaction(sig) {
+function MakeTransaction(sig, checkonly = false) {
   transObject = getTransactionObject(true)
 
   if(transObject == null || transObject == undefined) {
@@ -733,8 +747,10 @@ function MakeTransaction(sig) {
     obj = JSON.parse(resp)
     //console.log(obj)
     if(obj.Error == "none") {
-      disableInput()
-      ShowNewButtons()
+        if (!checkonly) {
+            disableInput()
+            ShowNewButtons()
+        }
       totalInput = obj.Content.Total / 1e8
       feeFact = obj.Content.Fee / 1e8
       
@@ -751,11 +767,15 @@ function MakeTransaction(sig) {
 
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
-      if(importexport) {
-        setExportDownload(obj.Content.Json)
-        SetGeneralSuccess('Click "Export Transaction" to download, or go back to editing it')
+      if (checkonly) {
+        ClearGeneralMessage()
       } else {
-        SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
+        if(importexport) {
+            setExportDownload(obj.Content.Json)
+            SetGeneralSuccess('Click "Export Transaction" to download, or go back to editing it')
+        } else {
+            SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
+        }
       }
     } else {
       SetGeneralError("Error: " + obj.Error)
@@ -985,34 +1005,24 @@ function LoadAddressesSendConvert(){
 
 function factoidAddressRadio(address, name){
 return '<pre>' +
-  '  <input type="radio" name="' + name + '" id="address" value="' + address.Address + 
-  '"> <span for="' + address.Address + '" id="address-name" name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
+  '  <input type="radio" name="' + name + '" id="address-'+address.Address+'" value="' + address.Address + 
+  '"> <span id="address-name" data-address="'+address.Address+'" data-name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
   '</pre><br />'
 }
 
-$('#addresses-reveal').on("mouseover", "#address-name", function(){
+$('#addresses-reveal,#fee-addresses-reveal').on("mouseover", "#address-name", function(){
   $(this).css("font-size", "90%")
-  $(this).text($(this).parent().find("#address").val());
+  $(this).text($(this).data("address"));
 })
 
-$('#addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).attr("name"));
-  $(this).css("font-size", "100%")
-})
-
-$('#fee-addresses-reveal').on("mouseover", "#address-name", function(){
-  $(this).css("font-size", "90%")
-  $(this).text($(this).parent().find("#address").val());
-})
-
-$('#fee-addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).attr("name"));
+$('#addresses-reveal,#fee-addresses-reveal').on("mouseout", "#address-name", function(){
+  $(this).text($(this).data("name"));
   $(this).css("font-size", "100%")
 })
 
 function factoidECRadio(address, type){
   return '<pre>' +
-  '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
+  '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" data-address="'+address.Address+'" data-name="' + address.Name + '">' + address.Name + '</span>' +
   '</pre> <br />'
 }
 
@@ -1026,6 +1036,7 @@ $("#addresses-reveal-button").on("click", function(){
 
   $(".single-output-" + toChange + " #output-factoid-address").val(newAddress)
   $(".single-output-" + toChange + " #output-factoid-address-container").removeClass("input-group-error")
+  mockTransaction()
 })
 
 toChange = "-1"
@@ -1058,6 +1069,7 @@ $("#fee-addresses-reveal-button").on("click", function(){
     $(".single-input-" + toChange + " #input-factoid-address").val(newAddress)
     $(".single-input-" + toChange + " #input-factoid-address-container").removeClass("input-group-error")
   }
+  mockTransaction()
 })
 
 function HideNewButtons() {
