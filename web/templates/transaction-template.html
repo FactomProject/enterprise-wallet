@@ -117,9 +117,9 @@
                 <a id="export-transaction" class="button" download="exported-transaction.txt">Export Transaction</a>
                 <a id="broadcast-transaction" class="button" style="display: none;">Broadcast Transaction</a>
             {{else}}
-                <!--<a id="send-entire-transaction" class="button">Send Transaction</a>-->
+                <a id="send-entire-transaction" class="button">Confirm</a>
             {{end}}
-                <a id="edit-transaction" class="button">Edit Transaction</a>
+                <!--<a id="edit-transaction" class="button">Edit Transaction</a>-->
             </div>
             <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
             <div id="success-zone" class="callout success text-center" style="display:none"></div>
@@ -143,7 +143,13 @@
 
         </div>
         <div class="small-10 medium-4 large-3 columns">
-            <a id="send-entire-transaction" class="button expanded">Make Transaction</a>
+            <a id="make-entire-transaction" class="button expanded">
+                {{- if eq "FCT" $abr -}}
+                    Send Factoids
+                {{- else -}}
+                    Buy Entry Credits
+                {{- end -}}
+            </a>
         </div>
         <div class="small-2 medium-1 columns">
             

@@ -150,6 +150,7 @@ $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
 
 
 function mockTransaction() {
+    HideNewButtons()
     if($("#make-entire-transaction").attr("value") == "1") {
         if($("#sign-transaction").prop('checked')) {
             MakeTransaction(true, true)
@@ -164,6 +165,10 @@ function mockTransaction() {
 
 // Update Fee
 $("#all-outputs").on('keyup', 'input[type=text]', function(){
+    // Need to determine new fee
+    mockTransaction()
+})
+$("#all-inputs").on('keyup', 'input[type=text]', function(){
     // Need to determine new fee
     mockTransaction()
 })
@@ -216,7 +221,6 @@ function MakeTransaction(sig, checkonly = false) {
     //console.log(obj)
     if(obj.Error == "none") {
         if (!checkonly) {
-            disableInput()
             ShowNewButtons()
         }
       totalInput = obj.Content.Total / 1e8
@@ -242,7 +246,7 @@ function MakeTransaction(sig, checkonly = false) {
             setExportDownload(obj.Content.Json)
             SetGeneralSuccess('Click "Export Transaction" to download, or go back to editing it')
         } else {
-            SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
+            SetGeneralSuccess('Please confirm that all the details of your transactions are correct')
         }
       }
     } else {
@@ -433,34 +437,34 @@ function LoadAddressesSendConvert(){
 
     if(obj.FactoidAddresses.List  != null) {
       obj.FactoidAddresses.List.forEach(function(address){
-        $('#fee-addresses-reveal').append(factoidAddressRadio(address, "fee-address"));
+        $('#fee-addresses-reveal ul').append(factoidAddressRadio(address, "fee-address"));
       })
     }
 
     if(PageTokenABR == "FCT") {
       if(obj.FactoidAddresses.List  != null) {
         obj.FactoidAddresses.List.forEach(function(address){
-          $('#addresses-reveal').append(factoidAddressRadio(address, "address"));
+          $('#addresses-reveal ul').append(factoidAddressRadio(address, "address"));
         })
       }
 
       if(obj.ExternalAddresses.List  != null) {
         obj.ExternalAddresses.List.forEach(function(address){
           if(address.Address.startsWith("FA")){
-            $('#addresses-reveal').append(factoidAddressRadio(address, "address"));
+            $('#addresses-reveal ul').append(factoidAddressRadio(address, "address"));
           }
         })          
       }
     } else {
       if(obj.EntryCreditAddresses.List  != null) {
         obj.EntryCreditAddresses.List.forEach(function(address){
-          $('#addresses-reveal').append(factoidECRadio(address, "address"));
+          $('#addresses-reveal ul').append(factoidAddressRadio(address, "address", true));
         })
       }
       if(obj.ExternalAddresses.List  != null) {
         obj.ExternalAddresses.List.forEach(function(address){
           if(address.Address.startsWith("EC")){
-            $('#addresses-reveal').append(factoidECRadio(address, "address"));
+            $('#addresses-reveal ul').append(factoidAddressRadio(address, "address", true));
           }
         })
       }
@@ -472,28 +476,29 @@ function LoadAddressesSendConvert(){
   }
 }
 
-function factoidAddressRadio(address, name){
-return '<pre>' +
-  '  <input type="radio" name="' + name + '" id="address-'+address.Address+'" value="' + address.Address + 
-  '"> <span id="address-name" data-address="'+address.Address+'" data-name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
-  '</pre><br />'
+function factoidAddressRadio(address, name, ec = false){
+    let tmpName
+    if (ec) {
+        tmpName = "(" + address.Balance  + " EC) " + address.Name;
+    } else {
+        tmpName = "(" + FCTNormalize(address.Balance)  + " FCT) " + address.Name;
+    }
+    
+    let tmpId = name + "-" + address.Address
+return `
+<li>
+    <input type="radio" name="${name}" id="${tmpId}" value="${address.Address}">
+    <label for="${tmpId}" data-address="${address.Address}" data-name="${tmpName}">${tmpName}</label>
+</li>`
 }
 
-$('#addresses-reveal,#fee-addresses-reveal').on("mouseover", "#address-name", function(){
-  $(this).css("font-size", "90%")
-  $(this).text($(this).data("address"));
+$('#addresses-reveal,#fee-addresses-reveal').on("mouseover", "li", function(){
+  $(this).children("label").text($(this).children("label").data("address"));
 })
 
-$('#addresses-reveal,#fee-addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).data("name"));
-  $(this).css("font-size", "100%")
+$('#addresses-reveal,#fee-addresses-reveal').on("mouseout", "li", function(){
+  $(this).children("label").text($(this).children("label").data("name"));
 })
-
-function factoidECRadio(address, type){
-  return '<pre>' +
-  '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" data-address="'+address.Address+'" data-name="' + address.Name + '">' + address.Name + '</span>' +
-  '</pre> <br />'
-}
 
 done = false
 
