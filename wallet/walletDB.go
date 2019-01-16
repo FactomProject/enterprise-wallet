@@ -25,8 +25,10 @@ import (
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factom/wallet"
 	"github.com/FactomProject/factomd/common/primitives"
+
 	// "github.com/FactomProject/factom/wallet/wsapi"
 	"encoding/json"
+
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/database/mapdb"
 	"github.com/FactomProject/go-bip39"
@@ -72,6 +74,8 @@ type WalletDB struct {
 
 	changeAddrMap     map[string]UpdateANP // Addresses that need to be moved to addrmap
 	changeAddrMapLock sync.Mutex
+
+	BalanceCache *BalanceCache
 
 	quit bool
 }
@@ -213,6 +217,8 @@ func NewWalletDB(v1Import bool, password string) (*WalletDB, error) {
 	w.changeAddrMap = make(map[string]UpdateANP)
 	w.cachedHeight = 0
 	w.ActiveCachedTransactions = w.cachedTransactions
+
+	w.BalanceCache = NewBalanceCache()
 
 	return w, nil
 }

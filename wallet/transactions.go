@@ -139,7 +139,7 @@ func (wal *WalletDB) CalculateNeededInput(toAddresses []string, toAmounts []stri
 		return 0, err
 	}
 
-	rate, err := factom.GetRate()
+	rate, err := wal.GetRate()
 	if err != nil {
 		return 0, fmt.Errorf("Could not get the rate for converting entry credits. Factomd may be down or on a different port.\n")
 	}
@@ -210,7 +210,7 @@ func (wal *WalletDB) ConstructTransactionFromValues(toAddresses []string, toAmou
 		return trans, nil, err
 	}
 
-	rate, err := factom.GetRate()
+	rate, err := wal.GetRate()
 	if err != nil {
 		return trans, nil, err
 	}
@@ -401,7 +401,7 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 		return trans, nil, err
 	}
 
-	rate, err := factom.GetRate()
+	rate, err := wal.GetRate()
 	if err != nil {
 		return trans, nil, err
 	}
@@ -438,7 +438,7 @@ func (wal *WalletDB) ConstructTransaction(toAddresses []string, amounts []uint64
 
 	for _, address := range faAddresses {
 		addr := address.String()
-		balance, err := factom.GetFactoidBalance(addr)
+		balance, err := wal.GetAddressBalance(addr)
 		if err != nil {
 			return trans, nil, err
 		}
@@ -547,9 +547,34 @@ func checkForAddressForFee(list []AddressBalancePair, transStruct *factoid.Trans
 	return i, nil
 }
 
+// GetAddressBalance Return balance for an address
+// Checks the balance cache first, if nothing is found it
+// sends a request to factomd
 func (wal *WalletDB) GetAddressBalance(address string) (uint64, error) {
+	if bal, hit := wal.BalanceCache.Get(address); hit {
+		return bal, nil
+	}
 	bal, err := factom.GetFactoidBalance(address)
+	if err == nil {
+		wal.BalanceCache.Set(address, uint64(bal))
+	}
 	return uint64(bal), err
+}
+
+// GetRate Return current EC rate,
+// Cached for 60 seconds
+func (wal *WalletDB) GetRate() (uint64, error) {
+	if rate, hit := wal.BalanceCache.Get("rate"); hit {
+		return rate, nil
+	}
+
+	rate, err := factom.GetRate()
+	if err != nil {
+		return 0, err
+	}
+
+	wal.BalanceCache.Set("rate", rate)
+	return rate, nil
 }
 
 type SendTransactionResp struct {

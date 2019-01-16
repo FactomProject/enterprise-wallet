@@ -666,6 +666,8 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		r.Name = name
 		w.Write(jsonResp(r))
 	case "send-transaction":
+		MasterWallet.BalanceCache.Clear()
+
 		trans := new(SendTransStruct)
 
 		jsonElement := r.FormValue("json")
