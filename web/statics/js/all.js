@@ -876,9 +876,9 @@ function getTransactionObject(checkInput) {
   }
 
   if(err){
-    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "' for output and 'FCT' for input. "}
-    if(amtErr){errMessage += "Amounts should not be 0. "}
-    if(feeErr){errMessage += "Fee Address must be given. "}
+    if(faErr){errMessage += "Please enter an address for all inputs and outputs. "}
+    if(amtErr){errMessage += "Please enter the "+PageTokenABR+" amounts in all fields. "}
+    if(feeErr){errMessage += "Please enter a Fee Address."}
     SetGeneralError("Error(s): " + errMessage)
     return null
   }
@@ -1025,11 +1025,11 @@ return `
 }
 
 $('#addresses-reveal,#fee-addresses-reveal').on("mouseover", "li", function(){
-  $(this).children("label").text($(this).children("label").data("address"));
+  $(this).children("label").text($(this).children("label").data("address"))
 })
 
 $('#addresses-reveal,#fee-addresses-reveal').on("mouseout", "li", function(){
-  $(this).children("label").text($(this).children("label").data("name"));
+  $(this).children("label").text($(this).children("label").data("name"))
 })
 
 done = false
