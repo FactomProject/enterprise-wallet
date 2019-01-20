@@ -9,7 +9,7 @@
 {{template "templateTop" $info}}
 <div id="guts">
     <h1>Advanced Features</h1>
-    <form>
+    <form id="settings-form">
         <div id="error-zone" class="callout alert text-center" style="display:none;">An error has occured</div>
         <div id="success-zone" class="callout success text-center" {{if .Success}} {{else}} style="display:none" {{end}}>Settings Saved</div>
         <div class="row">
@@ -26,17 +26,29 @@
                     <br>
                     <input type="checkbox" id="darkTheme" name="darkThme" value="true" {{if .Settings.DarkTheme}} checked{{end}}>
                     <label for="darkTheme">Enable dark theme</label>
-                    <br>
-                    <input type="checkbox" id="customFactomd" name="customFactomd" value="true" {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} {{else}} checked {{end}}>
-                    <label for="customFactomd">Custom Factomd Location</label>
+ 
                 </p>
-                <div id="factomd-location-container" class='row factomdInput {{if compareStrings .Settings.FactomdLocation "localhost:8088"}} hide {{end}}''>
-                    <div class="small-12 medium-8 columns">
-                        <pre><input id="factomd-location" type="text" class="input-group-field" maxlength="100" value="{{.Settings.FactomdLocation}}"></pre>
-                    </div>
-                </div>
             </div>
         </div>
+        <h1>Sync Method</h1>
+        <div class="row">
+            <div class="columns">
+                <p>
+            <input type="radio" name="factomd" value="localhost:8088" id="factomd-local" {{if eq .FactomdType 0}}checked{{end}}>
+            <label for="factomd-local">Local - Download the entire blockchain. Slowest and most don't need this option. <b>Note that you must also run factomd separately.</b></label>
+            <br>
+            <input type="radio" name="factomd" value="https://api.factomd.net" id="factomd-opennode" {{if eq .FactomdType 3}}checked{{end}}>
+            <label for="factomd-opennode">Factomd.net - A courtesy node system provided by multiple ANOs. Only downloads transactions. See <a href="https://factomd.net/" target="_blank">https://factomd.net/</a></label>
+            <br>
+            <input type="radio" name="factomd" value="https://courtesy-node.factom.com" id="factomd-courtesy" {{if eq .FactomdType 2}}checked{{end}}>
+            <label for="factomd-courtesy">A courtesy node provided by the ANO Factom Inc. Only downloads transactions.</label>
+            <br>
+            <input type="radio" name="factomd" value="custom" id="factomd-custom" {{if eq .FactomdType 1}}checked{{end}}><label for="factomd-custom" >
+                Custom: <input id="factomd-location" name="factomd-location" type="text" class="input-group-field" maxlength="100" value="{{if eq .FactomdType 1}}{{.Settings.FactomdLocation}}{{end}}"></label>
+                </p>
+            </div>
+        </div>
+
         <div class="row">
             <div class="columns">
                 <br>

@@ -414,6 +414,10 @@ header {
                         line-height: 40px;
                     }
                 }
+                div {
+                    font-size: 20px;
+                    display: inline-block;
+                }
                 i {
                     position: absolute;
                     top: 0px;
@@ -538,7 +542,7 @@ header {
                     background-repeat: no-repeat;
                     background-position: center right;
                 }
-                input[type='checkbox'] {
+                input[type='checkbox'], input[type='radio'] {
                     //margin-right: 8px;
                     display: none;
                     & + label {
@@ -1059,11 +1063,11 @@ body.darkTheme {
 					background-color: darken($dark-gray,20%);
 					&[disabled='true'] { background: darken($secondary-color, 35%); }
 				}
-                input[type='checkbox'] {
+                input[type='checkbox'], input[type='radio'] {
                     & + label {
 						&:before { background-color: darken($dark-gray,20%); }
 					}
-				}
+                }
 			}
 			main .newCTA.active ul {
 				background: #000;

@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// BalanceCache holds temporary data as a buffer
+//   ttl - the duration a value should be cached
 type BalanceCache struct {
 	ttl       time.Duration
 	mutex     *sync.RWMutex
@@ -12,6 +14,7 @@ type BalanceCache struct {
 	cacheTime map[string]time.Time
 }
 
+// NewBalanceCache create a new default cache with a ttl of 60 seconds
 func NewBalanceCache() *BalanceCache {
 	return &BalanceCache{
 		60 * time.Second,
@@ -21,6 +24,7 @@ func NewBalanceCache() *BalanceCache {
 	}
 }
 
+// Clear removes all data from the cache
 func (c *BalanceCache) Clear() {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -28,6 +32,8 @@ func (c *BalanceCache) Clear() {
 	c.cacheTime = make(map[string]time.Time)
 }
 
+// Get retrieve a value for the given key, returns false in second
+// param if key not found or expired
 func (c *BalanceCache) Get(key string) (uint64, bool) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
@@ -37,6 +43,7 @@ func (c *BalanceCache) Get(key string) (uint64, bool) {
 	return 0, false
 }
 
+// Set store a value for the given key
 func (c *BalanceCache) Set(key string, val uint64) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
