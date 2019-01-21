@@ -877,9 +877,15 @@ function getTransactionObject(checkInput) {
 
   if(err){
     if(faErr){errMessage += "Please enter an address for all inputs and outputs. "}
-    if(amtErr){errMessage += "Please enter the "+PageTokenABR+" amounts in all fields. "}
+    if(amtErr){
+        if (PageTokenABR == "FCT") {
+            errMessage += "Please enter the amount of FCT you would like to send. "
+        } else {
+            errMessage += "Please enter the amount of EC you would like to convert. "
+        }
+    }
     if(feeErr){errMessage += "Please enter a Fee Address."}
-    SetGeneralError("Error(s): " + errMessage)
+    SetGeneralError(errMessage)
     return null
   }
 
