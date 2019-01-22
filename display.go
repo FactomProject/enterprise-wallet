@@ -275,8 +275,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonError("Error occurred"))
 	case "related-transactions":
 		if on, server := MasterWallet.FactomdOnline(); !on {
-			errorMsg := fmt.Sprintf("Unable to connect to factomd instance. The wallet is at '%s' for it's factomd instance. If this is set locally "+
-				"you must download the latest factomd and run it until it is synced", server)
+			errorMsg := fmt.Sprintf("Unable to connect to the factomd instance. Make sure there is an active, fully synced factomd at %s", server)
 			w.Write(jsonError(errorMsg))
 			return
 		}

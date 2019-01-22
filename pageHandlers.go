@@ -260,7 +260,7 @@ func HandleSettings(w http.ResponseWriter, r *http.Request) error {
 	st.Settings = MasterSettings
 
 	switch MasterSettings.FactomdLocation {
-	case "localhost:8088": // the normal default
+	case "http://localhost:8088": // the normal default
 		st.FactomdType = 0
 	case "courtesy-node.factom.com":
 		fallthrough

@@ -30,12 +30,12 @@
                 </p>
             </div>
         </div>
-        <h1>Sync Method</h1>
+        <h1>Factom Protocol Node Location</h1>
         <div class="row">
             <div class="columns">
                 <p>
-            <input type="radio" name="factomd" value="localhost:8088" id="factomd-local" {{if eq .FactomdType 0}}checked{{end}}>
-            <label for="factomd-local">Local - Download the entire blockchain. Slowest and most don't need this option. <b>Note that you must also run factomd separately.</b></label>
+            <input type="radio" name="factomd" value="http://localhost:8088" id="factomd-local" {{if eq .FactomdType 0}}checked{{end}}>
+            <label for="factomd-local">Local - Download the entire blockchain and run your own node. Slowest and most don't need this option. <b>Note that you must also run factomd separately.</b></label>
             <br>
             <input type="radio" name="factomd" value="https://api.factomd.net" id="factomd-opennode" {{if eq .FactomdType 3}}checked{{end}}>
             <label for="factomd-opennode">Factomd.net - A courtesy node system provided by multiple ANOs. Only downloads transactions. See <a href="https://factomd.net/" target="_blank">https://factomd.net/</a></label>
@@ -44,7 +44,7 @@
             <label for="factomd-courtesy">A courtesy node provided by the ANO Factom Inc. Only downloads transactions.</label>
             <br>
             <input type="radio" name="factomd" value="custom" id="factomd-custom" {{if eq .FactomdType 1}}checked{{end}}><label for="factomd-custom" >
-                Custom: <input id="factomd-location" name="factomd-location" type="text" class="input-group-field" maxlength="100" value="{{if eq .FactomdType 1}}{{.Settings.FactomdLocation}}{{end}}"></label>
+                Custom: <input id="factomd-location" name="factomd-location" type="text" class="input-group-field" maxlength="100" placeholder="http://" value="{{if eq .FactomdType 1}}{{.Settings.FactomdLocation}}{{end}}"></label>
                 </p>
             </div>
         </div>
@@ -74,7 +74,7 @@
         </div>
     </form>
 
-    <div class="reveal" id="import-seed-reveal" data-reveal data-close-on-click="true" data-animation-in="fade-in" data-animation-out="fade-out">
+    <div class="reveal fast" id="import-seed-reveal" data-reveal data-close-on-click="true" data-animation-in="fade-in fast" data-animation-out="fade-out fast">
         <h1>Confirm Restore</h1>
         <form>
             <p>Clicking 'Restore Seed' will overwrite your current seed. This will make all seeded addresses unabled to be backed up, so make sure you back up your old seed before continuing.</p>
