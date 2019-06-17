@@ -29,7 +29,7 @@ func NewPlaceHolderStruct() *PlaceHolderStruct {
 	return e
 }
 
-const MAX_FACTOMDLOCATION_SIZE int = 30
+const MAX_FACTOMDLOCATION_SIZE int = 50
 
 // SettingsStruct
 // Every Handle struct must have settings
@@ -245,9 +245,9 @@ func HandleAddressBook(w http.ResponseWriter, r *http.Request) error {
 }
 
 type HandleSettingsStruct struct {
-	Settings *SettingsStruct
-
-	Success bool
+	Settings    *SettingsStruct
+	FactomdType int
+	Success     bool
 }
 
 func HandleSettings(w http.ResponseWriter, r *http.Request) error {
@@ -258,6 +258,19 @@ func HandleSettings(w http.ResponseWriter, r *http.Request) error {
 
 	st := new(HandleSettingsStruct)
 	st.Settings = MasterSettings
+
+	switch MasterSettings.FactomdLocation {
+	case "http://localhost:8088": // the normal default
+		st.FactomdType = 0
+	case "courtesy-node.factom.com":
+		fallthrough
+	case "https://courtesy-node.factom.com":
+		st.FactomdType = 2
+	case "https://api.factomd.net":
+		st.FactomdType = 3
+	default: // "custom location"
+		st.FactomdType = 1
+	}
 
 	st.Success = false
 	if suc == "true" {

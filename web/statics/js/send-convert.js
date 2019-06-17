@@ -42,9 +42,9 @@ function addNewOutputAddress(defaultAdd, defaultAmt, error, first) {
   }
 
 
-  defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '">'
+  defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount">'
   if(defaultAmt != 0) {
-     defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of ' + PageToken + '" value="' + defaultAmt + '">'
+     defAmt = '<input id="output-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount" value="' + defaultAmt + '">'
   }
 
   button = '<a id="remove-new-output" class="button expanded newMinus">&nbsp;</a>'
@@ -89,9 +89,9 @@ function addNewInputAddress(defaultAdd, defaultAmt, error, first) {
     eClass = "input-group-error"
   }
 
-  defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids">'
+  defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount">'
   if(defaultAmt != 0) {
-    defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount of factoids" value="' + defaultAmt + '">'
+    defAmt = '<input id="input-factoid-amount" type="text" class="input-group-field" name="output1-num" placeholder="Amount" value="' + defaultAmt + '">'
   }
 
 
@@ -149,9 +149,28 @@ $("#all-outputs").on("keypress", "#output-factoid-amount", function(evt) {
 });
 
 
+function mockTransaction() {
+    HideNewButtons()
+    if($("#make-entire-transaction").attr("value") == "1") {
+        if($("#sign-transaction").prop('checked')) {
+            MakeTransaction(true, true)
+        } else {
+            MakeTransaction(false, true)
+        }
+    } else {
+        MakeTransaction(true, true)
+    }
+}
+
+
 // Update Fee
-$("#all-outputs").on('change', '#output-factoid-amount', function(){
-	// Need to determine new fee
+$("#all-outputs").on('keyup', 'input[type=text]', function(){
+    // Need to determine new fee
+    mockTransaction()
+})
+$("#all-inputs").on('keyup', 'input[type=text]', function(){
+    // Need to determine new fee
+    mockTransaction()
 })
 
 $("#all-outputs").on('click', '#output-factoid-address-container', function(){
@@ -181,7 +200,7 @@ $("#make-entire-transaction").on('click', function(){
   }
 })
 
-function MakeTransaction(sig) {
+function MakeTransaction(sig, checkonly = false) {
   transObject = getTransactionObject(true)
 
   if(transObject == null || transObject == undefined) {
@@ -201,8 +220,9 @@ function MakeTransaction(sig) {
     obj = JSON.parse(resp)
     //console.log(obj)
     if(obj.Error == "none") {
-      disableInput()
-      ShowNewButtons()
+        if (!checkonly) {
+            ShowNewButtons()
+        }
       totalInput = obj.Content.Total / 1e8
       feeFact = obj.Content.Fee / 1e8
       
@@ -219,11 +239,15 @@ function MakeTransaction(sig) {
 
       $("#transaction-total").attr("value", total)
       $("#transaction-fee").attr("value", feeFact)
-      if(importexport) {
-        setExportDownload(obj.Content.Json)
-        SetGeneralSuccess('Click "Export Transaction" to download, or go back to editing it')
+      if (checkonly) {
+        HideMessages()
       } else {
-        SetGeneralSuccess('Click "Send Transaction" to send, or go back to editing it')
+        if(importexport) {
+            setExportDownload(obj.Content.Json)
+            SetGeneralSuccess('Click "Export Transaction" to download, or go back to editing it')
+        } else {
+            SetGeneralSuccess('Please confirm that all the details of your transactions are correct')
+        }
       }
     } else {
       SetGeneralError("Error: " + obj.Error)
@@ -246,6 +270,7 @@ function setExportDownload(json) {
 }
 
 $("#send-entire-transaction").on('click', function(){
+    disableInput()
   SendTransaction()
 })
 
@@ -319,10 +344,16 @@ function getTransactionObject(checkInput) {
   }
 
   if(err){
-    if(faErr){errMessage += "Addresses must start with '" + AddressPrefix + "' for output and 'FCT' for input. "}
-    if(amtErr){errMessage += "Amounts should not be 0. "}
-    if(feeErr){errMessage += "Fee Address must be given. "}
-    SetGeneralError("Error(s): " + errMessage)
+    if(faErr){errMessage += "Please enter an address for all inputs and outputs. "}
+    if(amtErr){
+        if (PageTokenABR == "FCT") {
+            errMessage += "Please enter the amount of FCT you would like to send. "
+        } else {
+            errMessage += "Please enter the amount of EC you would like to convert. "
+        }
+    }
+    if(feeErr){errMessage += "Please enter a Fee Address."}
+    SetGeneralError(errMessage)
     return null
   }
 
@@ -412,34 +443,34 @@ function LoadAddressesSendConvert(){
 
     if(obj.FactoidAddresses.List  != null) {
       obj.FactoidAddresses.List.forEach(function(address){
-        $('#fee-addresses-reveal').append(factoidAddressRadio(address, "fee-address"));
+        $('#fee-addresses-reveal ul').append(factoidAddressRadio(address, "fee-address"));
       })
     }
 
     if(PageTokenABR == "FCT") {
       if(obj.FactoidAddresses.List  != null) {
         obj.FactoidAddresses.List.forEach(function(address){
-          $('#addresses-reveal').append(factoidAddressRadio(address, "address"));
+          $('#addresses-reveal ul').append(factoidAddressRadio(address, "address"));
         })
       }
 
       if(obj.ExternalAddresses.List  != null) {
         obj.ExternalAddresses.List.forEach(function(address){
           if(address.Address.startsWith("FA")){
-            $('#addresses-reveal').append(factoidAddressRadio(address, "address"));
+            $('#addresses-reveal ul').append(factoidAddressRadio(address, "address"));
           }
         })          
       }
     } else {
       if(obj.EntryCreditAddresses.List  != null) {
         obj.EntryCreditAddresses.List.forEach(function(address){
-          $('#addresses-reveal').append(factoidECRadio(address, "address"));
+          $('#addresses-reveal ul').append(factoidAddressRadio(address, "address", true));
         })
       }
       if(obj.ExternalAddresses.List  != null) {
         obj.ExternalAddresses.List.forEach(function(address){
           if(address.Address.startsWith("EC")){
-            $('#addresses-reveal').append(factoidECRadio(address, "address"));
+            $('#addresses-reveal ul').append(factoidAddressRadio(address, "address", true));
           }
         })
       }
@@ -451,38 +482,29 @@ function LoadAddressesSendConvert(){
   }
 }
 
-function factoidAddressRadio(address, name){
-return '<pre>' +
-  '  <input type="radio" name="' + name + '" id="address" value="' + address.Address + 
-  '"> <span for="' + address.Address + '" id="address-name" name="(' + FCTNormalize(address.Balance)  + " FCT) "  + address.Name + '">(' + FCTNormalize(address.Balance)  + " FCT) " + address.Name + '</span>' +
-  '</pre><br />'
+function factoidAddressRadio(address, name, ec = false){
+    let tmpName
+    if (ec) {
+        tmpName = "(" + address.Balance  + " EC) " + address.Name;
+    } else {
+        tmpName = "(" + FCTNormalize(address.Balance)  + " FCT) " + address.Name;
+    }
+    
+    let tmpId = name + "-" + address.Address
+return `
+<li>
+    <input type="radio" name="${name}" id="${tmpId}" value="${address.Address}">
+    <label for="${tmpId}" data-address="${address.Address}" data-name="${tmpName}">${tmpName}</label>
+</li>`
 }
 
-$('#addresses-reveal').on("mouseover", "#address-name", function(){
-  $(this).css("font-size", "90%")
-  $(this).text($(this).parent().find("#address").val());
+$('#addresses-reveal,#fee-addresses-reveal').on("mouseover", "li", function(){
+  $(this).children("label").text($(this).children("label").data("address"))
 })
 
-$('#addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).attr("name"));
-  $(this).css("font-size", "100%")
+$('#addresses-reveal,#fee-addresses-reveal').on("mouseout", "li", function(){
+  $(this).children("label").text($(this).children("label").data("name"))
 })
-
-$('#fee-addresses-reveal').on("mouseover", "#address-name", function(){
-  $(this).css("font-size", "90%")
-  $(this).text($(this).parent().find("#address").val());
-})
-
-$('#fee-addresses-reveal').on("mouseout", "#address-name", function(){
-  $(this).text($(this).attr("name"));
-  $(this).css("font-size", "100%")
-})
-
-function factoidECRadio(address, type){
-  return '<pre>' +
-  '  <input type="radio" name="address" id="address" value="' + address.Address + '"> <span id="address-name" name="' + address.Name + '">' + address.Name + '</span>' +
-  '</pre> <br />'
-}
 
 done = false
 
@@ -494,6 +516,7 @@ $("#addresses-reveal-button").on("click", function(){
 
   $(".single-output-" + toChange + " #output-factoid-address").val(newAddress)
   $(".single-output-" + toChange + " #output-factoid-address-container").removeClass("input-group-error")
+  mockTransaction()
 })
 
 toChange = "-1"
@@ -526,6 +549,7 @@ $("#fee-addresses-reveal-button").on("click", function(){
     $(".single-input-" + toChange + " #input-factoid-address").val(newAddress)
     $(".single-input-" + toChange + " #input-factoid-address-container").removeClass("input-group-error")
   }
+  mockTransaction()
 })
 
 function HideNewButtons() {
@@ -569,6 +593,8 @@ function disableInput() {
   $("#addressbook-button").prop("disabled", true)
   $("#make-entire-transaction").addClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", true)
+  $("#send-entire-transaction").addClass("disabled-input")
+  $("#send-entire-transaction").prop("disabled", true)
   $("#first-stage-buttons").slideUp(100)
   $("#import-file").addClass("disabled-input")
   $("#import-file").prop("disabled", true)
@@ -596,6 +622,8 @@ function enableInput() {
   $("#addressbook-button").prop("disabled", false)
   $("#make-entire-transaction").removeClass("disabled-input")
   $("#make-entire-transaction").prop("disabled", false)
+  $("#send-entire-transaction").removeClass("disabled-input")
+  $("#send-entire-transaction").prop("disabled", false)
   $("#first-stage-buttons").slideDown(100)
 
   $("#import-file").removeClass("disabled-input")

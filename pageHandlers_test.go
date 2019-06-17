@@ -86,7 +86,7 @@ func MarshalSettingAndGetNewUnmarshaled(a *SettingsStruct) (*SettingsStruct, err
 	n := new(SettingsStruct)
 	newdata, err := n.UnmarshalBinaryData(data)
 	if err != nil {
-		return nil, fmt.Errorf("Did not unmarshal", err)
+		return nil, fmt.Errorf("Did not unmarshal %s", err.Error())
 	}
 	if len(newdata) != 0 {
 		return nil, fmt.Errorf("Did not unmarshal correctly")
