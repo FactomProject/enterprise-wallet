@@ -116,16 +116,16 @@ function checkSynced(){
     // Change progress
     switch (obj.Content.Stage) {
       case 0:
-        $("#load-message").text("Setting up...")
+        $("#load-message").text("Setting up... (1/4)")
         break;
       case 1:
-        $("#load-message").text("Gathering new transactions...")
+        $("#load-message").text("Gathering new transactions... (2/4)")
         break;
       case 2:
-        $("#load-message").text("Checking any new addresses...")
+        $("#load-message").text("Checking any new addresses... (3/4)")
         break;
       case 3:
-        $("#load-message").text("Sorting transactions...")
+        $("#load-message").text("Sorting transactions... (4/4)")
         break;
     }
 

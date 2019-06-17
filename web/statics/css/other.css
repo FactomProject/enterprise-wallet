@@ -149,3 +149,16 @@ pre {
   border-style: solid;
   border-color: white;
 }
+
+ul.address-list {
+    list-style-type: none;
+}
+ul.address-list li label {
+    font-size: 14px !important;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#factomd-location {
+    display: inline-block;
+    width: 350px;
+}

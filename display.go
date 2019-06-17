@@ -275,8 +275,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonError("Error occurred"))
 	case "related-transactions":
 		if on, server := MasterWallet.FactomdOnline(); !on {
-			errorMsg := fmt.Sprintf("Unable to connect to factomd instance. The wallet is at '%s' for it's factomd instance. If this is set locally "+
-				"you must download the latest factomd and run it until it is synced", server)
+			errorMsg := fmt.Sprintf("Unable to connect to the factomd instance. Make sure there is an active, fully synced factomd at %s", server)
 			w.Write(jsonError(errorMsg))
 			return
 		}
@@ -666,6 +665,8 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		r.Name = name
 		w.Write(jsonResp(r))
 	case "send-transaction":
+		MasterWallet.BalanceCache.Clear()
+
 		trans := new(SendTransStruct)
 
 		jsonElement := r.FormValue("json")
@@ -712,6 +713,13 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		MasterSettings.KeyExport = st.Bools[1]
 		MasterSettings.CoinControl = st.Bools[2]
 		MasterSettings.ImportExport = st.Bools[3]
+
+		if loc, err := SanitizeFactomdLocation(st.FactomdLocation); err != nil {
+			w.Write(jsonError(err.Error()))
+			return
+		} else {
+			st.FactomdLocation = loc
+		}
 
 		fdChange := false
 		if len(st.FactomdLocation) > 0 && st.FactomdLocation != MasterSettings.FactomdLocation {

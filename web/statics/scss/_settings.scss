@@ -38,6 +38,7 @@
 //  33. Title Bar
 //  34. Tooltip
 //  35. Top Bar
+//  36. Motion UI settings
 
 @import '../bower_components/foundation-sites/scss/util/util';
 
@@ -542,3 +543,11 @@ $topbar-background: $light-gray;
 $topbar-link-color: $primary-color;
 $topbar-input-width: 200px;
 
+// 36. Motion UI Settings
+// -----------
+
+$motion-ui-speeds: (
+  default: 100ms,
+  slow: 150ms,
+  fast: 50ms,
+) !default;

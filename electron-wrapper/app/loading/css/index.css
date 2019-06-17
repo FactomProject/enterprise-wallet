@@ -826,3 +826,6 @@ aside.light-theme footer .wallet-type .wallet-icon img {
 .pointer {
     cursor: pointer;
 }
+.home .logo img, .loading .logo img {
+    height: 59px;
+}
