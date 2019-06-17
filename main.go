@@ -116,6 +116,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 
 	// Start Settings
 	MasterSettings = new(SettingsStruct)
+	MasterSettings.Version = wallet.VERSION
 	data, err := MasterWallet.GUIlDB.Get([]byte("gui-wallet"), []byte("settings"), MasterSettings)
 	if err != nil || data == nil {
 		// Settings are not saved, AKA fresh start
@@ -169,6 +170,9 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		addRandomAddresses()
 	}
 	//
+
+	// We are about to launch the wallet, so that means we accepted the terms and conditions from earlier. Create that now.
+	wallet.AddAcceptTermsFile()
 
 	ServeWallet(port)
 }

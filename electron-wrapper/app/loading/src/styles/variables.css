@@ -1,0 +1,24 @@
+:root {
+    --open-sans: 'Open Sans', sans-serif;
+
+    --yellow: #EDB820;
+    --yellow-light: #F5E3AF;
+    --red: #FF6047;
+    --purple: #302c42;
+    --white: #FFF;
+    --black: #000;
+
+    --success: #50E3C2;
+
+    --border-white: 1px solid var(--white);
+    --border-black: 1px solid var(--black);
+    --border-yellow: 1px solid var(--yellow);
+    --border-red: 1px solid var(--red);
+    --border-purple-light: 1px solid #4A4857;
+    --border-gray: 1px solid color(var(--black) alpha(0.1));
+
+    --bg-gradient: linear-gradient(0deg, #1F1B2F 0%, #434058 100%);
+    --bg-gradient-light: linear-gradient(-180deg, #FBFBFB 3%, #F3F3F3 100%);
+
+    --hover-transition: 0.2s ease-in-out;
+}

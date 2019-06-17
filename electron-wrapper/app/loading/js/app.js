@@ -1,7 +1,8 @@
 const ipc = require('electron').ipcRenderer
 
+
 const {shell} = require('electron')
-function openBlog(link) {
+function openExternal(link) {
 	shell.openExternal(link)
 }
 
@@ -28,11 +29,14 @@ function clearError() {
 function updateCheckbox() {
 	var c = document.getElementById('checkbox');
 	if(c.checked) {
-		document.getElementById("proceed-button").disabled = false;
+		$("#proceed-button").removeAttr('disabled');
+		$("#proceed-button").removeClass("disabled")
 	} else {
-		document.getElementById("proceed-button").disabled = true;
+		$("#proceed-button").addClass("disabled")
+		$("#proceed-button").attr('disabled','disabled');
 	}
 }
+
 
 function checkValidPassword(pass) {
 	if(pass.length < 8) {
@@ -41,3 +45,10 @@ function checkValidPassword(pass) {
 	}
 	return true
 }
+
+$("#termsbox").bind('scroll', function() {
+	if($("#termsbox").scrollTop() + $("#termsbox").innerHeight() >= .95 * $("#termsbox").prop('scrollHeight')) {
+		// Toggle class to show proceed
+		$(".toggle-scrolled").addClass("scrolled")
+	}
+});

@@ -13,12 +13,14 @@ package wallet
  */
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/user"
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/FactomProject/enterprise-wallet/address"
 	"github.com/FactomProject/enterprise-wallet/wallet/database"
@@ -1146,6 +1148,57 @@ func (w *WalletDB) FactomdOnline() (bool, string) {
 	} else {
 		return true, factom.FactomdServer()
 	}
+}
+
+type TermsAccept struct {
+	Accepted bool   `json:"accepted"`
+	Date     string `json:"date"`
+	Version  string `json:"version"`
+}
+
+func AddAcceptTermsFile() {
+	created := false
+	path := GetHomeDir() + "/.factom/wallet/.agree"
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		// File exists, check if it has version
+		file, err := os.Open(path)
+		if err != nil {
+			return // This shouldn't happen, as the file exists
+		}
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			// Look for this version already added
+			line := scanner.Text()
+			var lineTA TermsAccept
+			err := json.Unmarshal([]byte(line), &lineTA)
+			if err == nil && lineTA.Version == VERSION {
+				file.Close()
+				return // Version already added
+			}
+		}
+		file.Close()
+	} else {
+		created = true
+
+	}
+
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	t := TermsAccept{true, time.Now().Format("2006/01/02"), VERSION}
+
+	prefix := ""
+	if !created {
+		prefix = ",\n"
+	}
+
+	d, _ := json.Marshal(t)
+	f.WriteString(fmt.Sprintf("%s%s", prefix, string(d)))
+	f.Close()
 }
 
 func GetHomeDir() string {
