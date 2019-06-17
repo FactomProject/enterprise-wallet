@@ -376,7 +376,7 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 			err = json.Unmarshal(data, respR)
 			if err != nil || respR.Error != "none" {
 
-				t.Errorf("Error occured making transaction, %s", respR)
+				t.Errorf("Error occured making transaction, %v", respR)
 			} else {
 				// lets send it
 				data, _ = handlePostRequestHelper("send-transaction", jsonToSend)
@@ -419,7 +419,7 @@ func TestSendEntryCreditsTransaction(t *testing.T) {
 	}
 
 	if fail {
-		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %f, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
+		t.Errorf("ECBuy: Tried %d times -- Balance is incorrect. Balance found is: %d, it should be %d\n CurrAmt: %d, TotalAdded: %d", trys, respA.Content.Balance, totalSent+currAmt, currAmt, totalSent)
 	}
 }
 
@@ -487,7 +487,7 @@ func TestConstructTransaction(t *testing.T) {
 			data, _ = handlePostRequestHelper("make-transaction", jsonToSend)
 			err = json.Unmarshal(data, respR)
 			if err != nil || respR.Error != "none" {
-				t.Errorf("Error occured making transaction, %s", respR)
+				t.Errorf("Error occured making transaction, %v", respR)
 			} else {
 				if sts.TransType == "nosig" {
 					continue
