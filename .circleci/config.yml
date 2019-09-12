@@ -1,11 +1,19 @@
 version: 2
 
 jobs:
+  mac-deploy:
+    macos:
+    steps:
+      - checkout
+      - run:
+          name: Install GoLang
+          command: brew install go
+
 
   build:
     working_directory: /go/src/github.com/FactomProject/enterprise-wallet
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.12.1
 
     steps:
       - checkout
@@ -274,6 +282,10 @@ workflows:
   version: 2
   build:
     jobs:
+      - mac-deploy:
+          filters:
+            tags:
+              only: /.*/
       - build:
           filters:
             tags:
