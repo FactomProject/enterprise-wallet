@@ -1,22 +1,22 @@
 language: go
 go:
-        - 1.x
+  - 1.x
 os:
-        - osx
+  - osx
 
 before_install:
-        - brew update
-        - brew install node
-        - go get github.com/FactomProject/staticfiles
-        - curl https://glide.sh/get | sh
-        - brew cask install java
+  - brew update
+  - brew install node
+  - go get github.com/FactomProject/staticfiles
+  - curl https://glide.sh/get | sh
+  - brew cask install java
 install:
-        - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
-        - bash make.sh
-        - cd electron-wrapper/app
-        - npm install
-        - cd ..
-        - npm install
-        - npm run dist:mac
+  - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
+  - bash make.sh
+  - cd electron-wrapper/app
+  - npm install
+  - cd ..
+  - npm install
+  - npm run dist:mac
 script:
-        - ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist
+  - ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist
