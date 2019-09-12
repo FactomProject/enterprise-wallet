@@ -273,10 +273,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - mac-deploy:
-          filters:
-            tags:
-              only: /.*/
       - build:
           filters:
             tags:
