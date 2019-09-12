@@ -1,16 +1,6 @@
 version: 2
 
 jobs:
-  mac-deploy:
-    macos:
-      xcode: "11.0.0"
-    steps:
-      - checkout
-      - run:
-          name: Install GoLang
-          command: brew install go
-
-
   build:
     working_directory: /go/src/github.com/FactomProject/enterprise-wallet
     docker:

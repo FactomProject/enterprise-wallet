@@ -1,19 +1,22 @@
 language: go
 go:
-        - 1.7.4
+        - 1.x
+os:
+        - osx
+
 before_install:
-        - go get github.com/mattn/goveralls
-        - go get -d github.com/FactomProject/factomd
+        - brew update
+        - brew install node
+        - go get github.com/FactomProject/staticfiles
+        - curl https://glide.sh/get | sh
+        - brew cask install java
 install:
-        - go get -v github.com/Masterminds/glide
-        - cd $GOPATH/src/github.com/Masterminds/glide && git checkout tags/v0.12.3 && go install && cd -
-        - glide install
+        - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
+        - bash make.sh
+        - cd electron-wrapper/app
+        - npm install
+        - cd ..
+        - npm install
+        - npm run dist:mac
 script:
-        - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
-        - glide install
-        - go build -v
-        - cd $GOPATH/src/github.com/FactomProject/factomd && git checkout develop && glide install
-        - go build -v
-        - nohup ./factomd -network=LOCAL -db=Map -blktime=1 &
-        - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
-        - $GOPATH/bin/goveralls -service=travis-ci -ignore=$(paste -sd, .coverignore)
+        - ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist
