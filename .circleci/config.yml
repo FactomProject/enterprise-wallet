@@ -3,6 +3,7 @@ version: 2
 jobs:
   mac-deploy:
     macos:
+      xcode: "11.0.0"
     steps:
       - checkout
       - run:
