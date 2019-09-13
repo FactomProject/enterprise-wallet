@@ -1,31 +1,50 @@
 language: go
 go:
-- 1.x
+  - 1.x
 os:
-- osx
+  - osx
+  - linux
 osx_image: xcode8
 before_install:
-- brew update
-- go get github.com/FactomProject/staticfiles
-- curl https://glide.sh/get | sh
-- brew cask install java
+  - if [ "$TRAVIS_OS_NAME" = "osx" ];   then  brew update ;fi
+  - go get github.com/FactomProject/staticfiles
+  - curl https://glide.sh/get | sh
+  - if [ "$TRAVIS_OS_NAME" = "osx" ];   then brew cask install java          ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository ppa:ubuntu-wine/ppa -y ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install graphviz -y ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install graphicsmagick -y ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install icnsutils -y ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install icnsutils -y ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo sudo apt-get install wine1.8 winetricks -y ; fi
+  - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet/web
+  - mkdir closure
+  - cd closure
+  - wget -O compiler.jar https://dl.google.com/closure-compiler/compiler-latest.zip
 install:
-- cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
-- glide install
-- bash make.sh
-- cd electron-wrapper/app
-- npm install
-- cd ..
-- npm install
-- export DEBUG=electron-builder
-- npm run dist:mac
+  - cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
+  - glide install
+  - bash make.sh closure
+  - cd electron-wrapper/app
+  - npm install
+  - cd ..
+  - npm install
+  - export DEBUG=electron-builder
+  - if [ "$TRAVIS_OS_NAME" = "osx" ];   then npm run dist:mac ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then npm run dist:win ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then npm run dist:linux:deb ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then npm run dist:linux:zip ; fi
 script:
-- ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/mac
+  - ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/
 deploy:
   provider: releases
   api_key:
     secure: bx/jcalkNDA/g/eQEpPg+cyswXT29hZABMrnYUQUTKEjvoA7HBlU1Iox6HVJ5V6gRuQmDUDO/04duXeWej4LVIkTjf4aNK07TWsSJVE/PNJD5OFSFc4rGost0i8L95au0EyAz4L0j7ZyZ4JGUYa5xXFfBIjqbMfZid/0ax2HFrGvrQWB1TPvz93ps3PffjR78NGifYj+YLZzG+qwF0ODCtd0TN2QsUKZa108bscSPI0K8wqoSIdQZvOfCBfxXD7dGIwQyj3qMpAoLazdvK/Aemn/4Wzhr9qF20pHjzWyOnhn9+L/Fv06arns42/xop6aaL8yeMbFO9ymCqUPgFS5IwjGAD1sLNZpLnqyJTHewjLLErc1wnOOokomNiZwoo1uDpyGqUD/9jb2lYF2I/QhCR6XRhT+FqeRbwoIKTygoF2wvs5Ro3Kq2k513SV415zvNxJUPI8BXM6I6cQEJvM32dtpEvA5dLAVUsi0/AX1KnGWL8P4BAQopD1Tpbx/ttqh9wzS4ekjqHZD2Bi/Ym+hnx+C2+UwLVuQEFAhQsRdaGJlahrOovRLd4vGqmkMIEKp8Km5xmlbv+P3nJBsOq5/SmzNdPGAusYw7lFil/QPmOII0wgwk0hMwUqRKZptIIs5N+SQuWnOjPZvn1Dl61YAktx0bp6n/9hdGJsshrNdAMk=
-  file: "$GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/mac/Enterprise\ Wallet-0.2.0.dmg"
+  file:
+    - "$GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/mac/Enterprise\ Wallet-0.2.0.dmg"
+    - "$GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/enterprisewallet_0.3.1_amd64.deb"
+    - "$GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/enterprisewallet-0.3.1.zip"
+    - "$GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/Enterprise\ Wallet\ Setup 0.3.1.exe"
   on:
     tags: true
   skip_cleanup: true
