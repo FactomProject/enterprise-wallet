@@ -36,7 +36,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then npm run dist:linux:zip ; fi
 script:
   - ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/mac ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/mac ; fi
 deploy:
   provider: releases
   skip_cleanup: true
