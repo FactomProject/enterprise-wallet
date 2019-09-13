@@ -19,7 +19,6 @@ install:
 - npm install
 - export DEBUG=electron-builder
 - npm run dist:mac
--
 script:
 - ls $GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/mac
 deploy:
