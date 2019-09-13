@@ -50,3 +50,4 @@ deploy:
     - "$GOPATH/src/github.com/FactomProject/enterprise-wallet/electron-wrapper/dist/*.exe"
   on:
     tags: true
+#   repo: FactomProject/enterprise-wallet # Switch to this from tags to always build for the last release
