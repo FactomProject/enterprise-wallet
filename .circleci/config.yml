@@ -1,11 +1,10 @@
 version: 2
 
 jobs:
-
   build:
     working_directory: /go/src/github.com/FactomProject/enterprise-wallet
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.12.1
 
     steps:
       - checkout
