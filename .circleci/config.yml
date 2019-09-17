@@ -148,7 +148,7 @@ jobs:
     working_directory: /go/src/github.com/FactomProject/enterprise-wallet
 
     docker:
-      - image: docker:17.06.0-ce-git
+      - image: factominc/elixir_python
 
     steps:
       - checkout
@@ -177,42 +177,73 @@ jobs:
             docker build -t enterprise-wallet-alpine -f Dockerfile.alpine .
             docker build -t enterprise-wallet -f Dockerfile .
 
+      # Push, depending on branch/tag
       - run:
           name: Push  master / develop to DockerHub
           command: |
+
+           # Login to DockerHub
             docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+            # If there is a tag, use it
+            if [ "$CIRCLE_TAG" != "" ]; then
+              docker tag enterprise-wallet factominc/enterprise-wallet:${CIRCLE_TAG}
+              docker push factominc/enterprise-wallet:${CIRCLE_TAG}
+              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:${CIRCLE_TAG}-alpine
+              docker push factominc/enterprise-wallet:${CIRCLE_TAG}-alpine
+            fi
 
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
 
-              # If there is a tag, use it
-              if [ "$CIRCLE_TAG" != "" ]; then
-                docker tag enterprise-wallet-alpine factominc/enterprise-wallet:${TAG}-alpine
-                docker push factominc/enterprise-wallet:${TAG}-alpine
-                docker tag enterprise-wallet factominc/enterprise-wallet:${TAG}
-                docker push factominc/enterprise-wallet:${TAG}
-              fi
-
-              # But tag it as alpine/latest anyhow
-              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:alpine
-              docker push factominc/enterprise-wallet:alpine
+              # Tag master as latest
               docker tag enterprise-wallet factominc/enterprise-wallet:latest
               docker push factominc/enterprise-wallet:latest
+              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:alpine
+              docker push factominc/enterprise-wallet:alpine
+            fi
 
-            elif [ "${CIRCLE_BRANCH}" == "develop" ]; then
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
 
-              # If there is a tag, use it
-              if [ "$CIRCLE_TAG" != "" ]; then
-                docker tag enterprise-wallet-alpine factominc/enterprise-wallet:${TAG}-alpine-develop
-                docker push factominc/enterprise-wallet:${TAG}-alpine-develop
-                docker tag enterprise-wallet factominc/enterprise-wallet:${TAG}-develop
-                docker push factominc/enterprise-wallet:${TAG}-develop
-              fi
-
-              # But tag it as alpine-develop/develop anyhow
-              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:alpine-develop
-              docker push factominc/enterprise-wallet:alpine-develop
+              # Tag develop as develop anyhow
               docker tag enterprise-wallet factominc/enterprise-wallet:develop
               docker push factominc/enterprise-wallet:develop
+              docker tag enterprise-wallet-alpine factominc/enterprise-wallet:alpine-develop
+              docker push factominc/enterprise-wallet:alpine-develop
+            fi
+
+            docker logout
+
+      - run:
+          name: Push images to AWS ECR
+          command: |
+            # Login to AWS ECR
+            login="$(aws ecr get-login  --no-include-email --region $AWS_REGION)"
+            ${login}
+
+            # If there is a tag, use it
+            if [ "$CIRCLE_TAG" != "" ]; then
+              docker tag enterprise-wallet ${AWS_REPO_BASE_URI}/enterprise-wallet:${CIRCLE_TAG}
+              docker push ${AWS_REPO_BASE_URI}/enterprise-wallet:${CIRCLE_TAG}
+              docker tag enterprise-wallet-alpine ${AWS_REPO_BASE_URI}/enterprise-wallet:${CIRCLE_TAG}-alpine
+              docker push ${AWS_REPO_BASE_URI}/enterprise-wallet:${CIRCLE_TAG}-alpine
+            fi
+
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+
+              # Tag master as latest
+              docker tag enterprise-wallet ${AWS_REPO_BASE_URI}/enterprise-wallet:latest
+              docker push ${AWS_REPO_BASE_URI}/enterprise-wallet:latest
+              docker tag enterprise-wallet-alpine ${AWS_REPO_BASE_URI}/enterprise-wallet:alpine
+              docker push ${AWS_REPO_BASE_URI}/enterprise-wallet:alpine
+            fi
+
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+
+              # Tag develop as develop anyhow
+              docker tag enterprise-wallet ${AWS_REPO_BASE_URI}/enterprise-wallet:develop
+              docker push ${AWS_REPO_BASE_URI}/enterprise-wallet:develop
+              docker tag enterprise-wallet-alpine ${AWS_REPO_BASE_URI}/enterprise-wallet:alpine-develop
+              docker push ${AWS_REPO_BASE_URI}/enterprise-wallet:alpine-develop
             fi
 
             docker logout
@@ -243,14 +274,39 @@ workflows:
   version: 2
   build:
     jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
+      - coveralls:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - test
+      - docker_build:
+          filters:
+            tags:
+              only: /.*/
+          context: org-global
+          requires:
+            - test
+
+  scheduled-workflow:
+    triggers:
+      - schedule:
+          cron: "0 5 * * *"
+          filters:
+            branches:
+              only: develop
+    jobs:
       - build
       - test:
           requires:
             - build
-      - coveralls:
-          requires:
-            - test
-      - docker_build:
-          context: org-global
-          requires:
-            - test

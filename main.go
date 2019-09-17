@@ -58,7 +58,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	cfg := util.ReadConfig(filename)
 
 	// Ports
-	factomdLocation := "courtesy-node.factom.com"
+	factomdLocation := "https://api.factomd.net"
 	if factomdLocFlag != "" {
 		factomdLocation = factomdLocFlag
 	}
@@ -133,7 +133,7 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 		MasterSettings = data.(*SettingsStruct)
 		// If we have a custom config file, or a custom flag, we will overwrite the settings.
 		// This is so we can still trump the settings in the GUI
-		if factomdLocation != "courtesy-node.factom.com" {
+		if factomdLocation != "https://api.factomd.net" {
 			MasterSettings.FactomdLocation = factomdLocation
 		}
 		// Here is the first override of the factomd location from the GUI settings.
@@ -149,6 +149,9 @@ func InitiateWalletAndWeb(guiDBStr string, walDBStr string, txDBStr string, port
 	if walletDB == wallet.ENCRYPTED {
 		MasterSettings.Encrypted = true
 	}
+
+	factomdLocation, _ = SanitizeFactomdLocation(factomdLocation)
+	MasterSettings.FactomdLocation, _ = SanitizeFactomdLocation(MasterSettings.FactomdLocation)
 
 	MasterSettings.SetFactomdLocation(factomdLocation)
 

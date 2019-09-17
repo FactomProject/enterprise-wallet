@@ -53,7 +53,7 @@ func TestGetRelatedTransaction(t *testing.T) {
 
 	_, err = TestWallet.AddAddress("Temp", Add2.Sec)
 	if err != nil {
-		t.Fatalf("Error adding address: ", err.Error())
+		t.Fatal("Error adding address: ", err.Error())
 	}
 
 	// Send 3 Transactions
@@ -273,22 +273,22 @@ func TestDBInteraction(t *testing.T) {
 
 	err = DBAddAndCountTest(wal)
 	if err != nil {
-		t.Fatalf("--2--", err.Error())
+		t.Fatal("--2--", err.Error())
 	}
 
 	err = DBAddingExternalAddress(wal)
 	if err != nil {
-		t.Fatalf("--3--", err.Error())
+		t.Fatal("--3--", err.Error())
 	}
 
 	err = ChangeAddressNameTest(wal)
 	if err != nil {
-		t.Fatalf("--4--", err.Error())
+		t.Fatal("--4--", err.Error())
 	}
 
 	err = CheckRemoveAddressTest(wal)
 	if err != nil {
-		t.Fatalf("--5--", err.Error())
+		t.Fatal("--5--", err.Error())
 	}
 
 	err = RelatedTransTest(wal)
@@ -465,25 +465,25 @@ func TestWalletMarshaling(t *testing.T) {
 	wal := NewWallet()
 	list, err := RandomAddressList(5)
 	if err != nil {
-		t.Fatalf("--6--", err.Error())
+		t.Fatal("--6--", err.Error())
 	}
 	wal.FactoidAddresses = list
 
 	list, err = RandomAddressList(5)
 	if err != nil {
-		t.Fatalf("--7--", err.Error())
+		t.Fatal("--7--", err.Error())
 	}
 	wal.EntryCreditAddresses = list
 
 	list, err = RandomAddressList(5)
 	if err != nil {
-		t.Fatalf("--8--", err.Error())
+		t.Fatal("--8--", err.Error())
 	}
 	wal.ExternalAddresses = list
 
 	data, err := wal.MarshalBinary()
 	if err != nil {
-		t.Fatalf("--9--", err.Error())
+		t.Fatal("--9--", err.Error())
 	}
 
 	wal2 := NewWallet()

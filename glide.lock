@@ -32,7 +32,7 @@ imports:
   - state/stateinit
   - wallet
 - name: github.com/FactomProject/factom
-  version: 08500616ce183ef271faa0f133bc220886061d6f
+  version: fc1c06ae7272973dd767b473b384c6221e74c7d7
   subpackages:
   - wallet
   - wallet/wsapi
@@ -67,7 +67,7 @@ imports:
 - name: github.com/FactomProject/go-bip39
   version: d1007fb78d9a7ec65314dad412973e63caf4c527
 - name: github.com/FactomProject/go-bip44
-  version: fd672f46ddc35bb381f497f7b64c9cf34f9e0703
+  version: b541a96d8da98567af7610ef96105a834e6ed46c
 - name: github.com/FactomProject/go-simplejson
   version: aabad6e819789e569bd6aabf444c935aa9ba1e44
 - name: github.com/FactomProject/go-spew

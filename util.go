@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
 
 	"encoding/json"
 )
@@ -77,4 +79,25 @@ func UnmarshalStringFromBytesData(data []byte, maxlength int) (resp string, newD
 	resp = string(newData[:end])
 	newData = newData[end+1:]
 	return
+}
+
+// SanitizeFactomdLocation sanitizes user input for the factdom endpoint
+// Accepts any string and attempts to parse scheme, host, port, and path
+// returns a well-formated URL of scheme://host[:port][/path], removing
+// any trailing slash
+func SanitizeFactomdLocation(input string) (string, error) {
+	if strings.Index(input, "://") == -1 {
+		input = "http://" + input
+	}
+
+	parsed, err := url.Parse(input)
+	if err != nil {
+		return "", err
+	}
+
+	if len(parsed.Path) > 0 && parsed.Path[len(parsed.Path)-1:] == "/" {
+		parsed.Path = parsed.Path[0 : len(parsed.Path)-1]
+	}
+
+	return fmt.Sprintf("%s://%s%s", parsed.Scheme, parsed.Host, parsed.Path), nil
 }

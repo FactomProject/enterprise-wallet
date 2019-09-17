@@ -76,3 +76,39 @@ func TestMarshal(t *testing.T) {
 	}
 
 }
+
+func TestSanitizeFactomdLocation(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"Normal", args{"http://courtesy-node.factom.com/"}, "http://courtesy-node.factom.com", false},
+		{"SSL", args{"https://courtesy-node.factom.com/"}, "https://courtesy-node.factom.com", false},
+		{"IP", args{"127.0.0.1"}, "http://127.0.0.1", false},
+		{"IP&Port", args{"192.168.0.2:8088"}, "http://192.168.0.2:8088", false},
+		{"Localhost", args{"localhost"}, "http://localhost", false},
+		{"Localhost&Port", args{"localhost:80"}, "http://localhost:80", false},
+		{"Short", args{"courtesy-node.factom.com"}, "http://courtesy-node.factom.com", false},
+		{"With Port", args{"courtesy-node.factom.com:8088"}, "http://courtesy-node.factom.com:8088", false},
+		{"With Path", args{"courtesy-node.factom.com/subpath"}, "http://courtesy-node.factom.com/subpath", false},
+		{"With Trailing Slash", args{"courtesy-node.factom.com/subpath/"}, "http://courtesy-node.factom.com/subpath", false},
+		{"With Path & Port", args{"courtesy-node.factom.com:443/subpath"}, "http://courtesy-node.factom.com:443/subpath", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := SanitizeFactomdLocation(tt.args.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SanitizeFactomdLocation() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("SanitizeFactomdLocation() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
